@@ -14,7 +14,7 @@ export default function Header() {
 
         <Link href="/" className="flex items-center">
           <div className="w-32 h-6 pb-6 flex items-center justify-center">
-          <img src="/Logo.svg" alt="Logo" className="w-40" />
+          <img src="./logo.svg" alt="Logo" className="w-40" />
         </div>
         </Link>
 
