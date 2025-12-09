@@ -14,23 +14,23 @@ export default function Header() {
 
         <Link href="/" className="flex items-center">
           <div className="w-32 h-6 pb-6 flex items-center justify-center">
-          <img src="./logo.svg" alt="Logo" className="w-40" />
+          <img src="./Logo.svg" alt="Logo" className="w-40" />
         </div>
         </Link>
 
         <nav className="hidden md:flex items-center space-x-8">
-          <Link href="/" className="text-gray-700 hover:text-[#633B48] transition-colors">
+          <Link href="/#inicio" className="text-gray-700 hover:text-[#633B48] transition-colors">
             Início
           </Link>
-          <Link href="/" className="text-gray-700 hover:text-[#633B48] transition-colors">
+          <Link href="/#sobre" className="text-gray-700 hover:text-[#633B48] transition-colors">
             Sobre
           </Link>
-          <Link href="/" className="text-gray-700 hover:text-[#633B48] transition-colors">
+          <Link href="/#servicos" className="text-gray-700 hover:text-[#633B48] transition-colors">
             Serviços
           </Link>
-          <Link href="/" className="text-gray-700 hover:text-[#633B48] transition-colors">
+          <a href="mailto:contato@juryscan.com" className="text-gray-700 hover:text-[#633B48] transition-colors">
             Contato
-          </Link>
+          </a>
         </nav>
 
         <div className="hidden md:flex items-center space-x-4">
@@ -56,18 +56,18 @@ export default function Header() {
       {mobileMenuOpen && (
         <div className="md:hidden mt-4 pb-4 border-t border-gray-200">
           <nav className="flex flex-col space-y-4 mt-4">
-            <Link href="#" className="text-gray-700 hover:text-[#633B48] transition-colors px-4 py-2">
+            <Link href="/#inicio" className="text-gray-700 hover:text-[#633B48] transition-colors px-4 py-2">
               Início
             </Link>
-            <Link href="#" className="text-gray-700 hover:text-[#633B48] transition-colors px-4 py-2">
+            <Link href="/#sobre" className="text-gray-700 hover:text-[#633B48] transition-colors px-4 py-2">
               Sobre
             </Link>
-            <Link href="#" className="text-gray-700 hover:text-[#633B48] transition-colors px-4 py-2">
+            <Link href="/#servicos" className="text-gray-700 hover:text-[#633B48] transition-colors px-4 py-2">
               Serviços
             </Link>
-            <Link href="#" className="text-gray-700 hover:text-[#633B48] transition-colors px-4 py-2">
+            <a href="https://mail.google.com/contato@juryscan.com" className="text-gray-700 hover:text-[#633B48] transition-colors px-4 py-2 block">
               Contato
-            </Link>
+            </a>
             <div className="flex flex-col space-y-2 px-4 pt-4 border-t border-gray-200">
               <Link href="/login">
                 <Button

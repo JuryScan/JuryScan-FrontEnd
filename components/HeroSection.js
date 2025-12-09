@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Button } from "./ui/button"
 import { X } from "lucide-react"
 
@@ -8,7 +9,7 @@ export default function HeroSection() {
   const [showOverlay, setShowOverlay] = useState(true)
 
   return (
-    <section className="bg-gray-50 py-16 px-4">
+    <section id="inicio" className="bg-gray-50 py-16 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
 
@@ -22,10 +23,14 @@ export default function HeroSection() {
               jurídica.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button className="bg-[#633B48] hover:bg-[#300117] text-white px-8 py-3">Saiba +</Button>
-              <Button variant="outline" className="border-gray-300 text-gray-700 px-8 py-3 bg-transparent">
-                Sobre
-              </Button>
+              <Link href="/#servicos">
+                <Button className="bg-[#633B48] hover:bg-[#300117] text-white px-8 py-3">Saiba +</Button>
+              </Link>
+              <Link href="/#sobre">
+                <Button variant="outline" className="border-gray-300 text-gray-700 px-8 py-3 bg-transparent">
+                  Sobre
+                </Button>
+              </Link>
             </div>
           </div>
 

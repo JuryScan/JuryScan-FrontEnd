@@ -32,7 +32,7 @@ export default function ExperimentSection() {
   }
 
   return (
-    <section className="py-16 px-4 bg-gray-50">
+    <section id="servicos" className="py-16 px-4 bg-gray-50">
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-8">Experimente Agora!</h2>
 
