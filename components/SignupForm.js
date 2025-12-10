@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "./ui/button"
+import Link from "next/link";
 
 export default function SignupForm() {
   const [step, setStep] = useState(1)
@@ -178,7 +179,6 @@ export default function SignupForm() {
           </>
         )}
 
-        {/* Action buttons */}
         <div className="flex justify-between pt-4">
           <Button
             type="button"
@@ -194,9 +194,11 @@ export default function SignupForm() {
               Próximo
             </Button>
           ) : (
-            <Button type="submit" className="px-8 py-3 bg-[#633B48] hover:bg-[#300117] text-white">
-              Finalizar
-            </Button>
+          <Link href="/auditoria">
+              <Button type="submit" className="px-8 py-3 bg-[#633B48] hover:bg-[#300117] text-white">
+                Finalizar
+              </Button>
+            </Link>
           )}
         </div>
       </form>
