@@ -59,7 +59,7 @@ export default function Header() {
             <Link href="/#inicio" className="text-gray-700 hover:text-[#633B48] transition-colors px-4 py-2">
               Início
             </Link>
-            <Link href="/#sobre" className="text-gray-700 hover:text-[#633B48] transition-colors px-4 py-2">
+            <Link href="/sobre" className="text-gray-700 hover:text-[#633B48] transition-colors px-4 py-2">
               Sobre
             </Link>
             <Link href="/#servicos" className="text-gray-700 hover:text-[#633B48] transition-colors px-4 py-2">
