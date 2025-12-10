@@ -168,7 +168,7 @@ export default function ServicesPage() {
 
             <main className="flex-grow">
 
-                <section id="servicos" className="bg-white py-20 px-4 border-b border-gray-100">
+                <section className="bg-white py-20 px-4 border-b border-gray-100">
                     <div className="max-w-4xl mx-auto text-center space-y-6">
                         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
                             Tecnologia que impulsiona sua <span className="text-[#633B48]">Advocacia</span>

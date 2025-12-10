@@ -38,7 +38,7 @@ export default function SignupForm() {
     <div className="w-full max-w-md">
       <div className="flex justify-center mb-8">
         <div className="w-40 h-16 flex items-center justify-center">
-          <img src="/logo.svg" alt="Logo" className="w-40" />
+          <img src="/Logo.svg" alt="Logo" className="w-40" />
         </div>
       </div>
 

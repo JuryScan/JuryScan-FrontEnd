@@ -1,13 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "./ui/button"
-import { Link, X } from "lucide-react"
+import { X } from "lucide-react"
 
 export default function HeroSection() {
     const [showOverlay, setShowOverlay] = useState(true)
-    const router = useRouter()
 
     return (
         <section className="bg-gray-50 py-16 px-4">
@@ -24,9 +22,7 @@ export default function HeroSection() {
                             jurídica.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4">
-                            <Button className="bg-[#633B48] hover:bg-[#300117] text-white px-8 py-3" onClick={() => router.push('/servicos')}>
-                                Saiba +
-                            </Button>
+                            <Button className="bg-[#633B48] hover:bg-[#300117] text-white px-8 py-3">Sobre</Button>
                         </div>
                     </div>
 

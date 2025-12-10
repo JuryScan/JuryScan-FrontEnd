@@ -26,7 +26,7 @@ export default function ContactPage() {
 
             <main className="flex-grow">
 
-                <section id="contato" className="bg-[#633B48] py-16 px-4 text-center">
+                <section className="bg-[#633B48] py-16 px-4 text-center">
                     <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
                         Fale com a JuryScan
                     </h1>
