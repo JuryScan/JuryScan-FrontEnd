@@ -42,7 +42,9 @@ export default function LoginForm() {
           />
         </div>
 
-        <Button className="w-full bg-[#633B48] hover:bg-[#300117] text-white py-3 font-medium">Entrar</Button>
+        <Link href="/auditoria">
+          <Button className="w-full bg-[#633B48] hover:bg-[#300117] text-white py-3 font-medium">Entrar</Button>
+        </Link>
 
         <div className="flex flex-col justify-between items-center text-sm">
           <Link href="#" className="text-[#633B48] hover:text-[#300117]">
@@ -52,7 +54,6 @@ export default function LoginForm() {
             Sem conta? <span className="text-[#633B48]">criar conta</span>
           </Link>
         </div>
-
 
         <p className="text-xs text-gray-500 text-center mt-6">
           Ao clicar em "Criar conta", concordo com a{" "}
