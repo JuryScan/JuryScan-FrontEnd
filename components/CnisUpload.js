@@ -55,7 +55,6 @@ export default function CnisUpload({ onAnalyze }) {
 
     const handleAnalyzeClick = () => {
         if (file) {
-            // Envia o Mock direto para a página pai
             onAnalyze(MOCK_ANALYSIS_RESULT)
         }
     }
