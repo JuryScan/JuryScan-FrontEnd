@@ -1,0 +1,160 @@
+Index: components/HeroSection.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\"use client\"\r\n\r\nimport { useState } from \"react\"\r\nimport { Button } from \"./ui/button\"\r\nimport { X } from \"lucide-react\"\r\n\r\nexport default function HeroSection() {\r\n    const [showOverlay, setShowOverlay] = useState(true)\r\n\r\n    return (\r\n        <section className=\"bg-gray-50 py-16 px-4\">\r\n            <div className=\"max-w-7xl mx-auto\">\r\n                <div className=\"grid lg:grid-cols-2 gap-12 items-center\">\r\n\r\n<<<<<<< HEAD\r\n          <div>\r\n            <h1 className=\"text-4xl lg:text-5xl font-bold text-gray-900 mb-6 text-balance\">\r\n              Quer evitar atrasos com o INSS?\r\n            </h1>\r\n            <p className=\"text-lg text-gray-600 mb-8 leading-relaxed\">\r\n              A tecnologia da nossa plataforma auxilia na análise de processos do INSS, oferecendo insights precisos e\r\n              atualizados. Nossa ferramenta é uma solução completa para advogados que desejam otimizar sua prática\r\n              jurídica.\r\n            </p>\r\n            <div className=\"flex flex-col sm:flex-row gap-4\">\r\n              <Button className=\"bg-[#633B48] hover:bg-[#300117] text-white px-8 py-3\">Sobre</Button>\r\n=======\r\n                    <div>\r\n                        <h1 className=\"text-4xl lg:text-5xl font-bold text-gray-900 mb-6 text-balance\">\r\n                            Quer evitar atrasos com o INSS?\r\n                        </h1>\r\n                        <p className=\"text-lg text-gray-600 mb-8 leading-relaxed\">\r\n                            A tecnologia da nossa plataforma auxilia na análise de processos do INSS, oferecendo insights precisos e\r\n                            atualizados. Nossa ferramenta é uma solução completa para advogados que desejam otimizar sua prática\r\n                            jurídica.\r\n                        </p>\r\n                        <div className=\"flex flex-col sm:flex-row gap-4\">\r\n                            <Button className=\"bg-[#633B48] hover:bg-[#300117] text-white px-8 py-3\">Sobre</Button>\r\n                        </div>\r\n                    </div>\r\n\r\n                    <div className=\"relative\">\r\n                        <div className=\"bg-white rounded-lg shadow-lg overflow-hidden\">\r\n                            <img\r\n                                src=\"/HeroImage.jpg\"\r\n                                alt=\"Hero\"\r\n                                className=\"w-full h-64 sm:h-80 md:h-96 object-cover\"\r\n                            />\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n>>>>>>> c7dbb8e56b3c0bdc6e357530cd1d87cfa7611f4c\r\n            </div>\r\n        </section>\r\n    )\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/components/HeroSection.js b/components/HeroSection.js
+--- a/components/HeroSection.js	(revision 925a3c8a5a5c1e70509119604fe8b92c343c83fd)
++++ b/components/HeroSection.js	(date 1765333500416)
+@@ -12,7 +12,6 @@
+             <div className="max-w-7xl mx-auto">
+                 <div className="grid lg:grid-cols-2 gap-12 items-center">
+ 
+-<<<<<<< HEAD
+           <div>
+             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 text-balance">
+               Quer evitar atrasos com o INSS?
+@@ -24,7 +23,6 @@
+             </p>
+             <div className="flex flex-col sm:flex-row gap-4">
+               <Button className="bg-[#633B48] hover:bg-[#300117] text-white px-8 py-3">Sobre</Button>
+-=======
+                     <div>
+                         <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 text-balance">
+                             Quer evitar atrasos com o INSS?
+@@ -49,7 +47,6 @@
+                         </div>
+                     </div>
+                 </div>
+->>>>>>> c7dbb8e56b3c0bdc6e357530cd1d87cfa7611f4c
+             </div>
+         </section>
+     )
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"efa35ad9-b82e-41e3-aeba-8b095c3cbcff\" name=\"Changes\" comment=\"\">\r\n      <change afterPath=\"$PROJECT_DIR$/.idea/.gitignore\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/.idea/JuryScan-FrontEnd.iml\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/.idea/modules.xml\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/.idea/vcs.xml\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\r\n      <map>\r\n        <entry key=\"$PROJECT_DIR$\" value=\"main\" />\r\n      </map>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\"><![CDATA[{\r\n  \"lastFilter\": {\r\n    \"state\": \"OPEN\",\r\n    \"assignee\": \"Elyyihz\"\r\n  }\r\n}]]></component>\r\n  <component name=\"GithubPullRequestsUISettings\"><![CDATA[{\r\n  \"selectedUrlAndAccountId\": {\r\n    \"url\": \"https://github.com/JuryScan/JuryScan-FrontEnd.git\",\r\n    \"accountId\": \"8bad1294-d1d1-4182-8970-2d9a2ca3b281\"\r\n  }\r\n}]]></component>\r\n  <component name=\"ProjectColorInfo\"><![CDATA[{\r\n  \"associatedIndex\": 7\r\n}]]></component>\r\n  <component name=\"ProjectId\" id=\"36d9occNtxMJrRvbCTiRjvrZpch\" />\r\n  <component name=\"ProjectLevelVcsManager\">\r\n    <ConfirmationsSetting value=\"1\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"ASKED_SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\r\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252\": \"true\",\r\n    \"RunOnceActivity.git.unshallow\": \"true\",\r\n    \"RunOnceActivity.typescript.service.memoryLimit.init\": \"true\",\r\n    \"com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1\": \"true\",\r\n    \"git-widget-placeholder\": \"Merging develop\",\r\n    \"javascript.preferred.runtime.type.id\": \"node\",\r\n    \"js.debugger.nextJs.config.created.client\": \"true\",\r\n    \"js.debugger.nextJs.config.created.server\": \"true\",\r\n    \"junie.onboarding.icon.badge.shown\": \"true\",\r\n    \"last_opened_file_path\": \"C:/Users/elynn/Documents/JuryScan/JuryScan-FrontEnd\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"to.speed.mode.migration.done\": \"true\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RunManager\" selected=\"npm.Next.js: server-side\">\r\n    <configuration name=\"Next.js: debug client-side\" type=\"JavascriptDebugType\" uri=\"http://localhost:3000/\">\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"Next.js: server-side\" type=\"js.build_tools.npm\">\r\n      <package-json value=\"$PROJECT_DIR$/package.json\" />\r\n      <command value=\"run\" />\r\n      <scripts>\r\n        <script value=\"dev\" />\r\n      </scripts>\r\n      <node-interpreter value=\"project\" />\r\n      <envs />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-js-predefined-d6986cc7102b-c7e53b3be11b-JavaScript-WS-253.28294.332\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"efa35ad9-b82e-41e3-aeba-8b095c3cbcff\" name=\"Changes\" comment=\"\" />\r\n      <created>1765325757158</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1765325757158</updated>\r\n      <workItem from=\"1765325758439\" duration=\"7309000\" />\r\n    </task>\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n</project>
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 925a3c8a5a5c1e70509119604fe8b92c343c83fd)
++++ b/.idea/workspace.xml	(date 1765401415982)
+@@ -4,12 +4,7 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="efa35ad9-b82e-41e3-aeba-8b095c3cbcff" name="Changes" comment="">
+-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/.idea/JuryScan-FrontEnd.iml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+-    </list>
++    <list default="true" id="efa35ad9-b82e-41e3-aeba-8b095c3cbcff" name="Changes" comment="" />
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+@@ -18,26 +13,26 @@
+   <component name="Git.Settings">
+     <option name="RECENT_BRANCH_BY_REPOSITORY">
+       <map>
+-        <entry key="$PROJECT_DIR$" value="main" />
++        <entry key="$PROJECT_DIR$" value="develop" />
+       </map>
+     </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+-  "lastFilter": {
+-    "state": "OPEN",
+-    "assignee": "Elyyihz"
++  <component name="GitHubPullRequestSearchHistory">{
++  &quot;lastFilter&quot;: {
++    &quot;state&quot;: &quot;OPEN&quot;,
++    &quot;assignee&quot;: &quot;Elyyihz&quot;
+   }
+-}]]></component>
+-  <component name="GithubPullRequestsUISettings"><![CDATA[{
+-  "selectedUrlAndAccountId": {
+-    "url": "https://github.com/JuryScan/JuryScan-FrontEnd.git",
+-    "accountId": "8bad1294-d1d1-4182-8970-2d9a2ca3b281"
++}</component>
++  <component name="GithubPullRequestsUISettings">{
++  &quot;selectedUrlAndAccountId&quot;: {
++    &quot;url&quot;: &quot;https://github.com/JuryScan/JuryScan-FrontEnd.git&quot;,
++    &quot;accountId&quot;: &quot;8bad1294-d1d1-4182-8970-2d9a2ca3b281&quot;
+   }
+-}]]></component>
+-  <component name="ProjectColorInfo"><![CDATA[{
+-  "associatedIndex": 7
+-}]]></component>
++}</component>
++  <component name="ProjectColorInfo">{
++  &quot;associatedIndex&quot;: 7
++}</component>
+   <component name="ProjectId" id="36d9occNtxMJrRvbCTiRjvrZpch" />
+   <component name="ProjectLevelVcsManager">
+     <ConfirmationsSetting value="1" id="Add" />
+@@ -46,30 +41,30 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+-    "ModuleVcsDetector.initialDetectionPerformed": "true",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+-    "RunOnceActivity.git.unshallow": "true",
+-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+-    "git-widget-placeholder": "Merging develop",
+-    "javascript.preferred.runtime.type.id": "node",
+-    "js.debugger.nextJs.config.created.client": "true",
+-    "js.debugger.nextJs.config.created.server": "true",
+-    "junie.onboarding.icon.badge.shown": "true",
+-    "last_opened_file_path": "C:/Users/elynn/Documents/JuryScan/JuryScan-FrontEnd",
+-    "node.js.detected.package.eslint": "true",
+-    "node.js.detected.package.tslint": "true",
+-    "node.js.selected.package.eslint": "(autodetect)",
+-    "node.js.selected.package.tslint": "(autodetect)",
+-    "nodejs_package_manager_path": "npm",
+-    "to.speed.mode.migration.done": "true",
+-    "vue.rearranger.settings.migration": "true"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
++    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
++    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
++    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
++    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
++    &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
++    &quot;js.debugger.nextJs.config.created.server&quot;: &quot;true&quot;,
++    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
++    &quot;last_opened_file_path&quot;: &quot;C:/Users/elynn/Documents/JuryScan/JuryScan-FrontEnd&quot;,
++    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
++    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
++    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
++    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
++    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="RunManager" selected="npm.Next.js: server-side">
+     <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
+       <method v="2" />
+@@ -99,7 +94,7 @@
+       <option name="number" value="Default" />
+       <option name="presentableId" value="Default" />
+       <updated>1765325757158</updated>
+-      <workItem from="1765325758439" duration="7309000" />
++      <workItem from="1765325758439" duration="7769000" />
+     </task>
+     <servers />
+   </component>
