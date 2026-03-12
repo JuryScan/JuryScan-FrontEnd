@@ -10,18 +10,18 @@ export default function Header() {
 
     return (
         <header className="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-50 shadow-sm w-full">
-            {/* O container principal agora é relative para permitir a centralização absoluta do menu */}
             <div className="max-w-7xl mx-auto flex items-center justify-between relative h-10">
 
-                {/* Bloco 1: Logo alinhada à esquerda */}
                 <div className="flex-1 flex justify-start">
-                    <Link href="/" className="flex items-center" aria-label="Ir para a página inicial">
-                        {/* Adicionado object-contain e altura ajustada para evitar achatamento */}
-                        <img src="/logo.svg" alt="JuryScan" className="h-10 w-auto object-contain" />
+                    <Link href="/" className="flex items-center shrink-0" aria-label="Ir para a página inicial">
+                        <img 
+                            src="/logo.svg" 
+                            alt="JuryScan" 
+                            className="h-8 md:h-10 w-auto object-contain shrink-0" 
+                        />
                     </Link>
                 </div>
 
-                {/* Bloco 2: Menu perfeitamente centralizado na tela (Desktop) */}
                 <nav className="hidden md:flex items-center space-x-8 absolute left-1/2 -translate-x-1/2">
                     <Link href="/" className="text-gray-700 hover:text-[#633B48] font-medium transition-colors">
                         Início
