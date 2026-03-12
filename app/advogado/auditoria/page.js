@@ -60,7 +60,6 @@ export default function AuditorPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
-            <Header />
 
             <main className="flex-grow py-8 px-4">
                 <div className="max-w-7xl mx-auto">

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "./ui/button"
 import Link from "next/link"
 
-const API_URL = "http://localhost:8001/api"
+const API_URL = "http://localhost:8081/api/v1" 
 
 export default function LoginForm() {
   const router = useRouter()
@@ -24,110 +24,86 @@ export default function LoginForm() {
 
     try {
       const payload = {
-        login: credentials.email,
+        email: credentials.email,
         password: credentials.senha
       }
 
-      const response = await fetch(`${API_URL}/auth/login`, {
+      // 1. Faz o Login na rota única
+      const loginResponse = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
 
-      if (!response.ok) {
-        throw new Error("Credenciais inválidas")
+      if (!loginResponse.ok) throw new Error("Email ou senha incorretos.")
+      
+      const loginData = await loginResponse.json()
+      if (loginData.token) localStorage.setItem("token", loginData.token)
+
+      // 2. Busca os dados do usuário para saber se é advogado ou comum
+      const meResponse = await fetch(`${API_URL}/auth/me`, {
+        method: "GET",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${loginData.token}`
+        }
+      })
+
+      if (!meResponse.ok) throw new Error("Erro ao buscar perfil.")
+      
+      const userData = await meResponse.json()
+      
+      // 3. Redireciona com base no tipo de usuário (Ajuste a propriedade conforme o retorno do seu backend)
+      // Exemplo: se o backend retornar { role: "ADVOGADO" } ou algo similar
+      const isAdvogado = userData.role === "ADVOGADO" || userData.tipo === "ADVOGADO";
+
+      if (isAdvogado) {
+        router.push("/advogado/dashboard") // Crie essa rota no Next
+      } else {
+        router.push("/cliente/dashboard") // Crie essa rota no Next
       }
-
-      const data = await response.json()
-
-      if (data.token) {
-        localStorage.setItem("token", data.token)
-      }
-
-      router.push("/auditoria")
 
     } catch (err) {
-      setError("Email ou senha incorretos.")
+      setError(err.message || "Erro de conexão.")
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-        <div className="flex justify-center mb-8">
-          <div className="w-40 h-16 flex items-center justify-center">
-            <img src="/logo.svg" alt="Logo" className="w-40" />
-          </div>
-        </div>
+    <div className="min-h-screen w-full bg-white flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-[400px] flex flex-col items-center">
+        <h1 className="text-[40px] font-bold text-[#0A1F30] mb-8">Login</h1>
 
-        <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">Login</h1>
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-        {error && <p className="text-red-500 text-center mb-4 text-sm">{error}</p>}
-
-        <form className="space-y-6" onSubmit={handleLogin}>
-          <Button
-              type="button"
-              variant="outline"
-              className="w-full py-3 border-gray-300 text-gray-700 hover:bg-gray-50 bg-transparent"
-          >
-            <span className="mr-2">G</span>
+        <form className="w-full space-y-4" onSubmit={handleLogin}>
+          
+          <button type="button" className="w-full flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-md text-[#A50064] font-semibold hover:bg-gray-50 transition-colors">
             Continuar com o Google
-          </Button>
+            <img src="/google-icon.svg" alt="" className="w-5 h-5" />
+          </button>
 
-          <div className="text-center text-gray-500 text-sm">ou</div>
+          <div className="text-center text-gray-400 text-sm py-2">ou</div>
 
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">👤</span>
-            <input
-                type="email"
-                name="email"
-                value={credentials.email}
-                onChange={handleChange}
-                placeholder="E-mail"
-                required
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#633B48] focus:border-transparent"
-            />
+            <input type="email" name="email" value={credentials.email} onChange={handleChange} placeholder="E-mail" required className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-pink-300 text-gray-900" />
           </div>
 
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔒</span>
-            <input
-                type="password"
-                name="senha"
-                value={credentials.senha}
-                onChange={handleChange}
-                placeholder="Senha"
-                required
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#633B48] focus:border-transparent"
-            />
+            <input type="password" name="senha" value={credentials.senha} onChange={handleChange} placeholder="Senha" required className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-pink-300 text-gray-900" />
           </div>
 
-          <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-[#633B48] hover:bg-[#300117] text-white py-3 font-medium disabled:opacity-70"
-          >
+          <Button type="submit" disabled={isLoading} className="w-full bg-[#FFB6E1] hover:bg-[#ff9cd2] text-[#A50064] py-6 rounded-md font-bold text-lg border-none shadow-none">
             {isLoading ? "Entrando..." : "Entrar"}
           </Button>
 
-          <div className="flex flex-col justify-between items-center text-sm">
-            <Link href="#" className="text-[#633B48] hover:text-[#300117]">
-              Esqueci minha senha
-            </Link>
-            <Link href="/cadastro" className="text-gray-600 hover:text-gray-900">
-              Sem conta? <span className="text-[#633B48]">criar conta</span>
-            </Link>
+          <div className="flex justify-between items-center text-sm pt-2">
+            <Link href="#" className="text-[#A50064] hover:underline font-medium">Esqueci minha senha</Link>
+            <div className="text-gray-500">Sem conta? <Link href="/cadastro" className="text-[#A50064] font-medium hover:underline">criar conta</Link></div>
           </div>
-
-          <p className="text-xs text-gray-500 text-center mt-6">
-            Ao clicar em "Criar conta", concordo com a{" "}
-            <Link href="#" className="text-[#633B48] hover:text-[#300117]">
-              política de privacidade
-            </Link>{" "}
-            da JuryScan.
-          </p>
         </form>
       </div>
+    </div>
   )
 }
