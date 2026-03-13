@@ -47,7 +47,6 @@ export default function MarketplaceAdvogados() {
         <div className="min-h-screen bg-gray-50 p-6 md:p-12 font-sans flex flex-col items-center">
             <div className="w-full max-w-5xl">
                 
-                {/* CABEÇALHO */}
                 <div className="mb-10 text-center md:text-left">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Encontre seu Especialista</h1>
                     <p className="text-gray-600 text-lg max-w-2xl">
@@ -55,7 +54,6 @@ export default function MarketplaceAdvogados() {
                     </p>
                 </div>
 
-                {/* BARRA DE BUSCA E FILTROS */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-8 flex flex-col md:flex-row gap-4 items-center">
                     <div className="relative flex-grow w-full">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -72,12 +70,10 @@ export default function MarketplaceAdvogados() {
                     </button>
                 </div>
 
-                {/* LISTA DE ADVOGADOS */}
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {MOCK_LAWYERS.map((lawyer) => (
                         <div key={lawyer.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
                             
-                            {/* Card Header (Foto e Nome) */}
                             <div className="p-6 border-b border-gray-100 flex flex-col items-center text-center relative">
                                 {lawyer.verified && (
                                     <div className="absolute top-4 right-4 bg-green-100 text-green-700 p-1.5 rounded-full tooltip" title="Identidade Validada">
@@ -99,7 +95,6 @@ export default function MarketplaceAdvogados() {
                                 </div>
                             </div>
 
-                            {/* Card Body (Informações) */}
                             <div className="p-6 flex-grow flex flex-col gap-4">
                                 <div className="flex items-start gap-3">
                                     <Award className="w-5 h-5 text-[#633B48] flex-shrink-0 mt-0.5" />
@@ -117,7 +112,6 @@ export default function MarketplaceAdvogados() {
                                 </div>
                             </div>
 
-                            {/* Card Footer (Botão de Ação) */}
                             <div className="p-6 pt-0 mt-auto">
                                 <button className="w-full py-3 bg-white border-2 border-[#633B48] text-[#633B48] hover:bg-[#633B48] hover:text-white rounded-xl font-bold flex items-center justify-center transition-colors group">
                                     Ver Perfil
@@ -128,7 +122,6 @@ export default function MarketplaceAdvogados() {
                     ))}
                 </div>
 
-                {/* BANNER INFERIOR - SEGURANÇA */}
                 <div className="mt-12 bg-[#0A1F30] rounded-2xl p-8 text-center border border-[#14324a]">
                     <ShieldCheck className="w-12 h-12 text-[#FFB6E1] mx-auto mb-4" />
                     <h4 className="text-xl font-bold text-white mb-2">Contratação 100% Segura</h4>

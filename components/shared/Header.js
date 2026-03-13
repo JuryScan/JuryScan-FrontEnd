@@ -37,7 +37,6 @@ export default function Header() {
                     </Link>
                 </nav>
 
-                {/* Bloco 3: Botões alinhados à direita */}
                 <div className="hidden md:flex flex-1 justify-end items-center space-x-4">
                     <Link href="/login">
                         <Button variant="outline" className="border-[#633B48] text-[#633B48] hover:bg-[#FFECF1] bg-transparent font-medium">

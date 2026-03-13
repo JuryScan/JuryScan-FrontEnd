@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Upload, FileText, ShieldCheck, ArrowRight, AlertCircle, Clock, Lock, Unlock } from "lucide-react"
 
 export default function ClienteDashboardPage() {
@@ -17,7 +18,6 @@ export default function ClienteDashboardPage() {
         if (!file) return
         setIsAnalyzing(true)
         
-        // Simula o tempo de análise da IA
         setTimeout(() => {
             setIsAnalyzing(false)
             setResult(true) 
@@ -28,7 +28,6 @@ export default function ClienteDashboardPage() {
         <div className="min-h-screen bg-gray-50 p-6 md:p-12 font-sans flex flex-col items-center">
             <div className="w-full max-w-5xl">
                 
-                {/* Cabeçalho de Boas-vindas */}
                 <div className="mb-10 text-center md:text-left">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Olá! Vamos analisar seu INSS?</h1>
                     <p className="text-gray-600 text-lg">
@@ -36,10 +35,8 @@ export default function ClienteDashboardPage() {
                     </p>
                 </div>
 
-                {/* CONTAINER DAS DUAS COLUNAS COM ALTURA IGUAL (items-stretch) */}
                 <div className="grid lg:grid-cols-2 gap-8 items-stretch mb-8">
                     
-                    {/* COLUNA ESQUERDA: ÁREA DE UPLOAD */}
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 flex flex-col h-full">
                         <div className="mb-6 flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-[#FFECF1] flex items-center justify-center">
@@ -87,7 +84,6 @@ export default function ClienteDashboardPage() {
                         </div>
                     </div>
 
-                    {/* COLUNA DIREITA: RESULTADO TRADUZIDO */}
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 flex flex-col h-full">
                         {!result && !isAnalyzing && (
                             <div className="flex-grow flex flex-col items-center justify-center text-center text-gray-400 min-h-[400px]">
@@ -116,7 +112,6 @@ export default function ClienteDashboardPage() {
                                 </div>
 
                                 <div className="space-y-4 flex-grow">
-                                    {/* PREVIEW GRATUITO */}
                                     <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 relative">
                                         <div className="absolute -top-3 -right-3 bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full border border-green-200">
                                             Amostra Grátis
@@ -130,7 +125,6 @@ export default function ClienteDashboardPage() {
                                         </p>
                                     </div>
 
-                                    {/* ITEM BLOQUEADO */}
                                     <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 relative overflow-hidden">
                                         <div className="blur-sm opacity-50 select-none pointer-events-none">
                                             <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
@@ -166,14 +160,18 @@ export default function ClienteDashboardPage() {
                             </div>
                             
                             <div className="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
-                                <button className="w-full py-5 rounded-xl bg-white hover:bg-gray-100 text-[#633B48] font-bold text-lg flex items-center justify-center transition-transform hover:scale-[1.02] shadow-md">
-                                    <Unlock className="w-5 h-5 mr-2" /> 
-                                    Desbloquear Relatório (R$ 29,90)
-                                </button>
-                                
-                                <button className="w-full py-5 rounded-xl bg-[#300117] hover:bg-[#1a000c] text-white border border-[#FFECF1]/20 font-bold text-lg flex items-center justify-center transition-transform hover:scale-[1.02] shadow-md" link="/cliente/advogados">
-                                    Contratar Advogado Parceiro <ArrowRight className="ml-2 w-5 h-5" />
-                                </button>
+                                <Link href="/cliente/checkout" className="w-full">
+                                    <button className="w-full py-5 rounded-xl bg-white hover:bg-gray-100 text-[#633B48] font-bold text-lg flex items-center justify-center transition-transform hover:scale-[1.02] shadow-md">
+                                        <Unlock className="w-5 h-5 mr-2" /> 
+                                        Desbloquear Relatório (R$ 29,90)
+                                    </button>
+                                </Link>
+
+                                <Link href="/cliente/advogados" className="w-full">
+                                    <button className="w-full py-5 rounded-xl bg-[#300117] hover:bg-[#1a000c] text-white border border-[#FFECF1]/20 font-bold text-lg flex items-center justify-center transition-transform hover:scale-[1.02] shadow-md">
+                                        Contratar Advogado Parceiro <ArrowRight className="ml-2 w-5 h-5" />
+                                    </button>
+                                </Link>
                             </div>
                         </div>
                     </div>

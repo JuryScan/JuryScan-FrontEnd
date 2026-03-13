@@ -115,7 +115,6 @@ export default function SignupForm() {
         Selecione seu perfil e preencha as informações abaixo.
       </p>
 
-      {/* ABAS: CLIENTE / ADVOGADO */}
       <div className="flex bg-gray-100 p-1 rounded-lg mb-8">
         <button
           type="button"
@@ -143,7 +142,6 @@ export default function SignupForm() {
         </div>
       )}
 
-      {/* Indicadores de Passo */}
       <div className="flex justify-center space-x-4 mb-8">
         <div className={`w-8 h-8 ${step >= 1 ? "bg-[#FFB6E1] text-[#A50064]" : "bg-gray-100 text-gray-400"} rounded-full flex items-center justify-center font-bold text-sm transition-colors`}>
           {step > 1 ? "✓" : "1"}
@@ -158,7 +156,6 @@ export default function SignupForm() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         
-        {/* PASSO 1: Identificação Básica */}
         {step === 1 && (
           <>
             <div>
@@ -171,7 +168,6 @@ export default function SignupForm() {
               <label className="block text-xs text-gray-500 mb-1 ml-1">Data de Nascimento</label>
               <input type="date" name="dataNascimento" value={formData.dataNascimento} onChange={handleChange} required className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#FFB6E1] text-gray-500" />
             </div>
-            {/* OAB só aparece se for Advogado */}
             {userType === "advogado" && (
               <div>
                 <input type="text" name="numeroOab" value={formData.numeroOab} onChange={handleChange} placeholder="Número da OAB" required className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#FFB6E1] text-gray-900" />
@@ -180,7 +176,6 @@ export default function SignupForm() {
           </>
         )}
 
-        {/* PASSO 2: Contato e Perfil Profissional */}
         {step === 2 && (
           <>
             <div>
@@ -190,7 +185,6 @@ export default function SignupForm() {
               <input type="tel" name="telefone" value={formData.telefone} onChange={handleChange} placeholder="Telefone" required className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#FFB6E1] text-gray-900" />
             </div>
             
-            {/* Campos adicionais do Advogado */}
             {userType === "advogado" && (
               <>
                 <div>
@@ -204,7 +198,6 @@ export default function SignupForm() {
           </>
         )}
 
-        {/* PASSO 3: Senha */}
         {step === 3 && (
           <>
             <div>
@@ -221,7 +214,6 @@ export default function SignupForm() {
           </>
         )}
 
-        {/* Botões de Ação */}
         <div className="flex justify-between pt-4 gap-4">
           <Button type="button" onClick={handleBack} disabled={step === 1 || isLoading} variant="outline" className="flex-1 py-6 border-gray-300 text-gray-700 disabled:opacity-50">
             Voltar

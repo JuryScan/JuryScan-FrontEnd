@@ -28,7 +28,6 @@ export default function LoginForm() {
         password: credentials.senha
       }
 
-      // 1. Faz o Login na rota única
       const loginResponse = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -40,7 +39,6 @@ export default function LoginForm() {
       const loginData = await loginResponse.json()
       if (loginData.token) localStorage.setItem("token", loginData.token)
 
-      // 2. Busca os dados do usuário para saber se é advogado ou comum
       const meResponse = await fetch(`${API_URL}/auth/me`, {
         method: "GET",
         headers: { 
@@ -53,14 +51,12 @@ export default function LoginForm() {
       
       const userData = await meResponse.json()
       
-      // 3. Redireciona com base no tipo de usuário (Ajuste a propriedade conforme o retorno do seu backend)
-      // Exemplo: se o backend retornar { role: "ADVOGADO" } ou algo similar
       const isAdvogado = userData.role === "ADVOGADO" || userData.tipo === "ADVOGADO";
 
       if (isAdvogado) {
-        router.push("/advogado/dashboard") // Crie essa rota no Next
+        router.push("/advogado/dashboard")
       } else {
-        router.push("/cliente/dashboard") // Crie essa rota no Next
+        router.push("/cliente/dashboard")
       }
 
     } catch (err) {

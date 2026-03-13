@@ -123,7 +123,6 @@ export default function TestimonialsSection() {
             </button>
           </div>
 
-          {/* Pagination dots */}
           <div className="flex justify-center mt-8 space-x-2">
             {[...Array(totalPages)].map((_, index) => (
                 <button
