@@ -1,11 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import Header from "@/components/Header"
-import Footer from "@/components/Footer"
+import Footer from "@/components/shared/Footer"
 import CnisUpload from "@/components/CnisUpload"
 import AnalysisResult from "@/components/AnalysisResult"
-import { Shield } from "lucide-react"
 
 const MOCK_DATA = {
     status: "warning",
