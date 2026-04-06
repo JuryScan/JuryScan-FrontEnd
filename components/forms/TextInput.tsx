@@ -9,6 +9,7 @@ type TextInputProps = {
   placeholder?: string;
   rules?: RegisterOptions;
   type?: "text" | "password";
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const TextInput: React.FC<TextInputProps> = ({
@@ -18,6 +19,7 @@ export const TextInput: React.FC<TextInputProps> = ({
   placeholder,
   rules,
   type = "text",
+  onChange,
 }) => {
   const {
     register,
@@ -39,6 +41,7 @@ export const TextInput: React.FC<TextInputProps> = ({
           placeholder={placeholder}
           className={`input-base ${error ? "border-red-500" : ""}`}
           type={type}
+          onChange={onChange}
         />
       ) : (
         <input
@@ -47,6 +50,7 @@ export const TextInput: React.FC<TextInputProps> = ({
           placeholder={placeholder}
           className={`input-base ${error ? "border-red-500" : ""}`}
           type={type}
+          onChange={onChange}
         />
       )}
       {error && (
