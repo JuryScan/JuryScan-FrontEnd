@@ -164,8 +164,6 @@ export default function ServicesPage() {
         }
       `}</style>
 
-            <Header />
-
             <main className="flex-grow">
 
                 <section id="servicos" className="bg-white py-20 px-4 border-b border-gray-100">
