@@ -1,15 +1,21 @@
 import Link from "next/link"
+import Image from "next/image"
+import type { JSX } from "react"
 
-export default function Footer() {
+export default function Footer(): JSX.Element {
   return (
     <footer className="bg-gray-900 text-white py-12 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
-
           <div>
             <div className="flex items-center mb-6">
-              <div className="w-64 h-32 flex items-center justify-center">
-                <img src="/LogoBranca.svg" alt="Logo" className="w-64 h-64" />
+              <div className="w-64 h-32 flex items-center justify-center relative">
+                <Image
+                  src="/LogoBranca.svg"
+                  alt="Logo JuryScan"
+                  fill
+                  className="object-contain"
+                />
               </div>
             </div>
           </div>

@@ -123,3 +123,21 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .input-base {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#FFB6E1] text-gray-900 transition-all;
+  }
+
+  .checkbox-base {
+    @apply h-4 w-4 rounded border-gray-300 text-[#A50064] focus:ring-[#FFB6E1] cursor-pointer;
+  }
+
+  .radio-base {
+    @apply h-4 w-4 border-gray-300 text-[#A50064] focus:ring-[#FFB6E1] cursor-pointer;
+  }
+
+  .toggle-base {
+    @apply h-6 w-11 rounded-full bg-gray-200 checked:bg-[#A50064] transition-colors cursor-pointer appearance-none relative after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all checked:after:translate-x-full checked:after:border-white;
+  }
+}
