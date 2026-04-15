@@ -33,11 +33,10 @@ function removeCookie(name: string): void {
 }
 
 export interface UserData {
-  id?: string
-  nomeCompleto?: string
-  email?: string
-  role?: string
-  tipo?: string
+  id: string
+  nomeCompleto: string
+  email: string
+  tipoUsuario?: "COMUM" | "ADVOGADO" | "ADMIN"
   [key: string]: unknown
 }
 
@@ -102,7 +101,7 @@ export function isAuthenticated(): boolean {
 export function isAdvogado(): boolean {
   const user = getUser()
   if (!user) return false
-  return user.role === "ADVOGADO" || user.tipo === "ADVOGADO"
+  return user.tipoUsuario === "ADVOGADO"
 }
 
 /**

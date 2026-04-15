@@ -14,11 +14,10 @@ import {
   setToken,
   setUser,
   clearAuth,
-  isAuthenticated,
-  isAdvogado,
   type UserData,
 } from "@/lib/auth"
-import { post } from "@/lib/api"
+import { post, get } from "@/lib/api"
+import type { ApiResponse, LoginResponse } from "@/lib/types"
 
 interface AuthContextType {
   user: UserData | null
@@ -38,40 +37,63 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  // MOCK: Usuário fictício para desenvolvimento sem back-end
-  const [user, setUserState] = useState<UserData | null>({
-    id: "mock-123",
-    nomeCompleto: "Dr. Ana Clara (Mock)",
-    email: "ana.clara@juryscan.com.br",
-    role: "ADVOGADO",
-    tipo: "advogado",
-    cpf: "000.000.000-00",
-  })
-  const [token, setTokenState] = useState<string | null>("mock-token-secret")
-  const [isLoading, setIsLoading] = useState(false)
+  const [user, setUserState] = useState<UserData | null>(null)
+  const [token, setTokenState] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   // Inicializa o estado de autenticação ao montar o componente
   useEffect(() => {
-    // Mantém o estado mockado
+    const storedToken = getToken()
+    const storedUser = getUser()
+
+    if (storedToken && storedUser) {
+      setTokenState(storedToken)
+      setUserState(storedUser)
+    }
+    
     setIsLoading(false)
   }, [])
 
   const refreshUser = useCallback(async () => {
-    // No-op em mock
+    try {
+      const response = await get<ApiResponse<UserData>>("/auth/me")
+      if (response.success && response.data) {
+        setUserState(response.data)
+        setUser(response.data)
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar dados do usuário:", error)
+      // Se falhar a busca do "me", talvez o token tenha expirado
+      if ((error as any).status === 401) {
+        logout()
+      }
+    }
   }, [])
 
   const login = useCallback(
-    async (email: string, password: string) => {
-      // Simula login bem-sucedido
-      console.log("Mock Login:", email)
-      setTokenState("mock-token-secret")
-      setUserState({
-        id: "mock-123",
-        nomeCompleto: "Dr. Ana Clara (Mock)",
-        email: email,
-        role: "ADVOGADO",
-        tipo: "advogado",
-      })
+    async (email: string, senha: string) => {
+      setIsLoading(true)
+      try {
+        // Mapeia 'senha' do front para 'password' do back no login
+        const response = await post<LoginResponse>("/auth/login", {
+          email,
+          password: senha,
+        })
+
+        if (response.token && response.user) {
+          setTokenState(response.token)
+          setUserState(response.user as UserData)
+          
+          setToken(response.token)
+          setUser(response.user as UserData)
+        } else {
+          throw new Error("Resposta de login inválida")
+        }
+      } catch (error) {
+        throw error
+      } finally {
+        setIsLoading(false)
+      }
     },
     []
   )
@@ -79,6 +101,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = useCallback(() => {
     setUserState(null)
     setTokenState(null)
+    clearAuth()
   }, [])
 
   const value: AuthContextType = {
@@ -89,7 +112,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     logout,
     refreshUser,
     isAuthenticated: !!token,
-    isAdvogado: user?.role === "ADVOGADO" || user?.tipo === "advogado",
+    isAdvogado: user?.tipoUsuario === "ADVOGADO",
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

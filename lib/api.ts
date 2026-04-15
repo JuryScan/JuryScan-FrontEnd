@@ -37,8 +37,16 @@ export class ApiError extends Error {
 /**
  * Retorna os headers com o token de autorização se disponível.
  */
-function getHeaders(options?: ApiRequestOptions): Record<string, string> {
+function getHeaders(
+  body?: unknown,
+  options?: ApiRequestOptions
+): Record<string, string> {
   const headers: Record<string, string> = { ...DEFAULT_HEADERS }
+
+  // Se o corpo for FormData, removemos o Content-Type para o browser definir com boundary
+  if (body instanceof FormData) {
+    delete headers["Content-Type"]
+  }
 
   // Merge headers do options se existirem
   if (options?.headers) {
@@ -84,7 +92,7 @@ async function apiFetch<T = unknown>(
   try {
     const response = await fetch(url, {
       ...options,
-      headers: getHeaders(options),
+      headers: getHeaders(options?.body, options),
       signal: controller.signal,
       credentials: "same-origin",
     })
@@ -155,10 +163,16 @@ export async function post<T = unknown>(
   body?: unknown,
   options?: Omit<ApiRequestOptions, "method" | "body">
 ): Promise<T> {
+  const isFormData = body instanceof FormData
+
   return apiFetch<T>(endpoint, {
     ...options,
     method: "POST",
-    body: body ? JSON.stringify(body) : undefined,
+    body: isFormData
+      ? (body as FormData)
+      : body
+        ? JSON.stringify(body)
+        : undefined,
   })
 }
 
@@ -170,10 +184,16 @@ export async function put<T = unknown>(
   body?: unknown,
   options?: Omit<ApiRequestOptions, "method" | "body">
 ): Promise<T> {
+  const isFormData = body instanceof FormData
+
   return apiFetch<T>(endpoint, {
     ...options,
     method: "PUT",
-    body: body ? JSON.stringify(body) : undefined,
+    body: isFormData
+      ? (body as FormData)
+      : body
+        ? JSON.stringify(body)
+        : undefined,
   })
 }
 
@@ -185,10 +205,16 @@ export async function patch<T = unknown>(
   body?: unknown,
   options?: Omit<ApiRequestOptions, "method" | "body">
 ): Promise<T> {
+  const isFormData = body instanceof FormData
+
   return apiFetch<T>(endpoint, {
     ...options,
     method: "PATCH",
-    body: body ? JSON.stringify(body) : undefined,
+    body: isFormData
+      ? (body as FormData)
+      : body
+        ? JSON.stringify(body)
+        : undefined,
   })
 }
 

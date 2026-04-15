@@ -11,20 +11,34 @@ export interface LoginCredentials {
   password: string
 }
 
-export interface LoginResponse {
-  token: string
+export interface User {
+  id: string
+  nomeCompleto: string
+  email: string
+  telefone?: string
+  cpf?: string
+  dataNascimento?: string
+  tipoUsuario?: "COMUM" | "ADVOGADO" | "ADMIN"
+  status?: string
+  numeroOab?: string
+  experiencia?: string
+  descricao?: string
+  [key: string]: unknown
 }
 
-export interface User {
-  id?: string
-  nomeCompleto?: string
-  email?: string
-  role?: string
-  tipo?: string
-  cpf?: string
-  telefone?: string
-  dataNascimento?: string
-  [key: string]: unknown
+export interface LoginResponse {
+  token: string
+  success: boolean
+  message: string
+  status: number
+  user: User
+}
+
+export interface ApiResponse<T = unknown> {
+  success: boolean
+  message: string
+  data: T
+  status: number
 }
 
 export interface UserAdvogado extends User {

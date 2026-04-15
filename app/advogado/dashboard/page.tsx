@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, type JSX } from "react"
+import { useState, type JSX, useEffect, useCallback } from "react"
 import Link from "next/link"
 import {
   Users,
@@ -16,6 +16,7 @@ import {
   AlertCircle,
   Timer,
   Coins,
+  Loader2,
 } from "lucide-react"
 import {
   LineChart,
@@ -27,18 +28,54 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  Legend,
 } from "recharts"
 import {
   MOCK_DASHBOARD_STATS,
   MOCK_RECENT_LEADS,
-  MOCK_RECENT_ANALYSES,
   MOCK_INTELLIGENCE_STATS,
 } from "@/lib/mocks"
+import { useAuth } from "@/contexts/AuthContext"
+import { get } from "@/lib/api"
+import type { ApiResponse, AuditRecord } from "@/lib/types"
 
 export default function AdvogadoDashboardPage(): JSX.Element {
+  const { user } = useAuth()
   const [searchTerm, setSearchTerm] = useState("")
   const [viewMode, setViewMode] = useState<"general" | "intelligence">("general")
+  const [recentAnalyses, setRecentAnalyses] = useState<AuditRecord[]>([])
+  const [isLoadingAnalyses, setIsLoadingAnalyses] = useState(true)
+
+  const fetchAnalyses = useCallback(async () => {
+    if (!user?.id) return
+
+    setIsLoadingAnalyses(true)
+    try {
+      const response = await get<ApiResponse<any>>(`/analysis/user/${user.id}?page=0&page_size=5`)
+      
+      if (response.success && response.data?.items) {
+        const mappedAnalyses: AuditRecord[] = response.data.items.map((item: any) => ({
+          id: item.id,
+          client: item.titulo || "Segurado",
+          date: new Date(item.dataCriacao).toLocaleDateString("pt-BR"),
+          issues: item.falhas?.length || 0,
+          status: "Concluído"
+        }))
+        setRecentAnalyses(mappedAnalyses)
+      }
+    } catch (error) {
+      console.error("Erro ao buscar análises recentes:", error)
+    } finally {
+      setIsLoadingAnalyses(false)
+    }
+  }, [user?.id])
+
+  useEffect(() => {
+    fetchAnalyses()
+  }, [fetchAnalyses])
+
+  const filteredAnalyses = recentAnalyses.filter(analysis => 
+    analysis.client.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
     <div className="flex flex-col font-sans">
@@ -48,7 +85,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
             <div>
               <h1 className="text-3xl font-bold mb-2">Painel de Controle</h1>
               <p className="text-gray-400">
-                Bem-vindo de volta, Dr(a). Ana Clara. Aqui está o resumo do seu
+                Bem-vindo de volta, {user?.nomeCompleto || "Dr(a). Ana Clara"}. Aqui está o resumo do seu
                 escritório hoje.
               </p>
             </div>
@@ -212,39 +249,50 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                   </div>
                 </div>
                 <div className="divide-y divide-gray-100">
-                  {MOCK_RECENT_ANALYSES.map((analysis) => (
-                    <div
-                      key={analysis.id}
-                      className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 font-bold">
-                          {analysis.client.charAt(0)}
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-gray-900">
-                            {analysis.client}
-                          </h4>
-                          <p className="text-xs text-gray-500 flex items-center gap-2 mt-1">
-                            <span>Data: {analysis.date}</span>
-                            <span>•</span>
-                            <span className="text-orange-600 font-medium">
-                              {analysis.issues} pendências
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                      <Link href="/advogado/auditoria">
-                        <button
-                          className="p-2 text-gray-400 hover:text-[#633B48] hover:bg-[#FFECF1] rounded-lg transition-colors"
-                          title="Abrir Relatório"
-                          aria-label={`Abrir relatório de ${analysis.client}`}
-                        >
-                          <ArrowRight className="w-5 h-5" />
-                        </button>
-                      </Link>
+                  {isLoadingAnalyses ? (
+                    <div className="p-12 flex flex-col items-center justify-center text-gray-400">
+                      <Loader2 className="w-8 h-8 animate-spin mb-2" />
+                      <p className="text-sm">Carregando auditorias...</p>
                     </div>
-                  ))}
+                  ) : filteredAnalyses.length === 0 ? (
+                    <div className="p-12 text-center text-gray-400">
+                      <p className="text-sm">Nenhuma auditoria encontrada.</p>
+                    </div>
+                  ) : (
+                    filteredAnalyses.map((analysis) => (
+                      <div
+                        key={analysis.id}
+                        className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 font-bold">
+                            {analysis.client.charAt(0)}
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-gray-900">
+                              {analysis.client}
+                            </h4>
+                            <p className="text-xs text-gray-500 flex items-center gap-2 mt-1">
+                              <span>Data: {analysis.date}</span>
+                              <span>•</span>
+                              <span className="text-orange-600 font-medium">
+                                {analysis.issues} pendências
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                        <Link href="/advogado/auditoria">
+                          <button
+                            className="p-2 text-gray-400 hover:text-[#633B48] hover:bg-[#FFECF1] rounded-lg transition-colors"
+                            title="Abrir Relatório"
+                            aria-label={`Abrir relatório de ${analysis.client}`}
+                          >
+                            <ArrowRight className="w-5 h-5" />
+                          </button>
+                        </Link>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
