@@ -1,3 +1,5 @@
+import React from 'react'
+
 export default function DashboardHomePage() {
   return (
     <section className="space-y-6">

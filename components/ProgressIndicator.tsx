@@ -1,8 +1,14 @@
 "use client"
 
+import React from "react"
 import { Progress } from "@/components/ui/progress"
 
-export default function ProgressIndicator({ value, label }) {
+interface ProgressIndicatorProps {
+  value: number
+  label?: string
+}
+
+export default function ProgressIndicator({ value, label }: ProgressIndicatorProps) {
   return (
     <div className="w-full space-y-2">
 

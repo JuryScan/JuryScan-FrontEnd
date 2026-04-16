@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import {
   Dialog,
   DialogContent,
@@ -10,13 +11,21 @@ import {
 
 import { Button } from "@/components/ui/button"
 
+interface GlobalModalProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  title: string
+  children: React.ReactNode
+  onConfirm?: () => void
+}
+
 export default function GlobalModal({
   open,
   onOpenChange,
   title,
   children,
   onConfirm,
-}) {
+}: GlobalModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>

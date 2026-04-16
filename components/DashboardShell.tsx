@@ -1,7 +1,8 @@
 'use client'
 
+import React from 'react'
 import Link from 'next/link'
-import { LayoutDashboard, Users, FileSearch, CreditCard, Settings, ShieldCheck } from 'lucide-react'
+import { LayoutDashboard, Users, FileSearch, CreditCard, Settings } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -12,21 +13,29 @@ import {
   SidebarMenuButton,
   SidebarProvider,
   SidebarTrigger,
-  SidebarInset,
 } from '@/components/ui/sidebar'
-import { DashboardProvider, useDashboard } from '@/components/DashboardContext'
+import { DashboardProvider, useDashboard, useUser } from '@/components/DashboardContext'
 import Topbar from '@/components/Topbar'
 
-const menuItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/dashboard/clientes', label: 'Clientes', icon: Users },
-  { href: '/dashboard/analisar-cnis', label: 'Analisar CNIS', icon: FileSearch },
-  { href: '/dashboard/financeiro', label: 'Financeiro', icon: CreditCard },
-  { href: '/dashboard/configuracoes', label: 'Configurações', icon: Settings },
-]
+interface MenuItem {
+  href: string
+  label: string
+  icon: React.ElementType
+}
 
-function ShellContent({ children }) {
+function ShellContent({ children }: { children: React.ReactNode }) {
   const { selectedRoute, setSelectedRoute } = useDashboard()
+  const { user } = useUser()
+
+  const userBaseRoute = user?.tipoUsuario === 'ADVOGADO' ? '/advogado' : '/cliente'
+
+  const menuItems: MenuItem[] = [
+    { href: `${userBaseRoute}/dashboard`, label: 'Dashboard', icon: LayoutDashboard },
+    { href: `${userBaseRoute}/clientes`, label: 'Clientes', icon: Users },
+    { href: `${userBaseRoute}/auditoria`, label: 'Analisar CNIS', icon: FileSearch },
+    { href: `${userBaseRoute}/financeiro`, label: 'Financeiro', icon: CreditCard },
+    { href: `${userBaseRoute}/configuracoes`, label: 'Configurações', icon: Settings },
+  ]
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -46,11 +55,13 @@ function ShellContent({ children }) {
             <SidebarMenu>
               {menuItems.map((item) => {
                 const Icon = item.icon
+                const isActive = selectedRoute === item.href || (item.href.includes('dashboard') && selectedRoute === userBaseRoute)
+                
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
                       asChild
-                      isActive={selectedRoute === item.href}
+                      isActive={isActive}
                       tooltip={item.label}
                     >
                       <Link
@@ -76,7 +87,7 @@ function ShellContent({ children }) {
           </SidebarFooter>
         </Sidebar>
 
-        <main className="flex flex-1 flex-col md:ml-[var(--sidebar-width)]">
+        <main className="flex flex-1 flex-col">
           <Topbar />
           <div className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
             {children}
@@ -87,7 +98,7 @@ function ShellContent({ children }) {
   )
 }
 
-export default function DashboardShell({ children }) {
+export default function DashboardShell({ children }: { children: React.ReactNode }) {
   return (
     <DashboardProvider>
       <SidebarProvider defaultOpen>

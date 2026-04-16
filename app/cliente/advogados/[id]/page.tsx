@@ -1,9 +1,25 @@
 "use client"
 
+import React from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Star, ShieldCheck, MapPin, Briefcase, MessageCircle, CheckCircle2, Clock, Scale } from "lucide-react"
 
-const LAWYER_DETAILS = {
+interface LawyerDetails {
+  id: number
+  name: string
+  oab: string
+  specialty: string
+  location: string
+  rating: number
+  reviews: number
+  image: string
+  verified: boolean
+  experience: string
+  about: string
+  services: string[]
+}
+
+const LAWYER_DETAILS: LawyerDetails = {
     id: 1,
     name: "Dra. Ana Clara Fontes",
     oab: "OAB/PE 45.892",
@@ -60,7 +76,7 @@ export default function PerfilAdvogadoPage() {
                                     <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
                                         <h1 className="text-2xl font-bold text-gray-900">{LAWYER_DETAILS.name}</h1>
                                         {LAWYER_DETAILS.verified && (
-                                            <ShieldCheck className="w-6 h-6 text-green-500 tooltip" title="Identidade Validada" />
+                                            <ShieldCheck className="w-6 h-6 text-green-500" />
                                         )}
                                     </div>
                                     <p className="text-[#633B48] font-semibold mb-3">{LAWYER_DETAILS.oab}</p>

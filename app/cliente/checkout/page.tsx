@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, CreditCard, QrCode, Lock, ShieldCheck, FileText, CheckCircle2 } from "lucide-react"
 
@@ -9,7 +9,7 @@ export default function CheckoutPage() {
     const [paymentMethod, setPaymentMethod] = useState("pix")
     const [isProcessing, setIsProcessing] = useState(false)
 
-    const handlePayment = (e) => {
+    const handlePayment = (e: React.FormEvent) => {
         e.preventDefault()
         setIsProcessing(true)
         
@@ -133,7 +133,7 @@ export default function CheckoutPage() {
                             </div>
 
                             <button 
-                                onClick={paymentMethod === "card" ? handlePayment : () => {
+                                onClick={paymentMethod === "card" ? (e) => handlePayment(e) : () => {
                                     setIsProcessing(true);
                                     setTimeout(() => { setIsProcessing(false); router.push("/cliente/dashboard"); }, 2000);
                                 }}

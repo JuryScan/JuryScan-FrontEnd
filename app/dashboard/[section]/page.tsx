@@ -1,4 +1,11 @@
-const sectionMeta = {
+import React from 'react'
+
+interface SectionMeta {
+  title: string
+  description: string
+}
+
+const sectionMeta: Record<string, SectionMeta> = {
   clientes: {
     title: 'Clientes',
     description: 'Gerencie sua carteira de clientes e acompanhe solicitações em andamento.',
@@ -17,7 +24,13 @@ const sectionMeta = {
   },
 }
 
-export default function SectionPage({ params }) {
+interface SectionPageProps {
+  params: {
+    section: string
+  }
+}
+
+export default function SectionPage({ params }: SectionPageProps) {
   const section = sectionMeta[params.section]
 
   if (!section) {

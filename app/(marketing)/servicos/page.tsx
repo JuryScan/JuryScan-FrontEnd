@@ -1,11 +1,12 @@
 "use client"
 
+import React from "react"
 import Header from "@/components/shared/Header"
 import Footer from "@/components/shared/Footer"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import {
-    Shield, FileSearch, Calculator, FileText, Scale, BrainCircuit,
+    Shield, FileSearch, FileText, Scale, BrainCircuit,
     ArrowRight, Check, Star, Lock
 } from "lucide-react"
 
@@ -154,16 +155,6 @@ export default function ServicesPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
-            <style jsx global>{`
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-      `}</style>
-
             <main className="flex-grow">
 
                 <section id="servicos" className="bg-white py-20 px-4 border-b border-gray-100">

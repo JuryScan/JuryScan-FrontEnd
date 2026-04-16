@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Download, AlertCircle, CheckCircle2, FileText, ArrowRight, ShieldAlert, Info, AlertTriangle } from "lucide-react"
+import { ArrowLeft, Download, CheckCircle2, FileText, ArrowRight, ShieldAlert, Info, AlertTriangle } from "lucide-react"
 
 export default function RelatorioDesbloqueadoPage() {
     const router = useRouter()

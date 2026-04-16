@@ -1,10 +1,22 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { Search, MapPin, Star, Award, ShieldCheck, ArrowRight, Filter } from "lucide-react"
 
+interface Lawyer {
+  id: number
+  name: string
+  oab: string
+  specialty: string
+  location: string
+  rating: number
+  reviews: number
+  image: string
+  verified: boolean
+}
+
 // Dados falsos para simular os advogados cadastrados na plataforma
-const MOCK_LAWYERS = [
+const MOCK_LAWYERS: Lawyer[] = [
     {
         id: 1,
         name: "Dra. Ana Clara Fontes",
@@ -43,6 +55,11 @@ const MOCK_LAWYERS = [
 export default function MarketplaceAdvogados() {
     const [searchTerm, setSearchTerm] = useState("")
 
+    const filteredLawyers = MOCK_LAWYERS.filter(lawyer => 
+        lawyer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lawyer.specialty.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+
     return (
         <div className="min-h-screen bg-gray-50 p-6 md:p-12 font-sans flex flex-col items-center">
             <div className="w-full max-w-5xl">
@@ -71,12 +88,12 @@ export default function MarketplaceAdvogados() {
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {MOCK_LAWYERS.map((lawyer) => (
+                    {filteredLawyers.map((lawyer) => (
                         <div key={lawyer.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
                             
                             <div className="p-6 border-b border-gray-100 flex flex-col items-center text-center relative">
                                 {lawyer.verified && (
-                                    <div className="absolute top-4 right-4 bg-green-100 text-green-700 p-1.5 rounded-full tooltip" title="Identidade Validada">
+                                    <div className="absolute top-4 right-4 bg-green-100 text-green-700 p-1.5 rounded-full" title="Identidade Validada">
                                         <ShieldCheck className="w-5 h-5" />
                                     </div>
                                 )}
