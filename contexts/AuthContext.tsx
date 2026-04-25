@@ -23,7 +23,7 @@ interface AuthContextType {
   user: UserData | null
   token: string | null
   isLoading: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string, recaptchaToken: string) => Promise<void>
   logout: () => void
   refreshUser: () => Promise<void>
   isAuthenticated: boolean
@@ -71,13 +71,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [])
 
   const login = useCallback(
-    async (email: string, senha: string) => {
+    async (email: string, senha: string, recaptchaToken: string) => {
       setIsLoading(true)
       try {
         // Mapeia 'senha' do front para 'password' do back no login
         const response = await post<LoginResponse>("/auth/login", {
           email,
           password: senha,
+          recaptchaToken,
         })
 
         if (response.token && response.user) {

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, type JSX } from "react"
+import { useState, type JSX, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -10,12 +10,15 @@ import { useAuth } from "@/contexts/AuthContext"
 import { loginSchema, type LoginSchema } from "@/lib/schemas"
 import { TextInput } from "./forms/TextInput"
 import { PasswordInput } from "./forms/PasswordInput"
+import ReCAPTCHA from "react-google-recaptcha"
 
 export default function LoginForm(): JSX.Element {
   const router = useRouter()
   const { login, isAdvogado } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+  const recaptchaRef = useRef<ReCAPTCHA>(null)
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null)
 
   const methods = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
@@ -27,12 +30,23 @@ export default function LoginForm(): JSX.Element {
 
   const { handleSubmit } = methods
 
+  const onRecaptchaChange = (token: string | null) => {
+    setRecaptchaToken(token)
+    if (token) setError("")
+  }
+
   const onSubmit = async (data: LoginSchema) => {
     setError("")
+
+    if (!recaptchaToken) {
+      setError("Por favor, complete o reCAPTCHA.")
+      return
+    }
+
     setIsLoading(true)
 
     try {
-      await login(data.email, data.senha)
+      await login(data.email, data.senha, recaptchaToken)
 
       if (isAdvogado) {
         router.push("/advogado/dashboard")
@@ -40,6 +54,10 @@ export default function LoginForm(): JSX.Element {
         router.push("/cliente/dashboard")
       }
     } catch (err: unknown) {
+      // Reseta o reCAPTCHA em caso de erro
+      recaptchaRef.current?.reset()
+      setRecaptchaToken(null)
+
       const apiError = err as { status?: number; message?: string }
       if (apiError?.status === 401 || apiError?.status === 403) {
         setError("Email ou senha incorretos.")
@@ -89,10 +107,18 @@ export default function LoginForm(): JSX.Element {
               placeholder="Digite sua senha"
             />
 
+            <div className="flex justify-center py-2">
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+                onChange={onRecaptchaChange}
+              />
+            </div>
+
             <Button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-[#FFB6E1] hover:bg-[#ff9cd2] text-[#A50064] py-6 rounded-md font-bold text-lg border-none shadow-none mt-4"
+              disabled={isLoading || !recaptchaToken}
+              className="w-full bg-[#FFB6E1] hover:bg-[#ff9cd2] text-[#A50064] py-6 rounded-md font-bold text-lg border-none shadow-none mt-4 disabled:opacity-50"
             >
               {isLoading ? "Entrando..." : "Entrar"}
             </Button>

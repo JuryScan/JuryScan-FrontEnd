@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, type JSX } from "react"
+import { useState, type JSX, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -19,6 +19,7 @@ import { TextInput } from "./forms/TextInput"
 import { CpfCnpjInput } from "./forms/CpfCnpjInput"
 import { DateInput } from "./forms/DateInput"
 import { PasswordInput } from "./forms/PasswordInput"
+import ReCAPTCHA from "react-google-recaptcha"
 
 interface FormData {
   // Step 1
@@ -42,6 +43,8 @@ export default function SignupForm(): JSX.Element {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [userType, setUserType] = useState<UserType>("comum")
+  const recaptchaRef = useRef<ReCAPTCHA>(null)
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null)
 
   const step1 = useForm<SignupStep1Schema>({
     resolver: zodResolver(signupStep1Schema),
@@ -101,10 +104,22 @@ export default function SignupForm(): JSX.Element {
     step2.reset()
     step3.reset()
     setError("")
+    setRecaptchaToken(null)
+  }
+
+  const onRecaptchaChange = (token: string | null) => {
+    setRecaptchaToken(token)
+    if (token) setError("")
   }
 
   const onSubmit = async (data: FormData) => {
     setError("")
+
+    if (!recaptchaToken) {
+      setError("Por favor, complete o reCAPTCHA.")
+      return
+    }
+
     setIsLoading(true)
 
     try {
@@ -119,6 +134,7 @@ export default function SignupForm(): JSX.Element {
         senha: data.senha,
         dataNascimento: dataIso,
         cpf: data.cpf.replace(/\D/g, ""),
+        recaptchaToken,
       }
 
       let endpoint = "/users/comum/register"
@@ -141,6 +157,10 @@ export default function SignupForm(): JSX.Element {
 
       router.push("/login")
     } catch (err: unknown) {
+      // Reseta o reCAPTCHA em caso de erro
+      recaptchaRef.current?.reset()
+      setRecaptchaToken(null)
+
       const apiError = err as { name?: string; message?: string }
       if (apiError?.name === "ApiError") {
         setError(apiError.message ?? "Erro desconhecido.")
@@ -326,10 +346,18 @@ export default function SignupForm(): JSX.Element {
               placeholder="Confirme sua senha"
             />
 
-            <div className="bg-[#FFECF1] border border-[#FFB6E1] rounded-lg p-3 mt-2">
+            <div className="bg-[#FFECF1] border border-[#FFB6E1] rounded-lg p-3 mt-2 mb-4">
               <p className="text-xs text-[#A50064] text-center">
                 Mínimo 8 caracteres com letras e números.
               </p>
+            </div>
+
+            <div className="flex justify-center py-2">
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+                onChange={onRecaptchaChange}
+              />
             </div>
           </FormProvider>
         )}
@@ -356,7 +384,7 @@ export default function SignupForm(): JSX.Element {
             <Button
               type="button"
               onClick={handleFinalSubmit}
-              disabled={isLoading}
+              disabled={isLoading || !recaptchaToken}
               className="flex-1 py-6 bg-[#A50064] hover:bg-[#7a004a] text-white font-bold border-none shadow-none transition-colors disabled:opacity-70"
             >
               {isLoading ? "Criando..." : "Finalizar"}
