@@ -19,7 +19,19 @@ const navItems = [
 
 export default function ClienteLayout({ children }: ClienteLayoutProps): JSX.Element {
   const pathname = usePathname()
-  const { logout } = useAuth()
+  const { logout, isLoading, isAuthenticated } = useAuth()
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#A50064]"></div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return <div className="p-8 text-center">Redirecionando...</div>
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">

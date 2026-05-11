@@ -17,7 +17,21 @@ const navItems = [
 
 export default function AdvogadoLayout({ children }: AdvogadoLayoutProps): JSX.Element {
   const pathname = usePathname()
-  const { logout } = useAuth()
+  const { logout, isLoading, isAuthenticated, isAdvogado } = useAuth()
+
+  // Enquanto está validando a sessão, podemos mostrar um skeleton ou nada
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#A50064]"></div>
+      </div>
+    )
+  }
+
+  // Redundância de segurança caso o middleware falhe ou o usuário não seja advogado
+  if (!isAuthenticated || !isAdvogado) {
+    return <div className="p-8 text-center">Redirecionando...</div>
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">

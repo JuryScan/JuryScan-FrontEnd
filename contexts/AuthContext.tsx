@@ -43,15 +43,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Inicializa o estado de autenticação ao montar o componente
   useEffect(() => {
-    const storedToken = getToken()
-    const storedUser = getUser()
+    const initAuth = async () => {
+      const storedToken = getToken()
+      const storedUser = getUser()
 
-    if (storedToken && storedUser) {
-      setTokenState(storedToken)
-      setUserState(storedUser)
+      if (storedToken) {
+        setTokenState(storedToken)
+        if (storedUser) {
+          setUserState(storedUser)
+        }
+        
+        // Valida o token e atualiza os dados do usuário com o back-end
+        try {
+          const response = await get<ApiResponse<UserData>>("/auth/me")
+          if (response.success && response.data) {
+            setUserState(response.data)
+            setUser(response.data)
+          }
+        } catch (error) {
+          console.error("Sessão inválida ou expirada:", error)
+          logout()
+        }
+      }
+      
+      setIsLoading(false)
     }
-    
-    setIsLoading(false)
+
+    initAuth()
   }, [])
 
   const refreshUser = useCallback(async () => {

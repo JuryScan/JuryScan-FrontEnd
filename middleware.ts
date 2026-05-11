@@ -6,17 +6,33 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-// Rotas que requerem autenticação
-const PROTECTED_ROUTES = [
-  "/advogado",
-  "/cliente",
-]
-
-// Rotas de autenticação (não devem ser acessíveis se já estiver logado)
+const PROTECTED_ROUTES = ["/advogado", "/cliente", "/dashboard"]
 const AUTH_ROUTES = ["/login", "/cadastro"]
 
 export function middleware(request: NextRequest) {
-  // MOCK: Permite acesso a todas as rotas sem verificação de token
+  const token = request.cookies.get("juryscan_token")?.value
+  const { pathname } = request.nextUrl
+
+  // 1. Se estiver tentando acessar rota protegida SEM token
+  const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
+    pathname.startsWith(route)
+  )
+
+  if (isProtectedRoute && !token) {
+    const loginUrl = new URL("/login", request.url)
+    // Opcional: salva a URL original para redirecionar após o login
+    loginUrl.searchParams.set("callbackUrl", pathname)
+    return NextResponse.redirect(loginUrl)
+  }
+
+  // 2. Se estiver logado e tentar acessar login/cadastro
+  const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route))
+
+  if (isAuthRoute && token) {
+    // Redireciona para o dashboard (ou página inicial do perfil)
+    return NextResponse.redirect(new URL("/dashboard", request.url))
+  }
+
   return NextResponse.next()
 }
 

@@ -3,10 +3,12 @@
  * Inclui token de autenticação automaticamente e trata erros comuns.
  */
 
+import { getToken } from "./auth"
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
-if (!API_URL) {
-  throw new Error(
+if (!API_URL && typeof window !== "undefined") {
+  console.warn(
     "NEXT_PUBLIC_API_URL não configurada. Verifique o arquivo .env.local"
   )
 }
@@ -15,7 +17,7 @@ const DEFAULT_HEADERS: Record<string, string> = {
   "Content-Type": "application/json",
 }
 
-const TIMEOUT_MS = 15000 // 15 segundos
+const TIMEOUT_MS = 20000 // 20 segundos
 
 export interface ApiRequestOptions extends RequestInit {
   timeout?: number
@@ -43,20 +45,16 @@ function getHeaders(
 ): Record<string, string> {
   const headers: Record<string, string> = { ...DEFAULT_HEADERS }
 
-  // Se o corpo for FormData, removemos o Content-Type para o browser definir com boundary
   if (body instanceof FormData) {
     delete headers["Content-Type"]
   }
 
-  // Merge headers do options se existirem
   if (options?.headers) {
     const optionsHeaders = options.headers as Record<string, string>
     Object.assign(headers, optionsHeaders)
   }
 
-  // Adiciona token automaticamente
   if (!options?.skipAuth) {
-    const { getToken } = require("./auth")
     const token = getToken()
     if (token) {
       headers["Authorization"] = `Bearer ${token}`

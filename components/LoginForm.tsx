@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, type JSX, useRef } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "./ui/button"
@@ -137,6 +137,16 @@ export default function LoginForm(): JSX.Element {
                   className="text-[#A50064] font-medium hover:underline"
                 >
                   criar conta
+                </Link>
+              </div>
+            </div>
+          </form>
+        </FormProvider>
+      </div>
+    </div>
+  )
+}
+r conta
                 </Link>
               </div>
             </div>
