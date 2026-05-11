@@ -1,7 +1,7 @@
 "use client"
 
-import Header from "@/components/Header"
-import Footer from "@/components/Footer"
+import Header from "@/components/shared/Header"
+import Footer from "@/components/shared/Footer"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import {
@@ -163,8 +163,6 @@ export default function ServicesPage() {
             scrollbar-width: none;
         }
       `}</style>
-
-            <Header />
 
             <main className="flex-grow">
 
