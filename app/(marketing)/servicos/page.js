@@ -295,17 +295,29 @@ export default function ServicesPage() {
                                         })}
                                     </div>
 
-                                    <Button
-                                        className={`w-full py-5 text-base transition-transform active:scale-95 ${
-                                            plan.highlight
-                                                ? 'bg-[#633B48] hover:bg-[#300117] text-white shadow-lg'
-                                                : plan.isFree
-                                                    ? 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
-                                                    : 'bg-white border-2 border-[#633B48] text-[#633B48] hover:bg-[#FFECF1]'
-                                        }`}
+                                    {/* ── BOTÃO ATUALIZADO ── */}
+                                    <Link
+                                        href={
+                                            plan.isFree
+                                                ? "/auditor"
+                                                : plan.cta === "Falar com Consultor"
+                                                    ? "/contato"
+                                                    : `/checkout?plan=${encodeURIComponent(plan.name)}&price=${encodeURIComponent(plan.price)}`
+                                        }
                                     >
-                                        {plan.cta}
-                                    </Button>
+                                        <Button
+                                            className={`w-full py-5 text-base transition-transform active:scale-95 ${
+                                                plan.highlight
+                                                    ? 'bg-[#633B48] hover:bg-[#300117] text-white shadow-lg'
+                                                    : plan.isFree
+                                                        ? 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
+                                                        : 'bg-white border-2 border-[#633B48] text-[#633B48] hover:bg-[#FFECF1]'
+                                            }`}
+                                        >
+                                            {plan.cta}
+                                        </Button>
+                                    </Link>
+
                                 </div>
                             ))}
 
