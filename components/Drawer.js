@@ -12,7 +12,7 @@ export default function Drawer({ open, onClose, client }) {
                 className="fixed top-0 right-0 h-full w-[380px] bg-white shadow-2xl border-l border-gray-200 p-6 flex flex-col gap-6"
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* botão fechar */}
+                
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 text-xl text-gray-500 hover:text-black"
@@ -20,7 +20,6 @@ export default function Drawer({ open, onClose, client }) {
                     ×
                 </button>
 
-                {/* 👤 PERFIL */}
                 <div className="text-center">
                     <img
                         src={client?.photo}
@@ -34,7 +33,7 @@ export default function Drawer({ open, onClose, client }) {
                     <p className="text-sm text-gray-500">{client?.phone}</p>
                 </div>
 
-                {/* 📊 ATIVIDADES */}
+            
                 <div>
                     <h3 className="font-semibold text-gray-800 mb-2">
                         Atividades recentes
@@ -48,9 +47,9 @@ export default function Drawer({ open, onClose, client }) {
                     </div>
                 </div>
 
-                {/* ⚡ AÇÕES */}
+            
                 <div className="mt-auto flex flex-col gap-3">
-                    <button className="bg-[#6b3f46] text-white rounded-md py-2 font-medium hover:opacity-90">
+                    <button className="bg-[#633b48] text-white rounded-md py-2 font-medium hover:opacity-90">
                         Gerar Relatório Completo
                     </button>
 
