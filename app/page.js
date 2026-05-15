@@ -7,8 +7,13 @@ import TestimonialsSection from "../components/TestimonialsSection"
 import Footer from "../components/shared/Footer"
 
 export default function HomePage() {
+  const [open, setOpen] = useState(false);
+  const [client, setClient] = useState(null);
+
   return (
     <div className="min-h-screen bg-white">
+      <Header />
+
       <main>
         <HeroSection />
         <StatsSection />
@@ -16,7 +21,14 @@ export default function HomePage() {
         <AboutSection />
         <TestimonialsSection />
       </main>
+
       <Footer />
+
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        client={client}
+      />
     </div>
-  )
+  );
 }
