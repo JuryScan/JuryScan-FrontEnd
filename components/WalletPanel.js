@@ -1,10 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function WalletPanel() {
+
+    const router = useRouter();
+
     const [cliente, setCliente] = useState(null);
     const [walletData, setWalletData] = useState(null);
+
+    const handleUpgrade = () => {
+        router.push("/plans");
+    };
 
     useEffect(() => {
 
@@ -24,7 +32,6 @@ export default function WalletPanel() {
         fetchData();
     }, []);
 
-    const handleUpgrade = () => alert("Redirect to Upgrade/Plans page!");
 
     if (!cliente || !walletData) return <p style={{ textAlign: "center", marginTop: "50px" }}>Loading...</p>;
 
