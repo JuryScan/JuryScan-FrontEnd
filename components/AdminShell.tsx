@@ -31,6 +31,7 @@ function AdminShellContent({ children }: { children: React.ReactNode }) {
   const menuItems: MenuItem[] = [
     { href: `/admin/dashboard`, label: 'Dashboard Master', icon: LayoutDashboard },
     { href: `/admin/usuarios`, label: 'Usuários', icon: Users },
+    { href: `/admin/logs`, label: 'Logs de Atividade', icon: History },
     { href: `/admin/transacoes`, label: 'Transações', icon: CreditCard },
     { href: `/admin/configuracoes`, label: 'Configurações', icon: Settings },
   ]

@@ -15,7 +15,11 @@ import {
   Mail,
   ShieldOff,
   Trash2,
-  Camera
+  Camera,
+  KeyRound,
+  ShieldEllipsis,
+  ToggleLeft,
+  ToggleRight
 } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 import { get, put, post, del } from "@/lib/api"
@@ -29,10 +33,36 @@ import type { ApiResponse } from "@/lib/types"
 
 export default function ConfiguracoesPage() {
   const { user, refreshUser, logout } = useAuth()
-  const [activeTab, setActiveTab] = useState<"perfil" | "endereco" | "privacidade">("perfil")
+  const [activeTab, setActiveTab] = useState<"perfil" | "endereco" | "seguranca" | "privacidade">("perfil")
   const [isLoading, setIsLoading] = useState(false)
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false)
   const [address, setAddress] = useState<any>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  // 1. Alteração de Senha
+  const [passwords, setPasswords] = useState({ current: "", new: "", confirm: "" })
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (passwords.new !== passwords.confirm) {
+      toast({ title: "Erro", description: "As senhas não coincidem.", variant: "destructive" })
+      return
+    }
+    setIsLoading(true)
+    try {
+      const res = await put<ApiResponse<any>>(`/users/${user?.id}/password`, { 
+        currentPassword: passwords.current, 
+        newPassword: passwords.new 
+      })
+      if (res.success) {
+        toast({ title: "Sucesso", description: "Senha alterada com sucesso!" })
+        setPasswords({ current: "", new: "", confirm: "" })
+      }
+    } catch (error: any) {
+      toast({ title: "Erro", description: error.message || "Falha ao alterar senha", variant: "destructive" })
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const profileMethods = useForm<ProfileSchema>({
     resolver: zodResolver(profileSchema),
@@ -157,10 +187,10 @@ export default function ConfiguracoesPage() {
         <p className="text-gray-500">Gerencie suas informações pessoais e profissionais.</p>
       </div>
 
-      <div className="flex bg-gray-100 p-1 rounded-xl mb-8 max-w-lg">
+      <div className="flex bg-gray-100 p-1 rounded-xl mb-8 max-w-2xl overflow-x-auto scrollbar-hide">
         <button
           onClick={() => setActiveTab("perfil")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold transition-all ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${
             activeTab === "perfil" ? "bg-white text-[#A50064] shadow-sm" : "text-gray-500 hover:text-gray-700"
           }`}
         >
@@ -168,15 +198,23 @@ export default function ConfiguracoesPage() {
         </button>
         <button
           onClick={() => setActiveTab("endereco")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold transition-all ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${
             activeTab === "endereco" ? "bg-white text-[#A50064] shadow-sm" : "text-gray-500 hover:text-gray-700"
           }`}
         >
           <MapPin className="size-4" /> Endereço
         </button>
         <button
+          onClick={() => setActiveTab("seguranca")}
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${
+            activeTab === "seguranca" ? "bg-white text-[#A50064] shadow-sm" : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          <KeyRound className="size-4" /> Segurança
+        </button>
+        <button
           onClick={() => setActiveTab("privacidade")}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold transition-all ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${
             activeTab === "privacidade" ? "bg-white text-[#A50064] shadow-sm" : "text-gray-500 hover:text-gray-700"
           }`}
         >
@@ -275,6 +313,74 @@ export default function ConfiguracoesPage() {
                 </div>
               </form>
             </FormProvider>
+          </div>
+        ) : activeTab === "seguranca" ? (
+          <div className="p-8 animate-in fade-in duration-300">
+            <div className="mb-8">
+              <h3 className="text-xl font-bold text-[#0A1F30] mb-1">Configurações de Segurança</h3>
+              <p className="text-sm text-gray-500">Proteja sua conta alterando sua senha e ativando a verificação em duas etapas.</p>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-12">
+              <form onSubmit={handlePasswordChange} className="space-y-4">
+                <h4 className="font-bold text-gray-900 flex items-center gap-2">
+                  <ShieldEllipsis className="size-4 text-[#633B48]" /> Alterar Senha
+                </h4>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Senha Atual</label>
+                    <input 
+                      type="password" 
+                      value={passwords.current}
+                      onChange={e => setPasswords({...passwords, current: e.target.value})}
+                      className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-[#633B48] outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Nova Senha</label>
+                    <input 
+                      type="password" 
+                      value={passwords.new}
+                      onChange={e => setPasswords({...passwords, new: e.target.value})}
+                      className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-[#633B48] outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Confirmar Nova Senha</label>
+                    <input 
+                      type="password" 
+                      value={passwords.confirm}
+                      onChange={e => setPasswords({...passwords, confirm: e.target.value})}
+                      className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-[#633B48] outline-none"
+                    />
+                  </div>
+                </div>
+                <Button type="submit" disabled={isLoading} className="bg-[#633B48] hover:bg-[#300117] text-white rounded-xl w-full py-6 font-bold">
+                  {isLoading ? <Loader2 className="animate-spin" /> : "Atualizar Senha"}
+                </Button>
+              </form>
+
+              <div className="space-y-6">
+                <h4 className="font-bold text-gray-900 flex items-center gap-2">
+                  <ShieldCheck className="size-4 text-green-600" /> Autenticação de Dois Fatores (2FA)
+                </h4>
+                <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-gray-900 text-sm">Verificação via App/E-mail</p>
+                    <p className="text-xs text-gray-500 mt-1 max-w-[200px]">Adicione uma camada extra de proteção ao seu login.</p>
+                  </div>
+                  <button 
+                    onClick={() => setIs2FAEnabled(!is2FAEnabled)}
+                    className="text-[#633B48]"
+                  >
+                    {is2FAEnabled ? <ToggleRight className="size-10" /> : <ToggleLeft className="size-10 text-gray-300" />}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  Recomendamos fortemente a ativação do 2FA para garantir que apenas você tenha acesso às suas auditorias e dados financeiros.
+                </p>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="p-8 animate-in fade-in duration-300">
