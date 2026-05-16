@@ -93,3 +93,29 @@ export const contactSchema = z.object({
 })
 
 export type ContactSchema = z.infer<typeof contactSchema>
+
+// ============================================================
+// Perfil e Configurações
+// ============================================================
+
+export const profileSchema = z.object({
+  nomeCompleto: z.string().min(3, "Nome muito curto"),
+  email: z.string().email("E-mail inválido"),
+  telefone: z.string().min(10, "Telefone inválido"),
+  numeroOab: z.string().optional(),
+  experiencia: z.string().optional(),
+  descricao: z.string().optional(),
+})
+
+export type ProfileSchema = z.infer<typeof profileSchema>
+
+export const addressSchema = z.object({
+  tipoEndereco: z.enum(["RESIDENCIAL", "COMERCIAL"]),
+  logradouro: z.string().min(5, "Logradouro muito curto"),
+  bairro: z.string().min(2, "Bairro muito curto"),
+  cidade: z.string().min(2, "Cidade muito curta"),
+  estado: z.string().length(2, "Use a sigla (ex: PE)"),
+  cep: z.string().min(8, "CEP inválido"),
+})
+
+export type AddressSchema = z.infer<typeof addressSchema>
