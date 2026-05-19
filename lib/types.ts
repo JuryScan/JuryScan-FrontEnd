@@ -41,6 +41,14 @@ export interface ApiResponse<T = unknown> {
   status: number
 }
 
+export interface PageResponse<T> {
+  items: T[]
+  page: number
+  totalPages: number
+  pageSize: number
+  totalElements: number
+}
+
 export interface UserAdvogado extends User {
   numeroOab?: string
   experiencia?: string
@@ -51,15 +59,15 @@ export interface UserAdvogado extends User {
 // Análise CNIS
 // ============================================================
 
-export type Severity = "critical" | "warning" | "info" | "neutral"
+export type Severity = "ALTA" | "MEDIA" | "BAIXA" | "INFO"
 
 export interface AnalysisIssue {
-  id: number
-  type: string
-  severity: Severity
-  title: string
-  description: string
-  recommendation: string
+  id: string
+  titulo: string
+  severidade: Severity
+  descricao: string
+  sugestaoCorrecao: string
+  confianca?: number
 }
 
 export interface AnalysisSummary {
@@ -69,9 +77,12 @@ export interface AnalysisSummary {
 }
 
 export interface AnalysisResult {
-  status: Severity
-  summary: AnalysisSummary
-  issues: AnalysisIssue[]
+  id: string
+  titulo: string
+  descricaoGeral: string
+  dataCriacao: string
+  summary?: AnalysisSummary
+  issues?: AnalysisIssue[]
 }
 
 // ============================================================
@@ -145,7 +156,18 @@ export interface Testimonial {
 }
 
 // ============================================================
-// Utilitários
+// Marketplace
 // ============================================================
 
-export type StepIndicator = 1 | 2 | 3
+export interface Lawyer {
+  id: number
+  nomeCompleto: string
+  numeroOab: string
+  especialidade: string
+  localizacao: string
+  rating: number
+  reviews: number
+  fotoUrl: string
+  verificado: boolean
+  distancia?: number
+}

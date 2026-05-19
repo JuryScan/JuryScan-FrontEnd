@@ -12,8 +12,15 @@ import { toast } from "@/hooks/use-toast"
 export default function AuditorPage(): JSX.Element {
   const { user } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<"PASSWORD_PROTECTED" | "ILLEGIBLE" | "GENERIC" | null>(null)
   const [analysisResult, setAnalysisResult] =
     useState<AnalysisResultType | null>(null)
+
+  const handleRetry = () => {
+    setError(null)
+    setAnalysisResult(null)
+    setIsLoading(false)
+  }
 
   const handleAnalyze = useCallback(async (file: File) => {
     if (!user?.id) {
@@ -26,45 +33,47 @@ export default function AuditorPage(): JSX.Element {
     }
 
     setIsLoading(true)
+    setError(null)
     setAnalysisResult(null)
 
     try {
       const formData = new FormData()
       formData.append("file", file)
 
-      // A API retorna um objeto ApiResponse com AnalysisResponseDTO no campo 'data'
       const response = await post<any>(`/analysis/user/${user.id}`, formData)
       
       const backendData = response.data
 
-      // Map backend data to frontend AnalysisResultType
       const mappedResult: AnalysisResultType = {
-        status: (backendData.falhas?.some((f: any) => f.severidade === "ALTA") ? "critical" : 
-                backendData.falhas?.some((f: any) => f.severidade === "MEDIA") ? "warning" : "info") as Severity,
-        summary: {
-          clientName: backendData.titulo || "Segurado",
-          totalIssues: backendData.falhas?.length || 0,
-          processedAt: new Date(backendData.dataCriacao || Date.now()).toLocaleString("pt-BR"),
-        },
-        issues: (backendData.falhas || []).map((f: any, index: number) => ({
-          id: f.id || index,
-          type: "generic",
-          severity: f.severidade === "ALTA" ? "critical" : 
-                    f.severidade === "MEDIA" ? "warning" : "info",
-          title: f.titulo,
-          description: backendData.descricaoGeral || "Inconsistência detectada pela inteligência artificial.",
-          recommendation: f.sugestaoCorrecao,
-        })),
+        id: backendData.id,
+        titulo: backendData.titulo,
+        descricaoGeral: backendData.descricaoGeral,
+        dataCriacao: backendData.dataCriacao,
+        issues: backendData.falhas?.map((f: any) => ({
+          id: f.id,
+          titulo: f.titulo,
+          severidade: f.severidade,
+          descricao: f.descricao,
+          sugestaoCorrecao: f.sugestaoCorrecao,
+          confianca: f.confianca,
+        })) || [],
       }
 
       setAnalysisResult(mappedResult)
-    } catch (error: any) {
-      console.error("Erro ao analisar CNIS:", error)
-      toast({
-        title: "Erro ao processar arquivo",
-        description: error.message || "Ocorreu um erro ao tentar analisar o arquivo.",
-        variant: "destructive",
-      })
+    } catch (err: any) {
+      console.error("Erro ao analisar CNIS:", err)
+      
+      // Lógica de categorização de erro baseada no retorno da API
+      let errorType: "PASSWORD_PROTECTED" | "ILLEGIBLE" | "GENERIC" = "GENERIC"
+      
+      const errorMessage = err.message?.toLowerCase() || ""
+      if (errorMessage.includes("password") || errorMessage.includes("senha") || err.status === 403) {
+        errorType = "PASSWORD_PROTECTED"
+      } else if (errorMessage.includes("ilegível") || errorMessage.includes("corrompido") || errorMessage.includes("format")) {
+        errorType = "ILLEGIBLE"
+      }
+
+      setError(errorType)
     } finally {
       setIsLoading(false)
     }
@@ -83,6 +92,8 @@ export default function AuditorPage(): JSX.Element {
               <AnalysisResult
                 result={analysisResult}
                 loading={isLoading}
+                error={error}
+                onRetry={handleRetry}
               />
             </div>
           </div>

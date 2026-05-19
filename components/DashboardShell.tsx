@@ -31,8 +31,9 @@ function ShellContent({ children }: { children: React.ReactNode }) {
 
   const menuItems: MenuItem[] = [
     { href: `${userBaseRoute}/dashboard`, label: 'Dashboard', icon: LayoutDashboard },
-    { href: `${userBaseRoute}/clientes`, label: 'Clientes', icon: Users },
     { href: `${userBaseRoute}/auditoria`, label: 'Analisar CNIS', icon: FileSearch },
+    { href: `${userBaseRoute}/historico`, label: 'Histórico', icon: FileText },
+    { href: `${userBaseRoute}/clientes`, label: 'Clientes', icon: Users },
     { href: `${userBaseRoute}/financeiro`, label: 'Financeiro', icon: CreditCard },
     { href: `${userBaseRoute}/configuracoes`, label: 'Configurações', icon: Settings },
   ]

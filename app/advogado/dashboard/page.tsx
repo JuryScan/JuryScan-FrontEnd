@@ -44,16 +44,20 @@ export default function AdvogadoDashboardPage(): JSX.Element {
   const [viewMode, setViewMode] = useState<"general" | "intelligence">("general")
   const [recentAnalyses, setRecentAnalyses] = useState<AuditRecord[]>([])
   const [isLoadingAnalyses, setIsLoadingAnalyses] = useState(true)
+  const [balance, setBalance] = useState<number | null>(null)
 
-  const fetchAnalyses = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     if (!user?.id) return
 
     setIsLoadingAnalyses(true)
     try {
-      const response = await get<ApiResponse<any>>(`/analysis/user/${user.id}?page=0&page_size=5`)
+      const [analysesRes, balanceRes] = await Promise.all([
+        get<ApiResponse<any>>(`/analysis/user/${user.id}?page=0&page_size=5`),
+        get<ApiResponse<number>>(`/wallets/user/${user.id}/balance`)
+      ])
       
-      if (response.success && response.data?.items) {
-        const mappedAnalyses: AuditRecord[] = response.data.items.map((item: any) => ({
+      if (analysesRes.success && analysesRes.data?.items) {
+        const mappedAnalyses: AuditRecord[] = analysesRes.data.items.map((item: any) => ({
           id: item.id,
           client: item.titulo || "Segurado",
           date: new Date(item.dataCriacao).toLocaleDateString("pt-BR"),
@@ -62,16 +66,20 @@ export default function AdvogadoDashboardPage(): JSX.Element {
         }))
         setRecentAnalyses(mappedAnalyses)
       }
+
+      if (balanceRes.success) {
+        setBalance(balanceRes.data)
+      }
     } catch (error) {
-      console.error("Erro ao buscar análises recentes:", error)
+      console.error("Erro ao buscar dados do dashboard:", error)
     } finally {
       setIsLoadingAnalyses(false)
     }
   }, [user?.id])
 
   useEffect(() => {
-    fetchAnalyses()
-  }, [fetchAnalyses])
+    fetchData()
+  }, [fetchData])
 
   const filteredAnalyses = recentAnalyses.filter(analysis => 
     analysis.client.toLowerCase().includes(searchTerm.toLowerCase())
@@ -173,18 +181,20 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 </div>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex items-center gap-4">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex items-center gap-4 group hover:border-[#FFB6E1] transition-colors cursor-pointer relative overflow-hidden">
+                <Link href="/advogado/financeiro" className="absolute inset-0 z-10" />
                 <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6" />
+                  <Coins className="w-6 h-6" />
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 font-medium mb-1">
-                    Taxa de Conversão
+                    Saldo de Tokens
                   </p>
                   <h3 className="text-2xl font-bold text-gray-900">
-                    {MOCK_DASHBOARD_STATS.conversionRate}
+                    {balance !== null ? balance : "--"}
                   </h3>
                 </div>
+                <ArrowRight className="w-4 h-4 ml-auto text-gray-300 group-hover:text-[#A50064] transition-colors" />
               </div>
             </div>
 
@@ -231,21 +241,26 @@ export default function AdvogadoDashboardPage(): JSX.Element {
               </div>
 
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                  <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <div className="p-6 border-b border-gray-100 flex items-center justify-between gap-4">
+                  <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
                     <FileText className="w-5 h-5 text-[#633B48]" />
                     Auditorias Recentes
                   </h2>
-                  <div className="relative">
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Buscar cliente..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#633B48]"
-                      aria-label="Buscar cliente nas auditorias"
-                    />
+                  <div className="flex items-center gap-4 w-full justify-end">
+                    <div className="relative hidden md:block w-full max-w-xs">
+                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Buscar cliente..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#633B48]"
+                        aria-label="Buscar cliente nas auditorias"
+                      />
+                    </div>
+                    <Link href="/advogado/historico" className="text-sm text-[#633B48] font-bold hover:underline whitespace-nowrap">
+                      Ver todos
+                    </Link>
                   </div>
                 </div>
                 <div className="divide-y divide-gray-100">
@@ -281,7 +296,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                             </p>
                           </div>
                         </div>
-                        <Link href="/advogado/auditoria">
+                        <Link href={`/advogado/auditoria/${analysis.id}`}>
                           <button
                             className="p-2 text-gray-400 hover:text-[#633B48] hover:bg-[#FFECF1] rounded-lg transition-colors"
                             title="Abrir Relatório"

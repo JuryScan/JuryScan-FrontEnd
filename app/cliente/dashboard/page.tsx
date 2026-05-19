@@ -11,26 +11,103 @@ import {
   Clock,
   Lock,
   Unlock,
+  Loader2,
 } from "lucide-react"
 
+import { useAuth } from "@/contexts/AuthContext"
+import { post } from "@/lib/api"
+import type { ApiResponse } from "@/lib/types"
+import { toast } from "@/hooks/use-toast"
+
+import ProgressIndicator from "@/components/ProgressIndicator"
+
 export default function ClienteDashboardPage(): JSX.Element {
+  const { user } = useAuth()
   const [file, setFile] = useState<File | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [stepLabel, setStepLabel] = useState("")
+  const [error, setError] = useState<"PASSWORD_PROTECTED" | "ILLEGIBLE" | "GENERIC" | null>(null)
   const [result, setResult] = useState(false)
+  const [isBuying, setIsBuying] = useState(false)
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
-    if (selectedFile) setFile(selectedFile)
+    if (selectedFile) {
+      setFile(selectedFile)
+      setError(null)
+      setResult(false)
+    }
   }
 
   const handleAnalyze = () => {
     if (!file) return
     setIsAnalyzing(true)
+    setError(null)
+    setResult(false)
+    setProgress(10)
+    setStepLabel("Lendo documento...")
 
-    setTimeout(() => {
-      setIsAnalyzing(false)
-      setResult(true)
-    }, 2500)
+    // Simulação de progresso para o cliente
+    const steps = [
+      { p: 35, l: "Identificando vínculos..." },
+      { p: 70, l: "Analisando inconsistências..." },
+      { p: 95, l: "Gerando resumo..." }
+    ]
+
+    steps.forEach((step, index) => {
+      setTimeout(() => {
+        setProgress(step.p)
+        setStepLabel(step.l)
+        if (index === steps.length - 1) {
+          setTimeout(() => {
+            setIsAnalyzing(false)
+            setResult(true)
+            setProgress(100)
+          }, 2000)
+        }
+      }, (index + 1) * 3000)
+    })
+  }
+
+  const handleRetry = () => {
+    setError(null)
+    setResult(false)
+    setIsAnalyzing(false)
+    setFile(null)
+  }
+
+  const handleUnlock = async () => {
+    if (!user?.id) {
+      toast({
+        title: "Atenção",
+        description: "Você precisa estar logado para realizar esta ação.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsBuying(true)
+    try {
+      const response = await post<ApiResponse<any>>("/product-checkout/checkout", {
+        name: "Desbloqueio de Relatório Individual",
+        amount: 2990, // R$ 29,90 em centavos
+        quantity: 1
+      })
+
+      if (response.success && response.data.sessionUrl) {
+        window.location.href = response.data.sessionUrl
+      }
+    } catch (error) {
+      console.error("Erro no checkout:", error)
+      toast({
+        title: "Erro",
+        description: "Não foi possível iniciar o pagamento.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsBuying(false)
+    }
   }
 
   return (
@@ -88,6 +165,7 @@ export default function ClienteDashboardPage(): JSX.Element {
                     onClick={() => {
                       setFile(null)
                       setResult(false)
+                      setError(null)
                     }}
                     className="px-4 py-2 rounded-md text-gray-500 border border-gray-300 hover:bg-white transition-colors"
                     aria-label="Trocar arquivo"
@@ -105,14 +183,14 @@ export default function ClienteDashboardPage(): JSX.Element {
                 className="w-full py-5 bg-[#633B48] hover:bg-[#300117] text-white font-bold text-lg rounded-xl shadow-md transition-all disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isAnalyzing
-                  ? "Nossa IA está lendo seu documento..."
+                  ? "Processando..."
                   : "Traduzir meu CNIS"}
               </button>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 flex flex-col h-full">
-            {!result && !isAnalyzing && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 flex flex-col h-full min-h-[450px]">
+            {!result && !isAnalyzing && !error && (
               <div className="flex-grow flex flex-col items-center justify-center text-center text-gray-400 min-h-[400px]">
                 <Clock className="w-16 h-16 text-gray-200 mb-4" />
                 <p className="text-lg font-medium text-gray-500">
@@ -123,14 +201,31 @@ export default function ClienteDashboardPage(): JSX.Element {
             )}
 
             {isAnalyzing && (
-              <div className="flex-grow flex flex-col items-center justify-center text-center min-h-[400px]">
-                <div className="w-16 h-16 border-4 border-[#FFECF1] border-t-[#633B48] rounded-full animate-spin mb-6" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  Analisando seu histórico...
-                </h3>
-                <p className="text-gray-500">
-                  Procurando vínculos e oportunidades de correção.
+              <div className="flex-grow flex flex-col items-center justify-center text-center min-h-[400px] animate-in fade-in duration-500">
+                <div className="w-full max-w-xs">
+                  <h3 className="text-xl font-bold text-gray-900 mb-6">
+                    Analisando seu histórico...
+                  </h3>
+                  <ProgressIndicator value={progress} label={stepLabel} />
+                </div>
+              </div>
+            )}
+
+            {error && (
+               <div className="flex-1 flex flex-col items-center justify-center text-center p-6 animate-in fade-in zoom-in duration-300">
+                <div className="mb-6 bg-red-50 p-6 rounded-full">
+                  <AlertCircle className="w-12 h-12 text-red-500" />
+                </div>
+                <h3 className="text-xl font-bold text-[#0A1F30] mb-2">Erro na Análise</h3>
+                <p className="text-gray-500 text-sm max-w-xs mb-8">
+                  Ocorreu um problema ao ler seu documento. Tente enviar novamente ou use o arquivo original.
                 </p>
+                <button 
+                  onClick={handleRetry}
+                  className="border-2 border-[#633B48] text-[#633B48] hover:bg-[#FFECF1] font-bold px-8 py-2 rounded-xl transition-colors"
+                >
+                  Tentar Novamente
+                </button>
               </div>
             )}
 
@@ -205,12 +300,18 @@ export default function ClienteDashboardPage(): JSX.Element {
               </div>
 
               <div className="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
-                <Link href="/cliente/checkout" className="w-full">
-                  <button className="w-full py-5 rounded-xl bg-white hover:bg-gray-100 text-[#633B48] font-bold text-lg flex items-center justify-center transition-transform hover:scale-[1.02] shadow-md">
+                <button 
+                  onClick={handleUnlock}
+                  disabled={isBuying}
+                  className="w-full py-5 rounded-xl bg-white hover:bg-gray-100 text-[#633B48] font-bold text-lg flex items-center justify-center transition-transform hover:scale-[1.02] shadow-md disabled:opacity-70"
+                >
+                  {isBuying ? (
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  ) : (
                     <Unlock className="w-5 h-5 mr-2" />
-                    Desbloquear Relatório (R$ 29,90)
-                  </button>
-                </Link>
+                  )}
+                  Desbloquear Relatório (R$ 29,90)
+                </button>
 
                 <Link href="/cliente/advogados" className="w-full">
                   <button className="w-full py-5 rounded-xl bg-[#300117] hover:bg-[#1a000c] text-white border border-[#FFECF1]/20 font-bold text-lg flex items-center justify-center transition-transform hover:scale-[1.02] shadow-md">

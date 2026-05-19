@@ -83,7 +83,7 @@ export default function Footer(): JSX.Element {
               <Link href="#" className="hover:text-white">
                 Política de Privacidade
               </Link>
-              <Link href="#" className="hover:text-white">
+              <Link href="/contato" className="hover:text-white">
                 Entre em contato com a JuryScan
               </Link>
               <Link href="#" className="hover:text-white">

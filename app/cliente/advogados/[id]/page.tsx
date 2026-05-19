@@ -1,47 +1,73 @@
 "use client"
 
-import React from "react"
-import { useRouter } from "next/navigation"
-import { ArrowLeft, Star, ShieldCheck, MapPin, Briefcase, MessageCircle, CheckCircle2, Clock, Scale } from "lucide-react"
-
-interface LawyerDetails {
-  id: number
-  name: string
-  oab: string
-  specialty: string
-  location: string
-  rating: number
-  reviews: number
-  image: string
-  verified: boolean
-  experience: string
-  about: string
-  services: string[]
-}
-
-const LAWYER_DETAILS: LawyerDetails = {
-    id: 1,
-    name: "Dra. Ana Clara Fontes",
-    oab: "OAB/PE 45.892",
-    specialty: "Aposentadoria Especial & Revisões",
-    location: "Recife, PE (Atende Online para todo o Brasil)",
-    rating: 4.9,
-    reviews: 128,
-    image: "https://i.pravatar.cc/150?img=47",
-    verified: true,
-    experience: "8 anos",
-    about: 'Especialista em Direito Previdenciário com foco em aposentadorias complexas, revisões de benefícios e auxílios negados pelo INSS. Minha missão é traduzir o "juridiquês" e lutar para que você receba cada centavo que é seu por direito, com total transparência.',
-    services: [
-        "Planejamento Previdenciário",
-        "Aposentadoria por Tempo de Contribuição",
-        "Aposentadoria Especial (Médicos, Enfermeiros, etc)",
-        "Revisão da Vida Toda",
-        "Auxílio-Doença e BPC/LOAS"
-    ]
-}
+import React, { useEffect, useState } from "react"
+import { useRouter, useParams } from "next/navigation"
+import { 
+    ArrowLeft, Star, ShieldCheck, MapPin, Briefcase, 
+    MessageCircle, CheckCircle2, Clock, Scale, Loader2 
+} from "lucide-react"
+import { get, post } from "@/lib/api"
+import type { ApiResponse, Lawyer } from "@/lib/types"
+import { toast } from "@/hooks/use-toast"
 
 export default function PerfilAdvogadoPage() {
     const router = useRouter()
+    const params = useParams()
+    const [lawyer, setLawyer] = useState<any>(null)
+    const [isLoading, setIsLoading] = useState(true)
+    const [isSendingLead, setIsSendingLead] = useState(false)
+
+    useEffect(() => {
+        const fetchLawyer = async () => {
+            if (!params.id) return
+            try {
+                const res = await get<ApiResponse<any>>(`/users/advogados/${params.id}`)
+                if (res.success) {
+                    setLawyer(res.data)
+                }
+            } catch (error) {
+                console.error("Erro ao buscar advogado:", error)
+                toast({ title: "Erro", description: "Não foi possível carregar o perfil.", variant: "destructive" })
+            } finally {
+                setIsLoading(false)
+            }
+        }
+        fetchLawyer()
+    }, [params.id])
+
+    const handleSolicitarAtendimento = async () => {
+        setIsSendingLead(true)
+        try {
+            // Simulação de criação de Lead/Chat
+            await post(`/leads`, { lawyerId: params.id })
+            toast({ 
+                title: "Solicitação Enviada!", 
+                description: "O advogado recebeu seu interesse e entrará em contato em breve.",
+                variant: "default" 
+            })
+        } catch (error) {
+            toast({ title: "Erro", description: "Falha ao enviar solicitação.", variant: "destructive" })
+        } finally {
+            setIsSendingLead(false)
+        }
+    }
+
+    if (isLoading) {
+        return (
+            <div className="flex h-screen items-center justify-center bg-gray-50">
+                <Loader2 className="size-12 animate-spin text-[#633B48]" />
+            </div>
+        )
+    }
+
+    if (!lawyer) {
+        return (
+            <div className="flex h-screen flex-col items-center justify-center bg-gray-50 p-6 text-center">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Advogado não encontrado</h2>
+                <button onClick={() => router.back()} className="text-[#633B48] font-bold">Voltar</button>
+            </div>
+        )
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 pb-12 font-sans">
@@ -68,28 +94,28 @@ export default function PerfilAdvogadoPage() {
                             
                             <div className="relative flex flex-col sm:flex-row gap-6 items-center sm:items-start text-center sm:text-left">
                                 <img 
-                                    src={LAWYER_DETAILS.image} 
-                                    alt={LAWYER_DETAILS.name} 
+                                    src={lawyer.fotoUrl || "https://via.placeholder.com/150"} 
+                                    alt={lawyer.nomeCompleto} 
                                     className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md z-10"
                                 />
                                 <div className="z-10 mt-2 sm:mt-4">
                                     <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
-                                        <h1 className="text-2xl font-bold text-gray-900">{LAWYER_DETAILS.name}</h1>
-                                        {LAWYER_DETAILS.verified && (
+                                        <h1 className="text-2xl font-bold text-gray-900">{lawyer.nomeCompleto}</h1>
+                                        {lawyer.verificado && (
                                             <ShieldCheck className="w-6 h-6 text-green-500" />
                                         )}
                                     </div>
-                                    <p className="text-[#633B48] font-semibold mb-3">{LAWYER_DETAILS.oab}</p>
+                                    <p className="text-[#633B48] font-semibold mb-3">{lawyer.numeroOab}</p>
                                     
                                     <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-gray-600">
                                         <div className="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-200">
                                             <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                            <span className="font-bold text-yellow-700">{LAWYER_DETAILS.rating}</span>
-                                            <span className="text-yellow-600">({LAWYER_DETAILS.reviews} avaliações)</span>
+                                            <span className="font-bold text-yellow-700">{lawyer.rating || "5.0"}</span>
+                                            <span className="text-yellow-600">({lawyer.reviews || "0"} avaliações)</span>
                                         </div>
                                         <div className="flex items-center gap-1">
                                             <MapPin className="w-4 h-4" />
-                                            {LAWYER_DETAILS.location}
+                                            {lawyer.localizacao || "Atendimento Online"}
                                         </div>
                                     </div>
                                 </div>
@@ -99,10 +125,10 @@ export default function PerfilAdvogadoPage() {
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                                 <Briefcase className="w-5 h-5 text-[#633B48]" />
-                                Sobre a Profissional
+                                Sobre o(a) Profissional
                             </h2>
                             <p className="text-gray-600 leading-relaxed mb-8">
-                                {LAWYER_DETAILS.about}
+                                {lawyer.descricao || "Este profissional ainda não adicionou uma descrição detalhada."}
                             </p>
 
                             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -110,7 +136,7 @@ export default function PerfilAdvogadoPage() {
                                 Especialidades
                             </h2>
                             <div className="grid sm:grid-cols-2 gap-3">
-                                {LAWYER_DETAILS.services.map((service, index) => (
+                                {(lawyer.servicos || ["Direito Previdenciário", "Cálculos CNIS"]).map((service: string, index: number) => (
                                     <div key={index} className="flex items-start gap-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
                                         <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
                                         <span className="text-gray-700 text-sm font-medium">{service}</span>
@@ -144,30 +170,26 @@ export default function PerfilAdvogadoPage() {
                     <div className="md:col-span-1">
                         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sticky top-24">
                             <div className="text-center mb-6">
-                                <h3 className="font-bold text-gray-900 text-lg mb-1">Gostou da profissional?</h3>
+                                <h3 className="font-bold text-gray-900 text-lg mb-1">Gostou do profissional?</h3>
                                 <p className="text-sm text-gray-500">Envie uma mensagem e anexe seu relatório do INSS gratuitamente.</p>
                             </div>
 
-                            <button className="w-full py-4 bg-[#633B48] hover:bg-[#300117] text-white rounded-xl font-bold text-lg flex items-center justify-center transition-all shadow-md mb-4">
-                                <MessageCircle className="w-5 h-5 mr-2" />
-                                Solicitar Atendimento
+                            <button 
+                                onClick={handleSolicitarAtendimento}
+                                disabled={isSendingLead}
+                                className="w-full py-4 bg-[#633B48] hover:bg-[#300117] text-white rounded-xl font-bold text-lg flex items-center justify-center transition-all shadow-md mb-4 disabled:opacity-70"
+                            >
+                                {isSendingLead ? <Loader2 className="size-6 animate-spin" /> : (
+                                    <>
+                                        <MessageCircle className="w-5 h-5 mr-2" />
+                                        Solicitar Atendimento
+                                    </>
+                                )}
                             </button>
 
                             <div className="flex items-center justify-center gap-2 text-xs text-gray-400 mb-6">
                                 <Clock className="w-4 h-4" />
                                 Tempo de resposta: aprox. 2 horas
-                            </div>
-
-                            <div className="border-t border-gray-100 pt-6">
-                                <div className="flex items-center gap-3 mb-3">
-                                    <img src="https://i.pravatar.cc/150?img=12" alt="Cliente" className="w-10 h-10 rounded-full" />
-                                    <div>
-                                        <div className="flex text-yellow-500">
-                                            <Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" /><Star className="w-3 h-3 fill-current" />
-                                        </div>
-                                        <p className="text-xs text-gray-500 italic">"Muito atenciosa e resolveu meu benefício rápido!"</p>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>

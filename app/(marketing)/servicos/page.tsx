@@ -290,10 +290,10 @@ export default function ServicesPage() {
                                     <Link
                                         href={
                                             plan.isFree
-                                                ? "/auditor"
+                                                ? "/advogado/auditoria"
                                                 : plan.cta === "Falar com Consultor"
                                                     ? "/contato"
-                                                    : `/checkout?plan=${encodeURIComponent(plan.name)}&price=${encodeURIComponent(plan.price)}`
+                                                    : `/cliente/checkout?plan=${encodeURIComponent(plan.name)}&price=${encodeURIComponent(plan.price)}`
                                         }
                                     >
                                         <Button
