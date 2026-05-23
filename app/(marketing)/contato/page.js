@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import Header from "@/components/Header"
-import Footer from "@/components/Footer"
+import Header from "@/components/shared/Header"
+import Footer from "@/components/shared/Footer"
 import { Button } from "@/components/ui/button"
 import { Mail, MapPin, Phone, Send, MessageSquare, CheckCircle } from "lucide-react"
 
