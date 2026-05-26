@@ -69,7 +69,7 @@ export default function ConfiguracoesPage() {
     defaultValues: {
       nomeCompleto: user?.nomeCompleto || "",
       email: user?.email || "",
-      telefone: user?.telefone || "",
+      telefone: String(user?.telefone || ""),
       numeroOab: user?.numeroOab || "",
       experiencia: user?.experiencia || "",
       descricao: user?.descricao || "",
