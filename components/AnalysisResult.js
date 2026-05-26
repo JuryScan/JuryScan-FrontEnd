@@ -1,6 +1,6 @@
 import { CheckCircle, AlertTriangle, AlertCircle, Info, FileText, Download } from "lucide-react"
 
-export default function AnalysisResult({ result, loading }) {
+export default function AnalysisResult({ result, loading, onExportPDF, onExportHTML }) {
 
     const getSeverityStyles = (severity) => {
         switch (severity) {
@@ -17,7 +17,6 @@ export default function AnalysisResult({ result, loading }) {
 
     return (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 h-full flex flex-col">
-
             {loading ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-gray-500 min-h-[400px]">
                     <div className="w-16 h-16 border-4 border-[#FFECF1] border-t-[#633B48] rounded-full animate-spin mb-6"></div>
@@ -29,14 +28,11 @@ export default function AnalysisResult({ result, loading }) {
                     <div className="mb-4 bg-gray-50 p-6 rounded-full">
                         <CheckCircle className="w-12 h-12 text-gray-300" />
                     </div>
-                    <p className="text-lg font-bold text-[#0A1F30] mb-1">
-                        Auditoria Pendente
-                    </p>
+                    <p className="text-lg font-bold text-[#0A1F30] mb-1">Auditoria Pendente</p>
                     <p className="text-sm">Faça o upload do documento ao lado.</p>
                 </div>
             ) : (
                 <div className="flex-1 flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
-
                     <div className="mb-6 pb-6 border-b border-gray-100 flex justify-between items-start">
                         <div>
                             <h3 className="font-bold text-2xl text-[#0A1F30] mb-1">Relatório Técnico</h3>
@@ -53,20 +49,13 @@ export default function AnalysisResult({ result, loading }) {
                     <div className="space-y-4 flex-grow overflow-y-auto max-h-[500px] pr-2 custom-scrollbar">
                         {result.issues.map((issue) => {
                             const styles = getSeverityStyles(issue.severity)
-
                             return (
                                 <div key={issue.id} className={`${styles.bg} ${styles.border} border rounded-xl p-5`}>
                                     <div className="flex gap-4">
-                                        <div className="mt-1 flex-shrink-0">
-                                            {styles.icon}
-                                        </div>
+                                        <div className="mt-1 flex-shrink-0">{styles.icon}</div>
                                         <div className="w-full">
-                                            <h4 className={`font-bold ${styles.text} text-lg mb-2`}>
-                                                {issue.title}
-                                            </h4>
-                                            <p className="text-gray-700 text-sm mb-4 leading-relaxed">
-                                                {issue.description}
-                                            </p>
+                                            <h4 className={`font-bold ${styles.text} text-lg mb-2`}>{issue.title}</h4>
+                                            <p className="text-gray-700 text-sm mb-4 leading-relaxed">{issue.description}</p>
                                             <div className="bg-white/80 rounded-lg p-3 text-sm font-medium border border-black/5 text-[#0A1F30]">
                                                 <strong className="text-[#633B48]">Ação Recomendada:</strong> {issue.recommendation}
                                             </div>
@@ -77,13 +66,22 @@ export default function AnalysisResult({ result, loading }) {
                         })}
                     </div>
 
-                    <div className="mt-8 pt-6 border-t border-gray-100">
-                        <button className="w-full py-4 border-2 border-[#633B48] text-[#633B48] hover:bg-[#633B48] hover:text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2">
+                    <div className="mt-8 pt-6 border-t border-gray-100 flex gap-3">
+                        <button
+                            onClick={onExportHTML}
+                            className="flex-1 py-4 border-2 border-[#633B48] text-[#633B48] hover:bg-[#FFECF1] font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
+                        >
+                            <FileText className="w-5 h-5" />
+                            Exportar HTML
+                        </button>
+                        <button
+                            onClick={onExportPDF}
+                            className="flex-1 py-4 bg-[#633B48] hover:bg-[#300117] text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
+                        >
                             <Download className="w-5 h-5" />
-                            Exportar Laudo em PDF
+                            Baixar PDF
                         </button>
                     </div>
-
                 </div>
             )}
         </div>
