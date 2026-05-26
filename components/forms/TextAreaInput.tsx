@@ -1,24 +1,19 @@
 import React from "react";
 import { useFormContext, RegisterOptions } from "react-hook-form";
 
-type Option = {
-  value: string | number;
-  label: string;
-};
-
-type SelectInputProps = {
+type TextAreaInputProps = {
   name: string;
   label: string;
-  options: Option[];
   placeholder?: string;
+  rows?: number;
   rules?: RegisterOptions;
 };
 
-export const SelectInput: React.FC<SelectInputProps> = ({
+export const TextAreaInput: React.FC<TextAreaInputProps> = ({
   name,
   label,
-  options,
-  placeholder = "Selecione...",
+  placeholder,
+  rows = 4,
   rules,
 }) => {
   const {
@@ -33,21 +28,13 @@ export const SelectInput: React.FC<SelectInputProps> = ({
       <label htmlFor={name} className="font-medium text-sm text-[#0A1F30]">
         {label}
       </label>
-      <select
+      <textarea
         {...register(name, rules)}
         id={name}
-        className={`input-base ${error ? "border-red-500 focus:ring-red-300" : ""}`}
-        defaultValue=""
-      >
-        <option value="" disabled>
-          {placeholder}
-        </option>
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+        rows={rows}
+        placeholder={placeholder}
+        className={`input-base resize-none ${error ? "border-red-500 focus:ring-red-300" : ""}`}
+      />
       {error && (
         <span className="text-red-500 text-xs mt-1">{error}</span>
       )}
