@@ -1,8 +1,6 @@
 "use client"
 
 import React from "react"
-import Header from "@/components/shared/Header"
-import Footer from "@/components/shared/Footer"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import {
@@ -11,13 +9,15 @@ import {
 } from "lucide-react"
 
 export default function ServicesPage() {
+   
+    const user = true 
 
     const services = [
         {
             icon: Shield,
             title: "Auditor CNIS",
             description: "Nossa IA analisa o extrato previdenciário em segundos, identificando vínculos extemporâneos e falhas.",
-            link: "/auditor",
+            link: "/advogado/auditoria", // Rota da ferramenta real interna
             active: true
         },
         {
@@ -168,6 +168,7 @@ export default function ServicesPage() {
                     </div>
                 </section>
 
+               
                 <section className="py-20 px-4">
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center mb-12">
@@ -178,27 +179,30 @@ export default function ServicesPage() {
                             {services.map((service, index) => (
                                 <div
                                     key={index}
-                                    className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:-translate-y-1 group"
+                                    className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:-translate-y-1 group flex flex-col justify-between"
                                 >
-                                    <div className="mb-6 bg-gray-50 w-20 h-20 rounded-2xl flex items-center justify-center group-hover:bg-[#FFECF1] transition-colors">
-                                        <service.icon className="w-10 h-10 text-[#633B48]" />
+                                    <div>
+                                        <div className="mb-6 bg-gray-50 w-20 h-20 rounded-2xl flex items-center justify-center group-hover:bg-[#FFECF1] transition-colors">
+                                            <service.icon className="w-10 h-10 text-[#633B48]" />
+                                        </div>
+
+                                        <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#633B48] transition-colors">
+                                            {service.title}
+                                        </h3>
+                                        <p className="text-gray-600 leading-relaxed mb-6">
+                                            {service.description}
+                                        </p>
                                     </div>
 
-                                    <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-[#633B48] transition-colors">
-                                        {service.title}
-                                    </h3>
-                                    <p className="text-gray-600 leading-relaxed mb-6">
-                                        {service.description}
-                                    </p>
-
                                     {service.active ? (
-                                        <Link href={service.link}>
+                                        
+                                        <Link href={user ? service.link : "/login"}>
                                             <Button variant="outline" className="w-full border-[#633B48] text-[#633B48] hover:bg-[#633B48] hover:text-white group">
                                                 Acessar Ferramenta <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                             </Button>
                                         </Link>
                                     ) : (
-                                        <Button disabled className="w-full bg-gray-100 text-gray-400 border-0">
+                                        <Button disabled className="w-full bg-gray-100 text-gray-400 border-0 cursor-not-allowed">
                                             Em Breve
                                         </Button>
                                     )}
@@ -208,6 +212,7 @@ export default function ServicesPage() {
                     </div>
                 </section>
 
+                
                 <section className="py-10 px-4 bg-[#633B48]/5 relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-30">
                         <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#633B48]/10 rounded-full blur-3xl"></div>
@@ -222,92 +227,96 @@ export default function ServicesPage() {
                             </p>
                         </div>
 
-                        <div className="flex flex-nowrap overflow-x-auto xl:flex-wrap xl:justify-center gap-6 py-12 px-4 snap-x snap-mandatory scroll-smooth scrollbar-hide items-start">
+                        <div className="flex flex-nowrap overflow-x-auto xl:flex-wrap xl:justify-center gap-6 py-12 px-4 snap-x snap-mandatory scroll-smooth scrollbar-hide">
 
                             {plans.map((plan, index) => (
                                 <div
                                     key={index}
                                     className={`
-                      snap-center flex-shrink-0 w-[300px] md:w-[320px] flex flex-col
-                      rounded-2xl p-6 border transition-all duration-300 relative
-                      ${plan.highlight
-                                        ? 'bg-white border-[#633B48] shadow-2xl xl:scale-105 z-10'
-                                        : 'bg-white/90 border-gray-200 hover:shadow-lg xl:mt-4'
-                                    }
-                      ${plan.isFree ? 'bg-gray-50/80 border-gray-200' : ''}
-                    `}
-                                >
-                                    {plan.highlight && (
-                                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#633B48] text-white px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1 shadow-md whitespace-nowrap z-20">
-                                            <Star size={14} fill="white" /> Recomendado
-                                        </div>
-                                    )}
-
-                                    {plan.isFree && (
-                                        <div className="absolute top-0 right-0 bg-gray-200 text-gray-600 text-[10px] font-bold px-2 py-1 rounded-bl-lg rounded-tr-lg">
-                                            GRÁTIS
-                                        </div>
-                                    )}
-
-                                    <div className="mb-6">
-                                        <h3 className="text-lg font-bold text-gray-800 mb-2">{plan.name}</h3>
-                                        <div className="flex items-baseline gap-1">
-                        <span className={`text-3xl font-bold ${plan.isFree ? 'text-gray-500' : 'text-[#633B48]'}`}>
-                            {plan.price}
-                        </span>
-                                            <span className="text-gray-400 text-xs">{plan.period}</span>
-                                        </div>
-                                        <span className="text-[10px] font-bold uppercase tracking-wide text-gray-500 bg-gray-100 px-2 py-1 rounded mt-2 inline-block border border-gray-200">
-                        {plan.target}
-                      </span>
-                                        <p className="text-gray-500 text-sm mt-3 leading-snug min-h-[40px]">
-                                            {plan.description}
-                                        </p>
-                                    </div>
-
-                                    <div className="flex-grow space-y-3 mb-6">
-                                        {plan.features.map((feature, idx) => {
-                                            const isLimitation = feature.startsWith("Sem") || feature.startsWith("Visualização apenas");
-
-                                            return (
-                                                <div key={idx} className="flex items-start gap-2.5">
-                                                    <div className={`mt-0.5 p-0.5 rounded-full flex-shrink-0 ${isLimitation ? 'bg-gray-100' : 'bg-green-100'}`}>
-                                                        {isLimitation ? (
-                                                            <Lock className="w-3 h-3 text-gray-400" />
-                                                        ) : (
-                                                            <Check className="w-3 h-3 text-green-700" />
-                                                        )}
-                                                    </div>
-                                                    <span className={`text-sm leading-snug ${isLimitation ? 'text-gray-400 italic' : 'text-gray-600'}`}>
-                                    {feature}
-                                </span>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-
-                                    {/* ── BOTÃO ATUALIZADO ── */}
-                                    <Link
-                                        href={
-                                            plan.isFree
-                                                ? "/advogado/auditoria"
-                                                : plan.cta === "Falar com Consultor"
-                                                    ? "/contato"
-                                                    : `/cliente/checkout?plan=${encodeURIComponent(plan.name)}&price=${encodeURIComponent(plan.price)}`
+                                        snap-center flex-shrink-0 w-[300px] md:w-[320px] flex flex-col justify-between
+                                        rounded-2xl p-6 border transition-all duration-300 relative bg-white
+                                        ${plan.highlight
+                                            ? 'border-[#633B48] shadow-2xl xl:scale-105 z-10'
+                                            : 'border-gray-200 hover:shadow-lg xl:mt-4'
                                         }
-                                    >
-                                        <Button
-                                            className={`w-full py-5 text-base transition-transform active:scale-95 ${
-                                                plan.highlight
-                                                    ? 'bg-[#633B48] hover:bg-[#300117] text-white shadow-lg'
+                                        ${plan.isFree ? 'bg-gray-50/80 border-gray-200' : ''}
+                                    `}
+                                align-items-stretch="true">
+                                    <div>
+                                        {plan.highlight && (
+                                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#633B48] text-white px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1 shadow-md whitespace-nowrap z-20">
+                                                <Star size={14} fill="white" /> Recomendado
+                                            </div>
+                                        )}
+
+                                        {plan.isFree && (
+                                            <div className="absolute top-0 right-0 bg-gray-200 text-gray-600 text-[10px] font-bold px-2 py-1 rounded-bl-lg rounded-tr-lg">
+                                                GRÁTIS
+                                            </div>
+                                        )}
+
+                                        <div className="mb-6">
+                                            <h3 className="text-lg font-bold text-gray-800 mb-2">{plan.name}</h3>
+                                            <div className="flex items-baseline gap-1">
+                                                <span className={`text-3xl font-bold ${plan.isFree ? 'text-gray-500' : 'text-[#633B48]'}`}>
+                                                    {plan.price}
+                                                </span>
+                                                <span className="text-gray-400 text-xs">{plan.period}</span>
+                                            </div>
+                                            <span className="text-[10px] font-bold uppercase tracking-wide text-gray-500 bg-gray-100 px-2 py-1 rounded mt-2 inline-block border border-gray-200">
+                                                {plan.target}
+                                            </span>
+                                            <p className="text-gray-500 text-sm mt-3 leading-snug min-h-[48px]">
+                                                {plan.description}
+                                            </p>
+                                        </div>
+
+                                        <div className="space-y-3 mb-6">
+                                            {plan.features.map((feature, idx) => {
+                                                const isLimitation = feature.startsWith("Sem") || feature.startsWith("Visualização apenas");
+
+                                                return (
+                                                    <div key={idx} className="flex items-start gap-2.5">
+                                                        <div className={`mt-0.5 p-0.5 rounded-full flex-shrink-0 ${isLimitation ? 'bg-gray-100' : 'bg-green-100'}`}>
+                                                            {isLimitation ? (
+                                                                <Lock className="w-3 h-3 text-gray-400" />
+                                                            ) : (
+                                                                <Check className="w-3 h-3 text-green-700" />
+                                                            )}
+                                                        </div>
+                                                        <span className={`text-sm leading-snug ${isLimitation ? 'text-gray-400 italic' : 'text-gray-600'}`}>
+                                                            {feature}
+                                                        </span>
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-auto">
+                                        
+                                        <Link
+                                            href={
+                                                plan.cta === "Falar com Consultor"
+                                                    ? "/contato"
                                                     : plan.isFree
-                                                        ? 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
-                                                        : 'bg-white border-2 border-[#633B48] text-[#633B48] hover:bg-[#FFECF1]'
-                                            }`}
+                                                        ? (user ? "/advogado/auditoria" : "/login")
+                                                        : (user ? `/cliente/checkout?plan=${encodeURIComponent(plan.name)}&price=${encodeURIComponent(plan.price)}` : "/login")
+                                            }
                                         >
-                                            {plan.cta}
-                                        </Button>
-                                    </Link>
+                                            <Button
+                                                className={`w-full py-5 text-base transition-transform active:scale-95 ${
+                                                    plan.highlight
+                                                        ? 'bg-[#633B48] hover:bg-[#300117] text-white shadow-lg'
+                                                        : plan.isFree
+                                                            ? 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
+                                                            : 'bg-white border-2 border-[#633B48] text-[#633B48] hover:bg-[#FFECF1]'
+                                                }`}
+                                            >
+                                                {plan.cta}
+                                            </Button>
+                                        </Link>
+                                    </div>
 
                                 </div>
                             ))}
@@ -339,8 +348,6 @@ export default function ServicesPage() {
                 </section>
 
             </main>
-
-            <Footer />
         </div>
     )
 }

@@ -5,7 +5,6 @@ import StatsSection from "@/components/StatsSection";
 import ExperimentSection from "@/components/ExperimentSection";
 import AboutSection from "@/components/AboutSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
-import Footer from "@/components/shared/Footer";
 import Drawer from "@/components/Drawer";
 
 export default function HomePage() {
@@ -21,7 +20,7 @@ export default function HomePage() {
         <AboutSection />
         <TestimonialsSection />
       </main>
-      <Footer />
+      
       <Drawer
         open={open}
         onClose={() => setOpen(false)}

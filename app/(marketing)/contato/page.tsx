@@ -220,7 +220,6 @@ export default function ContactPage(): JSX.Element {
         </section>
       </main>
 
-      <Footer />
     </div>
   )
 }

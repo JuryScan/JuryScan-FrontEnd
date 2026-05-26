@@ -100,7 +100,6 @@ export default function AuditorPage(): JSX.Element {
         </div>
       </main>
 
-      <Footer />
     </div>
   )
 }
