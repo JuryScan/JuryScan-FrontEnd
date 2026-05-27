@@ -29,9 +29,9 @@ export default function ClienteLayout({ children }: ClienteLayoutProps): JSX.Ele
     )
   }
 
-  if (!isAuthenticated) {
-    return <div className="p-8 text-center">Redirecionando...</div>
-  }
+  // if (!isAuthenticated) {
+  //   return <div className="p-8 text-center">Redirecionando...</div>
+  // }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">

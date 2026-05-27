@@ -128,7 +128,7 @@ export default function LoginForm(): JSX.Element {
                 href="#"
                 className="text-[#A50064] hover:underline font-medium"
               >
-                Esqueci minha senha
+                Campanha / Esqueci minha senha
               </Link>
               <div className="text-gray-500">
                 Sem conta?{" "}
@@ -137,16 +137,6 @@ export default function LoginForm(): JSX.Element {
                   className="text-[#A50064] font-medium hover:underline"
                 >
                   criar conta
-                </Link>
-              </div>
-            </div>
-          </form>
-        </FormProvider>
-      </div>
-    </div>
-  )
-}
-r conta
                 </Link>
               </div>
             </div>

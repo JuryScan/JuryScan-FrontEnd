@@ -15,7 +15,6 @@ export default function CadastroPage() {
           <SignupForm />
         </div>
       </div>
-      <Footer />
     </div>
   )
 }

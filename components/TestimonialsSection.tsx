@@ -18,7 +18,7 @@ const testimonials: Testimonial[] = [
     role: "Advogado",
     rating: 5,
     photo: "/marcos.jpg",
-    text: "A plataforma revolucionou minha prática jurídica. Consigo acompanhar processos de forma muito mais eficiente.",
+    text: "A plataforma revolutionized minha prática jurídica. Consigo acompanhar processos de forma muito mais eficiente.",
   },
   {
     name: "Ana Silva",
@@ -53,7 +53,7 @@ const testimonials: Testimonial[] = [
     role: "Advogada",
     rating: 5,
     photo: "/patricia.jpg",
-    text: "Melhor investimento que fiz para meu escritório. Resultados impressionantes!",
+    text: "Melhor investment que fiz para meu escritório. Resultados impressionantes!",
   },
 ]
 
@@ -95,39 +95,43 @@ export default function TestimonialsSection(): JSX.Element {
             <ChevronLeft size={20} className="text-gray-600" />
           </button>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          {/* O items-stretch garante que os 3 cards mantenham a mesma altura sempre */}
+          <div className="grid md:grid-cols-3 gap-8 items-stretch">
             {currentTestimonials.map((testimonial, index) => (
               <div
                 key={index}
-                className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
+                className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow flex"
               >
-                <div className="flex flex-col items-center">
-                  <div className="relative w-16 h-16 mb-4 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-                    <Image
-                      src={testimonial.photo}
-                      alt={`Foto de ${testimonial.name}`}
-                      fill
-                      className="object-cover"
-                      sizes="64px"
-                    />
+                <div className="flex flex-col items-center w-full justify-between">
+                  <div className="flex flex-col items-center">
+                    <div className="relative w-16 h-16 mb-4 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                      <Image
+                        src={testimonial.photo}
+                        alt={`Foto de ${testimonial.name}`}
+                        fill
+                        className="object-cover"
+                        sizes="64px"
+                      />
+                    </div>
+
+                    <h4 className="font-bold text-gray-900 text-center mb-1">
+                      {testimonial.name}
+                    </h4>
+                    <p className="text-gray-600 text-sm text-center mb-3">
+                      {testimonial.role}
+                    </p>
+
+                    <div className="flex justify-center mb-4">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <span key={i} className="text-yellow-400 text-lg">
+                          ★
+                        </span>
+                      ))}
+                    </div>
                   </div>
 
-                  <h4 className="font-bold text-gray-900 text-center mb-1">
-                    {testimonial.name}
-                  </h4>
-                  <p className="text-gray-600 text-sm text-center mb-3">
-                    {testimonial.role}
-                  </p>
-
-                  <div className="flex justify-center mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <span key={i} className="text-yellow-400 text-lg">
-                        ★
-                      </span>
-                    ))}
-                  </div>
-
-                  <p className="text-gray-600 text-sm text-center leading-relaxed">
+                  {/* A classe min-h-[96px] ou min-h-[110px] segura a flutuação vertical do texto */}
+                  <p className="text-gray-600 text-sm text-center leading-relaxed min-h-[96px] flex items-center justify-center">
                     {testimonial.text}
                   </p>
                 </div>

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { LayoutDashboard, Users, FileSearch, CreditCard, Settings, ShieldAlert, LogOut } from 'lucide-react'
+import { LayoutDashboard, Users, FileSearch, CreditCard, Settings, ShieldAlert, LogOut, History } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
