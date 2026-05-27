@@ -12,7 +12,7 @@ export interface LoginCredentials {
 }
 
 export interface User {
-  id: string
+  id?: string
   nomeCompleto: string
   email: string
   telefone?: string
@@ -62,11 +62,16 @@ export interface UserAdvogado extends User {
 export type Severity = "ALTA" | "MEDIA" | "BAIXA" | "INFO"
 
 export interface AnalysisIssue {
-  id: string
-  titulo: string
-  severidade: Severity
-  descricao: string
-  sugestaoCorrecao: string
+  severity?: string
+  title?: string
+  description?: string
+  recommendation?: string
+  type?: string
+  id?: string
+  titulo?: string
+  severidade?: Severity
+  descricao?: string
+  sugestaoCorrecao?: string
   confianca?: number
 }
 
@@ -77,10 +82,11 @@ export interface AnalysisSummary {
 }
 
 export interface AnalysisResult {
-  id: string
-  titulo: string
-  descricaoGeral: string
-  dataCriacao: string
+  status?: string
+  id?: string
+  titulo?: string
+  descricaoGeral?: string
+  dataCriacao?: string
   summary?: AnalysisSummary
   issues?: AnalysisIssue[]
 }
@@ -90,7 +96,7 @@ export interface AnalysisResult {
 // ============================================================
 
 export interface Lead {
-  id: number
+  id: number | string
   name: string
   status: string
   date: string
@@ -98,7 +104,7 @@ export interface Lead {
 }
 
 export interface AuditRecord {
-  id: number
+  id: number | string
   client: string
   date: string
   issues: number
@@ -137,7 +143,7 @@ export interface SignupFormData {
   confirmarSenha: string
   numeroOab: string
   experiencia: string
-  descricao: string
+  descricao?: string
 }
 
 export type UserType = "comum" | "advogado"
@@ -147,7 +153,7 @@ export type UserType = "comum" | "advogado"
 // ============================================================
 
 export interface Testimonial {
-  id: number
+  id: number | string
   name: string
   role: string
   image: string
@@ -160,7 +166,7 @@ export interface Testimonial {
 // ============================================================
 
 export interface Lawyer {
-  id: number
+  id: number | string
   nomeCompleto: string
   numeroOab: string
   especialidade: string

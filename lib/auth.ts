@@ -37,6 +37,12 @@ export interface UserData {
   nomeCompleto: string
   email: string
   tipoUsuario?: "COMUM" | "ADVOGADO" | "ADMIN"
+  telefone?: string
+  numeroOab?: string
+  experiencia?: string
+  descricao?: string
+  fotoUrl?: string
+  enderecoUrl?: string
   [key: string]: unknown
 }
 

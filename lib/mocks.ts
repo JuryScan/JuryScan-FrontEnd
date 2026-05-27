@@ -25,7 +25,7 @@ export const MOCK_ANALYSIS_RESULT: AnalysisResult = {
   },
   issues: [
     {
-      id: 1,
+      id: "1",
       type: "extemporaneo",
       severity: "warning",
       title: "Vínculo Extemporâneo Detectado (PEXT)",
@@ -35,7 +35,7 @@ export const MOCK_ANALYSIS_RESULT: AnalysisResult = {
         "Solicitar CTPS original, Ficha de Registro de Empregados ou extrato analítico do FGTS para comprovação do vínculo.",
     },
     {
-      id: 2,
+      id: "2",
       type: "open_date",
       severity: "info",
       title: "Vínculo em Aberto",
@@ -45,7 +45,7 @@ export const MOCK_ANALYSIS_RESULT: AnalysisResult = {
         "Realizar acerto de vínculo (Atualização de Vínculos e Remunerações) com apresentação do termo de rescisão.",
     },
     {
-      id: 3,
+      id: "3",
       type: "below_min",
       severity: "critical",
       title: "Contribuição Abaixo do Mínimo (PREC-MENOR-MIN)",
@@ -70,21 +70,21 @@ export const MOCK_DASHBOARD_STATS: DashboardStats = {
 
 export const MOCK_RECENT_LEADS: Lead[] = [
   {
-    id: 1,
+    id: "1",
     name: "Carlos Silva",
     status: "Novo",
     date: "Hoje, 09:30",
     message: "Gostaria de ajuda com as pendências do meu INSS...",
   },
   {
-    id: 2,
+    id: "2",
     name: "Maria Oliveira",
     status: "Em negociação",
     date: "Ontem, 14:15",
     message: "Podemos agendar uma consulta para ver meu tempo especial?",
   },
   {
-    id: 3,
+    id: "3",
     name: "João Mendonça",
     status: "Novo",
     date: "Ontem, 10:05",
@@ -116,7 +116,7 @@ export const MOCK_INTELLIGENCE_STATS: IntelligenceStats = {
 
 export const MOCK_TESTIMONIALS: Testimonial[] = [
   {
-    id: 1,
+    id: "1",
     name: "Marcos Martins",
     role: "Advogado",
     rating: 5,
@@ -124,7 +124,7 @@ export const MOCK_TESTIMONIALS: Testimonial[] = [
     text: "A plataforma revolucionou minha prática jurídica. Consigo acompanhar processos de forma muito mais eficiente.",
   },
   {
-    id: 2,
+    id: "2",
     name: "Ana Silva",
     role: "Advogada",
     rating: 5,
@@ -132,7 +132,7 @@ export const MOCK_TESTIMONIALS: Testimonial[] = [
     text: "Excelente ferramenta para análise de processos do INSS. Recomendo para todos os colegas advogados.",
   },
   {
-    id: 3,
+    id: "3",
     name: "Carlos Santos",
     role: "Advogado",
     rating: 5,

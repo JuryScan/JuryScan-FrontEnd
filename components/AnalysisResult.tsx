@@ -210,7 +210,7 @@ export default function AnalysisResultComponent({
           <div className="space-y-4 flex-grow overflow-y-auto max-h-[450px] pr-2 custom-scrollbar">
             {result.issues && result.issues.length > 0 ? (
               result.issues.map((issue) => {
-                const styles = getSeverityStyles(issue.severidade)
+                const styles = getSeverityStyles(issue.severidade ?? "INFO")
 
                 return (
                   <div

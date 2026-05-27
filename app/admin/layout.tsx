@@ -1,8 +1,7 @@
 import React from 'react'
 import AdminShell from '@/components/AdminShell'
-import { Metadata } from 'next'
 
-export const metadata: Metadata = {
+export const metadata = {
   title: 'JuryScan | Master Admin',
   description: 'Painel de controle global para administradores do JuryScan.',
 }

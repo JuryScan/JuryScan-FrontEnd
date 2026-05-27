@@ -55,7 +55,7 @@ export default function UserManagementPage() {
   // 4. Ação de Banir/Desativar
   const handleToggleStatus = async (user: User) => {
     const newStatus = user.status === "ATIVO" ? "BLOQUEADO" : "ATIVO"
-    setIsActionLoading(user.id)
+    setIsActionLoading(user.id ?? null)
     
     try {
       // Endpoint sugerido: PATCH /admin/users/{id}/status

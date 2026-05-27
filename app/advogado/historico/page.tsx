@@ -116,7 +116,7 @@ export default function AnalysisHistoryPage() {
                         <div className="flex items-center gap-2 text-gray-600">
                           <Calendar className="w-4 h-4" />
                           <span className="text-sm">
-                            {new Date(analysis.dataCriacao).toLocaleDateString("pt-BR", {
+                            {new Date(analysis.dataCriacao ?? "").toLocaleDateString("pt-BR", {
                               day: "2-digit",
                               month: "2-digit",
                               year: "numeric",
@@ -136,7 +136,7 @@ export default function AnalysisHistoryPage() {
                       </td>
                       <td className="px-6 py-5 text-right">
                         <button
-                          onClick={() => handleViewDetails(analysis.id)}
+                          onClick={() => handleViewDetails(analysis.id ?? "")}
                           className="px-4 py-2 bg-gray-100 hover:bg-[#633B48] text-gray-700 hover:text-white rounded-lg text-sm font-bold transition-all flex items-center gap-2 ml-auto"
                         >
                           Ver Detalhes

@@ -20,7 +20,7 @@ import { post, get } from "@/lib/api"
 import type { ApiResponse, LoginResponse } from "@/lib/types"
 
 // DEMO MODE - mude para false quando o backend estiver rodando
-const DEMO_MODE = false
+const DEMO_MODE = true
 
 interface AuthContextType {
   user: UserData | null

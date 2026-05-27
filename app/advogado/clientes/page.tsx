@@ -158,10 +158,10 @@ export default function ClientesLeadsPage(): JSX.Element {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="rounded-xl w-48">
-                          <DropdownMenuItem onClick={() => handleUpdateStatus(lead.id, "Em negociação")}>
+                          <DropdownMenuItem onClick={() => handleUpdateStatus(Number(lead.id), "Em negociação")}>
                             <Clock className="w-4 h-4 mr-2" /> Iniciar Atendimento
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleUpdateStatus(lead.id, "Concluído")} className="text-green-600">
+                          <DropdownMenuItem onClick={() => handleUpdateStatus(Number(lead.id), "Concluído")} className="text-green-600">
                             <CheckCircle2 className="w-4 h-4 mr-2" /> Marcar como Fechado
                           </DropdownMenuItem>
                           <DropdownMenuItem className="text-red-600">

@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { LayoutDashboard, Users, FileSearch, CreditCard, Settings } from 'lucide-react'
+import { LayoutDashboard, Users, FileSearch, CreditCard, Settings, FileText } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
