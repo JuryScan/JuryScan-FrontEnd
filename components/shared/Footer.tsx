@@ -29,15 +29,21 @@ export default function Footer(): JSX.Element {
                 </Link>
               </li>
               <li>
-                {/* Rota da área do advogado logado realizando auditoria */}
-                <Link href="/advogado/auditoria" className="hover:text-white">
+                <Link href="/servicos" className="hover:text-white">
                   Análise de CNIS
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="hover:text-white">
-                  Fazer o Cadastro / Login
-                </Link>
+                <span>
+                  Fazer o{" "}
+                  <Link href="/cadastro" className="hover:text-white underline underline-offset-2">
+                    Cadastro
+                  </Link>{" "}
+                  /{" "}
+                  <Link href="/login" className="hover:text-white underline underline-offset-2">
+                    Login
+                  </Link>
+                </span>
               </li>
             </ul>
           </div>
@@ -46,7 +52,6 @@ export default function Footer(): JSX.Element {
             <h3 className="font-bold text-lg mb-4">Clientes</h3>
             <ul className="space-y-2 text-gray-300">
               <li>
-                {/* Rota pública/privada de localização */}
                 <Link href="/mapa" className="hover:text-white">
                   Advogados perto de você
                 </Link>
@@ -63,12 +68,22 @@ export default function Footer(): JSX.Element {
             <h3 className="font-bold text-lg mb-4">Utilização</h3>
             <ul className="space-y-2 text-gray-300">
               <li>
-                <a href="/docs/manual_juryscan_leigo.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                <a
+                  href="/docs/manual_juryscan_leigo.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white"
+                >
                   Como utilizar a JuryScan [ PDF ]?
                 </a>
               </li>
               <li>
-                <a href="/docs/manual_juryscan_advogado.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                <a
+                  href="/docs/manual_juryscan_advogado.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white"
+                >
                   JuryScan para advogados [ PDF ]
                 </a>
               </li>

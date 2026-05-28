@@ -22,17 +22,14 @@ import { PasswordInput } from "./forms/PasswordInput"
 import ReCAPTCHA from "react-google-recaptcha"
 
 interface FormData {
-  // Step 1
   nomeCompleto: string
   cpf: string
   dataNascimento: string
   numeroOab?: string
-  // Step 2
   email: string
   telefone: string
   experiencia?: string
   descricao?: string
-  // Step 3
   senha: string
   confirmarSenha: string
 }
@@ -45,6 +42,8 @@ export default function SignupForm(): JSX.Element {
   const [userType, setUserType] = useState<UserType>("comum")
   const recaptchaRef = useRef<ReCAPTCHA>(null)
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null)
+
+  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
 
   const step1 = useForm<SignupStep1Schema>({
     resolver: zodResolver(signupStep1Schema),
@@ -105,6 +104,8 @@ export default function SignupForm(): JSX.Element {
     step3.reset()
     setError("")
     setRecaptchaToken(null)
+
+    recaptchaRef.current?.reset()
   }
 
   const onRecaptchaChange = (token: string | null) => {
@@ -114,6 +115,11 @@ export default function SignupForm(): JSX.Element {
 
   const onSubmit = async (data: FormData) => {
     setError("")
+
+    if (!recaptchaSiteKey) {
+      setError("O reCAPTCHA não está configurado no ambiente.")
+      return
+    }
 
     if (!recaptchaToken) {
       setError("Por favor, complete o reCAPTCHA.")
@@ -157,7 +163,6 @@ export default function SignupForm(): JSX.Element {
 
       router.push("/login")
     } catch (err: unknown) {
-      // Reseta o reCAPTCHA em caso de erro
       recaptchaRef.current?.reset()
       setRecaptchaToken(null)
 
@@ -172,7 +177,6 @@ export default function SignupForm(): JSX.Element {
     }
   }
 
-  // Combina todos os steps em um único submit
   const handleFinalSubmit = async () => {
     const isValid = await step3.trigger()
     if (!isValid) return
@@ -272,10 +276,7 @@ export default function SignupForm(): JSX.Element {
               placeholder="Digite seu nome completo"
             />
 
-            <CpfCnpjInput
-              name="cpf"
-              label="CPF"
-            />
+            <CpfCnpjInput name="cpf" label="CPF" />
 
             <DateInput
               name="dataNascimento"
@@ -353,11 +354,17 @@ export default function SignupForm(): JSX.Element {
             </div>
 
             <div className="flex justify-center py-2">
-              <ReCAPTCHA
-                ref={recaptchaRef}
-                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
-                onChange={onRecaptchaChange}
-              />
+              {recaptchaSiteKey ? (
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={recaptchaSiteKey}
+                  onChange={onRecaptchaChange}
+                />
+              ) : (
+                <p className="text-sm text-amber-600 text-center">
+                  reCAPTCHA não configurado no ambiente.
+                </p>
+              )}
             </div>
           </FormProvider>
         )}
@@ -372,6 +379,7 @@ export default function SignupForm(): JSX.Element {
           >
             Voltar
           </Button>
+
           {step < 3 ? (
             <Button
               type="button"
@@ -384,7 +392,7 @@ export default function SignupForm(): JSX.Element {
             <Button
               type="button"
               onClick={handleFinalSubmit}
-              disabled={isLoading || !recaptchaToken}
+              disabled={isLoading || !recaptchaToken || !recaptchaSiteKey}
               className="flex-1 py-6 bg-[#A50064] hover:bg-[#7a004a] text-white font-bold border-none shadow-none transition-colors disabled:opacity-70"
             >
               {isLoading ? "Criando..." : "Finalizar"}
