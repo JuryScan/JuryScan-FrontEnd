@@ -86,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const demoUser: UserData = email.includes("admin")
           ? { id: "demo-3", nomeCompleto: "Admin Demo", email, tipoUsuario: "ADMIN" } as any
           : email.includes("cliente")
-          ? { id: "demo-2", nomeCompleto: "Cliente Demo", email, tipoUsuario: "CLIENTE" } as any
+          ? { id: "demo-2", nomeCompleto: "Cliente Demo", email, tipoUsuario: "COMUM" } as any
           : { id: "demo-1", nomeCompleto: "Dr. Demo Advogado", email, tipoUsuario: "ADVOGADO" } as any
         setTokenState("demo-token")
         setUserState(demoUser)

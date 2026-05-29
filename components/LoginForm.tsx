@@ -78,13 +78,11 @@ export default function LoginForm(): JSX.Element {
   }
 
   return (
-    <div className="w-full bg-white flex flex-col items-center justify-start pt-6 pb-8 px-4">
-      <div className="w-full max-w-[400px] flex flex-col items-center">
-        <div className="flex items-center gap-2 mb-6">
-          <img src="/icon.png" alt="JuryScan" className="h-10 w-10" />
-          <span className="text-2xl font-bold text-[#0A1F30]">JuryScan</span>
-        </div>
-        <h1 className="text-[40px] font-bold text-[#0A1F30] mb-8">Login</h1>
+    <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-sm">
+      <div className="flex justify-center mb-8">
+        <img src="/logo.svg" alt="JuryScan" className="w-40 object-contain" />
+      </div>
+      <h1 className="text-3xl font-bold text-center text-[#0A1F30] mb-6">Entrar</h1>
 
         {error && (
           <p className="text-red-500 text-sm mb-4 w-full text-center" role="alert">
@@ -181,7 +179,6 @@ export default function LoginForm(): JSX.Element {
             </div>
           </form>
         </FormProvider>
-      </div>
     </div>
   )
 }

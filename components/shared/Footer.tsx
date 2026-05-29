@@ -6,7 +6,7 @@ export default function Footer(): JSX.Element {
   return (
     <footer className="bg-gray-900 text-white py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-8 mb-8">
+        <div className="grid md:grid-cols-3 gap-8 mb-8">
           <div>
             <div className="flex items-center mb-6">
               <div className="w-64 h-32 flex items-center justify-center relative">
@@ -52,40 +52,14 @@ export default function Footer(): JSX.Element {
             <h3 className="font-bold text-lg mb-4">Clientes</h3>
             <ul className="space-y-2 text-gray-300">
               <li>
-                <Link href="/mapa" className="hover:text-white">
+                <Link href="/cliente/advogados" className="hover:text-white">
                   Advogados perto de você
                 </Link>
               </li>
               <li>
-                <Link href="/mapa" className="hover:text-white">
+                <Link href="/cliente/advogados" className="hover:text-white">
                   Ir para o mapa
                 </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-bold text-lg mb-4">Utilização</h3>
-            <ul className="space-y-2 text-gray-300">
-              <li>
-                <a
-                  href="/docs/manual_juryscan_leigo.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white"
-                >
-                  Como utilizar a JuryScan [ PDF ]?
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/docs/manual_juryscan_advogado.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white"
-                >
-                  JuryScan para advogados [ PDF ]
-                </a>
               </li>
             </ul>
           </div>
@@ -97,14 +71,8 @@ export default function Footer(): JSX.Element {
               <Link href="/sobre" className="hover:text-white">
                 Sobre nós
               </Link>
-              <Link href="/privacidade" className="hover:text-white">
-                Política de Privacidade
-              </Link>
               <Link href="/contato" className="hover:text-white">
                 Entre em contato com a JuryScan
-              </Link>
-              <Link href="/termos" className="hover:text-white">
-                Termos de uso
               </Link>
             </div>
             <div>© JuryScan 2026</div>

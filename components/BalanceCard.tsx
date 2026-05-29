@@ -1,4 +1,9 @@
-export default function BalanceCard({ credits, value }) {
+interface BalanceCardProps {
+    credits: number;
+    value: number;
+}
+
+export default function BalanceCard({ credits, value }: BalanceCardProps) {
     return (
         <div style={{
             padding: '20px',

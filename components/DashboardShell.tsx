@@ -29,14 +29,23 @@ function ShellContent({ children }: { children: React.ReactNode }) {
 
   const userBaseRoute = user?.tipoUsuario === 'ADVOGADO' ? '/advogado' : '/cliente'
 
-  const menuItems: MenuItem[] = [
-    { href: `${userBaseRoute}/dashboard`, label: 'Dashboard', icon: LayoutDashboard },
-    { href: `${userBaseRoute}/auditoria`, label: 'Analisar CNIS', icon: FileSearch },
-    { href: `${userBaseRoute}/historico`, label: 'Histórico', icon: FileText },
-    { href: `${userBaseRoute}/clientes`, label: 'Clientes', icon: Users },
-    { href: `${userBaseRoute}/financeiro`, label: 'Financeiro', icon: CreditCard },
-    { href: `${userBaseRoute}/configuracoes`, label: 'Configurações', icon: Settings },
-  ]
+  // Menu por papel: cliente e advogado possuem rotas diferentes.
+  // O cliente so tem dashboard, advogados (marketplace) e relatorio;
+  // linkar /cliente/auditoria, /historico, etc. geraria 404.
+  const menuItems: MenuItem[] = user?.tipoUsuario === 'ADVOGADO'
+    ? [
+        { href: '/advogado/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { href: '/advogado/auditoria', label: 'Analisar CNIS', icon: FileSearch },
+        { href: '/advogado/historico', label: 'Histórico', icon: FileText },
+        { href: '/advogado/clientes', label: 'Clientes', icon: Users },
+        { href: '/advogado/financeiro', label: 'Financeiro', icon: CreditCard },
+        { href: '/advogado/configuracoes', label: 'Configurações', icon: Settings },
+      ]
+    : [
+        { href: '/cliente/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { href: '/cliente/advogados', label: 'Advogados', icon: Users },
+        { href: '/cliente/relatorio', label: 'Relatórios', icon: FileText },
+      ]
 
   return (
     <div className="min-h-screen bg-background text-foreground">

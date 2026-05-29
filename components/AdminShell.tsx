@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, CreditCard, Settings, LogOut, History, Shield, Menu } from 'lucide-react'
+import { LayoutDashboard, Users, LogOut, History, Shield, Menu } from 'lucide-react'
 import { DashboardProvider } from '@/components/DashboardContext'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -12,8 +12,6 @@ const menuItems: MenuItem[] = [
   { href: '/admin/dashboard', label: 'Dashboard Master', icon: LayoutDashboard },
   { href: '/admin/usuarios', label: 'Usuários', icon: Users },
   { href: '/admin/logs', label: 'Logs de Atividade', icon: History },
-  { href: '/admin/transacoes', label: 'Transações', icon: CreditCard },
-  { href: '/admin/configuracoes', label: 'Configurações', icon: Settings },
 ]
 
 function AdminShellContent({ children }: { children: React.ReactNode }) {
