@@ -1,6 +1,21 @@
 "use client";
 
-export default function Drawer({ open, onClose, client }) {
+interface ClientType {
+    photo?: string;
+    name?: string;
+    cpf?: string;
+    email?: string;
+    phone?: string;
+    activities?: string[];
+}
+
+interface DrawerProps {
+    open: boolean;
+    onClose: () => void;
+    client: ClientType | null;
+}
+
+export default function Drawer({ open, onClose, client }: DrawerProps) {
     if (!open) return null;
 
     return (
@@ -12,7 +27,6 @@ export default function Drawer({ open, onClose, client }) {
                 className="fixed top-0 right-0 h-full w-[380px] bg-white shadow-2xl border-l border-gray-200 p-6 flex flex-col gap-6"
                 onClick={(e) => e.stopPropagation()}
             >
-              
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 text-xl text-gray-500 hover:text-black"
@@ -20,11 +34,11 @@ export default function Drawer({ open, onClose, client }) {
                     ×
                 </button>
 
-               
                 <div className="text-center">
                     <img
                         src={client?.photo}
                         className="w-20 h-20 rounded-full mx-auto mb-3 object-cover"
+                        alt={client?.name || "Foto do cliente"}
                     />
                     <h2 className="text-lg font-semibold text-gray-900">
                         {client?.name}
@@ -34,13 +48,12 @@ export default function Drawer({ open, onClose, client }) {
                     <p className="text-sm text-gray-500">{client?.phone}</p>
                 </div>
 
-               
                 <div>
                     <h3 className="font-semibold text-gray-800 mb-2">
                         Atividades recentes
                     </h3>
                     <div className="flex flex-col gap-1">
-                        {client?.activities?.slice(0, 3).map((act, i) => (
+                        {client?.activities?.slice(0, 3).map((act: string, i: number) => (
                             <p key={i} className="text-sm text-gray-600">
                                 • {act}
                             </p>
@@ -48,9 +61,8 @@ export default function Drawer({ open, onClose, client }) {
                     </div>
                 </div>
 
-                
                 <div className="mt-auto flex flex-col gap-3">
-                    <button className="bg-[#6b3f46] text-white rounded-md py-2 font-medium hover:opacity-90">
+                    <button className="bg-[#633b48] text-white rounded-md py-2 font-medium hover:opacity-90">
                         Gerar Relatório Completo
                     </button>
 

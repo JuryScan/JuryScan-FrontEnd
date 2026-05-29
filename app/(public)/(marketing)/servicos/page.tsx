@@ -1,6 +1,11 @@
 "use client"
 
+<<<<<<<< HEAD:app/(marketing)/servicos/page.js
+import Header from "@/components/shared/Header"
+import Footer from "@/components/shared/Footer"
+========
 import React from "react"
+>>>>>>>> develop:app/(public)/(marketing)/servicos/page.tsx
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import {
@@ -155,6 +160,19 @@ export default function ServicesPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
+<<<<<<<< HEAD:app/(marketing)/servicos/page.js
+            <style jsx global>{`
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+      `}</style>
+
+========
+>>>>>>>> develop:app/(public)/(marketing)/servicos/page.tsx
             <main className="flex-grow">
 
                 <section id="servicos" className="bg-white py-20 px-4 border-b border-gray-100">
