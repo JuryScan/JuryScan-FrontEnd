@@ -1,11 +1,6 @@
 "use client"
 
-<<<<<<<< HEAD:app/(marketing)/servicos/page.js
-import Header from "@/components/shared/Header"
-import Footer from "@/components/shared/Footer"
-========
 import React from "react"
->>>>>>>> develop:app/(public)/(marketing)/servicos/page.tsx
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import {
@@ -14,15 +9,15 @@ import {
 } from "lucide-react"
 
 export default function ServicesPage() {
-   
-    const user = true 
+
+    const user = true
 
     const services = [
         {
             icon: Shield,
             title: "Auditor CNIS",
             description: "Nossa IA analisa o extrato previdenciário em segundos, identificando vínculos extemporâneos e falhas.",
-            link: "/advogado/auditoria", // Rota da ferramenta real interna
+            link: "/advogado/auditoria",
             active: true
         },
         {
@@ -160,19 +155,6 @@ export default function ServicesPage() {
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
-<<<<<<<< HEAD:app/(marketing)/servicos/page.js
-            <style jsx global>{`
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-      `}</style>
-
-========
->>>>>>>> develop:app/(public)/(marketing)/servicos/page.tsx
             <main className="flex-grow">
 
                 <section id="servicos" className="bg-white py-20 px-4 border-b border-gray-100">
@@ -186,7 +168,6 @@ export default function ServicesPage() {
                     </div>
                 </section>
 
-               
                 <section className="py-20 px-4">
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center mb-12">
@@ -213,7 +194,6 @@ export default function ServicesPage() {
                                     </div>
 
                                     {service.active ? (
-                                        
                                         <Link href={user ? service.link : "/login"}>
                                             <Button variant="outline" className="w-full border-[#633B48] text-[#633B48] hover:bg-[#633B48] hover:text-white group">
                                                 Acessar Ferramenta <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -230,7 +210,6 @@ export default function ServicesPage() {
                     </div>
                 </section>
 
-                
                 <section className="py-10 px-4 bg-[#633B48]/5 relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-30">
                         <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#633B48]/10 rounded-full blur-3xl"></div>
@@ -246,7 +225,6 @@ export default function ServicesPage() {
                         </div>
 
                         <div className="flex flex-nowrap overflow-x-auto xl:flex-wrap xl:justify-center gap-6 py-12 px-4 snap-x snap-mandatory scroll-smooth scrollbar-hide">
-
                             {plans.map((plan, index) => (
                                 <div
                                     key={index}
@@ -259,7 +237,7 @@ export default function ServicesPage() {
                                         }
                                         ${plan.isFree ? 'bg-gray-50/80 border-gray-200' : ''}
                                     `}
-                                align-items-stretch="true">
+                                >
                                     <div>
                                         {plan.highlight && (
                                             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#633B48] text-white px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1 shadow-md whitespace-nowrap z-20">
@@ -312,7 +290,6 @@ export default function ServicesPage() {
                                     </div>
 
                                     <div className="mt-auto">
-                                        
                                         <Link
                                             href={
                                                 plan.cta === "Falar com Consultor"
@@ -323,13 +300,12 @@ export default function ServicesPage() {
                                             }
                                         >
                                             <Button
-                                                className={`w-full py-5 text-base transition-transform active:scale-95 ${
-                                                    plan.highlight
+                                                className={`w-full py-5 text-base transition-transform active:scale-95 ${plan.highlight
                                                         ? 'bg-[#633B48] hover:bg-[#300117] text-white shadow-lg'
                                                         : plan.isFree
                                                             ? 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'
                                                             : 'bg-white border-2 border-[#633B48] text-[#633B48] hover:bg-[#FFECF1]'
-                                                }`}
+                                                    }`}
                                             >
                                                 {plan.cta}
                                             </Button>
@@ -338,7 +314,6 @@ export default function ServicesPage() {
 
                                 </div>
                             ))}
-
                         </div>
 
                         <div className="xl:hidden text-center text-xs text-gray-400 mt-2 animate-pulse">
