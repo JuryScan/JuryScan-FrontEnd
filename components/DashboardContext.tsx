@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import type { UserData } from '@/lib/auth'
 
@@ -44,6 +44,7 @@ const NavigationContext = React.createContext<NavigationContextType | undefined>
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const { user: authUser, logout: authLogout } = useAuth()
+  const router = useRouter()
   const [selectedRoute, setSelectedRoute] = React.useState('/dashboard')
 
   // Mapeia o usuário do AuthContext para o formato esperado pelo Dashboard
@@ -75,6 +76,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
   const logout = React.useCallback(() => {
     authLogout()
+    router.push('/login')
   }, [authLogout])
 
   const breadcrumbs = React.useMemo<Breadcrumb[]>(() => {

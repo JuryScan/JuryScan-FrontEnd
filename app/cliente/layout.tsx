@@ -2,7 +2,7 @@
 
 import { type JSX, type ReactNode } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
 import { LayoutDashboard, MapPin, CreditCard, FileText, LogOut } from "lucide-react"
 
@@ -19,7 +19,9 @@ const navItems = [
 
 export default function ClienteLayout({ children }: ClienteLayoutProps): JSX.Element {
   const pathname = usePathname()
-  const { logout, isLoading, isAuthenticated } = useAuth()
+  const { logout: authLogout, isLoading, isAuthenticated } = useAuth()
+  const router = useRouter()
+  const logout = () => { authLogout(); router.push('/login') }
 
   if (isLoading) {
     return (
