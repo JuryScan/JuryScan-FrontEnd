@@ -34,7 +34,7 @@ interface FormData {
   confirmarSenha: string
 }
 
-export default function SignupForm(): JSX.Element {
+export default function SignupForm({ defaultEmail = "" }: { defaultEmail?: string }): JSX.Element {
   const router = useRouter()
   const [step, setStep] = useState<number>(1)
   const [isLoading, setIsLoading] = useState(false)
@@ -59,7 +59,7 @@ export default function SignupForm(): JSX.Element {
   const step2 = useForm<SignupStep2Schema>({
     resolver: zodResolver(signupStep2Schema),
     defaultValues: {
-      email: "",
+      email: defaultEmail,
       telefone: "",
       experiencia: "",
       descricao: "",

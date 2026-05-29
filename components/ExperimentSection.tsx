@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, type FormEvent, type ChangeEvent } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "./ui/button"
 
 export default function ExperimentSection(): JSX.Element {
+  const router = useRouter()
   const [email, setEmail] = useState("")
-  const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState("")
 
   const handleSubmit = (e: FormEvent) => {
@@ -22,13 +23,8 @@ export default function ExperimentSection(): JSX.Element {
       return
     }
 
-    setSubmitted(true)
-    console.log("Email submitted:", email)
-
-    setTimeout(() => {
-      setSubmitted(false)
-      setEmail("")
-    }, 3000)
+    // Leva o visitante direto ao cadastro, ja com o e-mail preenchido.
+    router.push(`/cadastro?email=${encodeURIComponent(email)}`)
   }
 
   return (
@@ -39,8 +35,7 @@ export default function ExperimentSection(): JSX.Element {
         </h2>
 
         <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
-          {!submitted ? (
-            <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+          <form onSubmit={handleSubmit} className="max-w-md mx-auto">
               <div className="flex flex-col sm:flex-row gap-4">
                 <input
                   type="email"
@@ -66,16 +61,6 @@ export default function ExperimentSection(): JSX.Element {
                 </p>
               )}
             </form>
-          ) : (
-            <div className="py-4">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                <span className="text-green-500 text-3xl">✓</span>
-              </div>
-              <p className="text-green-600 font-medium">
-                Obrigado! Entraremos em contato em breve.
-              </p>
-            </div>
-          )}
         </div>
 
         <p className="text-sm text-gray-500">
