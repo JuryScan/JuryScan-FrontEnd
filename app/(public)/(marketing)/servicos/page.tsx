@@ -12,10 +12,6 @@ export default function ServicesPage() {
 
     const user = true
 
-    // Planos ainda nao desenvolvidos: secao de planos desabilitada via flag.
-    // Mude para true para reexibir a secao de planos em /servicos.
-    const SHOW_PLANS = false
-
     const services = [
         {
             icon: Shield,
@@ -214,7 +210,6 @@ export default function ServicesPage() {
                     </div>
                 </section>
 
-                {SHOW_PLANS && (
                 <section className="py-10 px-4 bg-[#633B48]/5 relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-30">
                         <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#633B48]/10 rounded-full blur-3xl"></div>
@@ -326,14 +321,11 @@ export default function ServicesPage() {
                         </div>
                     </div>
                 </section>
-                )}
 
                 <section className="bg-[#1e293b] py-20 px-4">
                     <div className="max-w-4xl mx-auto text-center text-white space-y-8">
                         <h2 className="text-3xl md:text-4xl font-bold">
-                            {SHOW_PLANS
-                                ? "Ainda com dúvidas sobre qual plano escolher?"
-                                : "Quer saber como a JuryScan pode ajudar você?"}
+                            Ainda com dúvidas sobre qual plano escolher?
                         </h2>
                         <p className="text-lg text-white/70 max-w-2xl mx-auto">
                             Nossa equipe de especialistas está pronta para analisar o perfil do seu escritório e sugerir a melhor configuração.
