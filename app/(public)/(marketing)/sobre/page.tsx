@@ -19,9 +19,9 @@ export default function AboutPage() {
         />
         <section className="max-w-6xl mx-auto px-6 md:px-10 py-16">
           <div>
-            <h2 className="text-gray-700 text-[15px] md:text-lg leading-8 md:leading-9 space-y-6 text-left max-w-4xl lg:max-w-5xl mx-auto">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-left max-w-3xl xl:max-w-5xl mx-auto">
               Sobre o JuryScan
-            </h2>
+            </h1>
 
             <div className="text-gray-700 text-base md:text-lg leading-8 space-y-6 text-left max-w-3xl xl:max-w-5xl mx-auto">
               <p>O JuryScan nasceu para transformar a forma como cidadãos e profissionais lidam com o CNIS — um documento essencial, mas frequentemente marcado por falhas, inconsistências e informações lançadas de forma incorreta. Problemas desse tipo podem atrasar benefícios previdenciários, gerar insegurança e exigir longos processos de correção, muitas vezes custando mais de R$ 2.000,00 e levando até seis meses para serem resolvidos.
