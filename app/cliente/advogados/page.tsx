@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useCallback } from "react"
+import Link from "next/link"
 import { Search, MapPin, Star, Award, ShieldCheck, ArrowRight, Filter, Loader2, MapPinned } from "lucide-react"
 import { get } from "@/lib/api"
 import type { Lawyer, ApiResponse } from "@/lib/types"
@@ -230,10 +231,10 @@ export default function MarketplaceAdvogados() {
                                 </div>
 
                                 <div className="p-6 pt-0 mt-auto">
-                                    <button className="w-full py-3 bg-white border-2 border-[#633B48] text-[#633B48] hover:bg-[#633B48] hover:text-white rounded-xl font-bold flex items-center justify-center transition-colors group">
+                                    <Link href={`/cliente/advogados/${lawyer.id}`} className="w-full py-3 bg-white border-2 border-[#633B48] text-[#633B48] hover:bg-[#633B48] hover:text-white rounded-xl font-bold flex items-center justify-center transition-colors group">
                                         Ver Perfil
                                         <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-                                    </button>
+                                    </Link>
                                 </div>
                             </div>
                         ))}

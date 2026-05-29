@@ -39,7 +39,6 @@ export default function AnalysisHistoryPage() {
     } catch (error) {
       console.error("Erro ao buscar histórico:", error)
     } finally {
-      setIsLoading(true) // Simulate some delay for smoother transition if needed, but actually set to false
       setIsLoading(false)
     }
   }, [user?.id, page])

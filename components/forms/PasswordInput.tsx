@@ -1,5 +1,7 @@
+"use client";
 import React, { useState } from "react";
 import { useFormContext, RegisterOptions } from "react-hook-form";
+import { Eye, EyeOff } from "lucide-react";
 
 type PasswordInputProps = {
   name: string;
@@ -43,7 +45,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           tabIndex={-1}
           aria-label={show ? "Ocultar senha" : "Mostrar senha"}
         >
-          {show ? "🙈" : "👁️"}
+          {show ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
         </button>
       </div>
       {error && (

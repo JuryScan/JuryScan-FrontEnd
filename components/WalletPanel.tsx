@@ -19,8 +19,8 @@ interface WalletDataType {
 export default function WalletPanel() {
     const router = useRouter();
 
-    const [cliente, setCliente] = useState < ClienteType | null > (null);
-    const [walletData, setWalletData] = useState < WalletDataType | null > (null);
+    const [cliente, setCliente] = useState<ClienteType | null>(null);
+    const [walletData, setWalletData] = useState<WalletDataType | null>(null);
 
     const handleUpgrade = () => {
         router.push("/plans");
