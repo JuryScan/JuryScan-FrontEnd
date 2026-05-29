@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { useFormContext, RegisterOptions } from "react-hook-form";
 
@@ -30,13 +31,13 @@ export const SelectInput: React.FC<SelectInputProps> = ({
 
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={name} className="font-medium text-sm">
+      <label htmlFor={name} className="font-medium text-sm text-[#0A1F30]">
         {label}
       </label>
       <select
         {...register(name, rules)}
         id={name}
-        className={`input-base ${error ? "border-red-500" : ""}`}
+        className={`input-base ${error ? "border-red-500 focus:ring-red-300" : ""}`}
         defaultValue=""
       >
         <option value="" disabled>

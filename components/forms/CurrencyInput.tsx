@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { useFormContext, RegisterOptions } from "react-hook-form";
 import { NumericFormat, NumericFormatProps } from "react-number-format";
@@ -25,13 +26,13 @@ export const CurrencyInput: React.FC<CurrencyInputProps> = ({
 
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={name} className="font-medium text-sm">
+      <label htmlFor={name} className="font-medium text-sm text-[#0A1F30]">
         {label}
       </label>
       <NumericFormat
         id={name}
         placeholder={placeholder}
-        className={`input-base ${error ? "border-red-500" : ""}`}
+        className={`input-base ${error ? "border-red-500 focus:ring-red-300" : ""}`}
         thousandSeparator="."
         decimalSeparator="," 
         prefix="R$ "

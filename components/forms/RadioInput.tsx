@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { useFormContext, RegisterOptions } from "react-hook-form";
 
@@ -28,7 +29,7 @@ export const RadioInput: React.FC<RadioInputProps> = ({
 
   return (
     <div className="flex flex-col gap-1">
-      <span className="font-medium text-sm">{label}</span>
+      <span className="font-medium text-sm text-[#0A1F30]">{label}</span>
       <div className="flex flex-col gap-2">
         {options.map((opt) => (
           <label key={opt.value} className="inline-flex items-center gap-2">
