@@ -9,7 +9,6 @@ import AboutSection from "../components/AboutSection";
 import TestimonialsSection from "../components/TestimonialsSection";
 
 import Footer from "../components/shared/Footer";
-import Header from "@/components/shared/Header"
 import Drawer from "../components/Drawer";
 
 export default function HomePage() {
