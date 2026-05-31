@@ -4,7 +4,7 @@ import { type JSX, type ReactNode } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
-import { LayoutDashboard, FileText, LogOut } from "lucide-react"
+import { LayoutDashboard, FileText, LogOut, Locate } from "lucide-react"
 
 interface AdvogadoLayoutProps {
   children: ReactNode
@@ -13,6 +13,7 @@ interface AdvogadoLayoutProps {
 const navItems = [
   { href: "/advogado/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/advogado/auditoria", label: "Auditoria CNIS", icon: FileText },
+  { href: "/advogado/buscador", label: "Localizar Clientes", icon: Locate },
 ]
 
 export default function AdvogadoLayout({ children }: AdvogadoLayoutProps): JSX.Element {
