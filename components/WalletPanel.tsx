@@ -1,49 +1,46 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-interface ClienteType {
-    name: string;
-    profileImage: string | null;
+
+export interface ClienteType {
+    nome: string;
+    imagemPerfil: string | null;
 }
 
-interface WalletDataType {
-    credits: number;
-    value: number;
-    used: number;
-    remaining: number;
-    plan: string;
+export interface WalletDataType {
+    creditos: number;
+    valorReais: number;
+    usado: number;
+    restante: number;
+    plano: string;
 }
 
-export default function WalletPanel() {
+interface WalletPanelProps {
+    cliente?: ClienteType | null;
+    walletData?: WalletDataType | null;
+}
+
+
+export default function WalletPanel({
+    cliente = { nome: "Fulano", imagemPerfil: null },
+    walletData = { creditos: 400, valorReais: 200, usado: 50, restante: 350, plano: "Básico" }
+}: WalletPanelProps) {
     const router = useRouter();
-
-    const [cliente, setCliente] = useState<ClienteType | null>(null);
-    const [walletData, setWalletData] = useState<WalletDataType | null>(null);
 
     const handleUpgrade = () => {
         router.push("/plans");
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const clienteMock = { name: "Fulano", profileImage: null };
-            const walletMock = {
-                credits: 400,
-                value: 200,
-                used: 50,
-                remaining: 350,
-                plan: "Basic"
-            };
-            await new Promise(res => setTimeout(res, 300));
-            setCliente(clienteMock);
-            setWalletData(walletMock);
-        };
-        fetchData();
-    }, []);
+    // Tela de carregamento teste para dados não injetados 
+    if (!cliente || !walletData) {
+        return <p style={{ textAlign: "center", marginTop: "50px", fontFamily: "sans-serif", color: "#666" }}>Carregando dados da carteira...</p>;
+    }
 
-    if (!cliente || !walletData) return <p style={{ textAlign: "center", marginTop: "50px" }}>Loading...</p>;
+
+    const formatarMoeda = (valor: number) => {
+        return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    };
 
     return (
         <div style={{
@@ -53,8 +50,10 @@ export default function WalletPanel() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "30px"
+            gap: "30px",
+            fontFamily: "sans-serif"
         }}>
+
             <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
                 <div style={{
                     width: "70px",
@@ -67,14 +66,17 @@ export default function WalletPanel() {
                     justifyContent: "center",
                     overflow: "hidden"
                 }}>
-                    {cliente.profileImage ? (
-                        <img src={cliente.profileImage} alt="profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    {cliente.imagemPerfil ? (
+                        <img src={cliente.imagemPerfil} alt="Foto de perfil" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     ) : (
-                        <span style={{ color: "#633B48", fontWeight: "bold", fontSize: "24px" }}>{cliente.name[0]?.toUpperCase() || "C"}</span>
+                        <span style={{ color: "#633B48", fontWeight: "bold", fontSize: "24px" }}>
+                            {cliente.nome[0]?.toUpperCase() || "C"}
+                        </span>
                     )}
                 </div>
-                <h2 style={{ fontSize: "24px", fontWeight: "bold", color: "#333" }}>Hi, {cliente.name}!</h2>
+                <h2 style={{ fontSize: "24px", fontWeight: "bold", color: "#333" }}>Olá, {cliente.nome}!</h2>
             </div>
+
 
             <div style={{
                 width: "100%",
@@ -87,28 +89,27 @@ export default function WalletPanel() {
                 gap: "25px"
             }}>
                 <div style={{ display: "flex", justifyContent: "space-between", textAlign: "center" }}>
+
                     <div style={{ flex: 1 }}>
-                        <p style={{ fontSize: "14px", color: "#666", marginBottom: "5px" }}>Current Balance</p>
-                        <p style={{ fontWeight: "bold", fontSize: "22px", color: "#633B48" }}>{walletData.credits} credits</p>
-                        <p style={{ fontSize: "14px", color: "#999" }}>(${walletData.value})</p>
+                        <p style={{ fontSize: "14px", color: "#666", marginBottom: "5px" }}>Saldo Atual</p>
+                        <p style={{ fontWeight: "bold", fontSize: "22px", color: "#633B48" }}>{walletData.creditos} créditos</p>
+                        <p style={{ fontSize: "14px", color: "#999" }}>({formatarMoeda(walletData.valorReais)})</p>
                     </div>
-                    <div style={{
-                        width: "1px",
-                        backgroundColor: "#ccc",
-                        margin: "0 20px"
-                    }} />
+
+                    <div style={{ width: "1px", backgroundColor: "#ccc", margin: "0 20px" }} />
+
+
                     <div style={{ flex: 1 }}>
-                        <p style={{ fontSize: "14px", color: "#666", marginBottom: "5px" }}>Used This Month</p>
-                        <p style={{ fontWeight: "bold", fontSize: "22px", color: "#633B48" }}>{walletData.used} credits</p>
+                        <p style={{ fontSize: "14px", color: "#666", marginBottom: "5px" }}>Usado Este Mês</p>
+                        <p style={{ fontWeight: "bold", fontSize: "22px", color: "#633B48" }}>{walletData.usado} créditos</p>
                     </div>
-                    <div style={{
-                        width: "1px",
-                        backgroundColor: "#ccc",
-                        margin: "0 20px"
-                    }} />
+
+                    <div style={{ width: "1px", backgroundColor: "#ccc", margin: "0 20px" }} />
+
+
                     <div style={{ flex: 1 }}>
-                        <p style={{ fontSize: "14px", color: "#666", marginBottom: "5px" }}>Remaining in Plan</p>
-                        <p style={{ fontWeight: "bold", fontSize: "22px", color: "#633B48" }}>{walletData.remaining} credits</p>
+                        <p style={{ fontSize: "14px", color: "#666", marginBottom: "5px" }}>Restante no Plano</p>
+                        <p style={{ fontWeight: "bold", fontSize: "22px", color: "#633B48" }}>{walletData.restante} créditos</p>
                     </div>
                 </div>
 
@@ -122,8 +123,9 @@ export default function WalletPanel() {
                     fontWeight: "bold",
                     color: "#633B48"
                 }}>
-                    Current Plan: {walletData.plan}
+                    Plano Atual: {walletData.plano}
                 </div>
+
 
                 <button
                     onClick={handleUpgrade}
@@ -139,7 +141,7 @@ export default function WalletPanel() {
                         cursor: "pointer"
                     }}
                 >
-                    Upgrade / See Other Plans
+                    Fazer Upgrade / Ver Outros Planos
                 </button>
             </div>
         </div>
