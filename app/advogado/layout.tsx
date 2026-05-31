@@ -39,9 +39,9 @@ export default function AdvogadoLayout({ children }: AdvogadoLayoutProps): JSX.E
       <nav className="bg-[#0A1F30] text-white border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-2">
               <Link href="/advogado/dashboard" className="flex items-center gap-2">
-                <img src="/logo.svg" alt="JuryScan" className="h-8 w-auto" />
+                <img src="/LogoBranca.svg" alt="JuryScan" className="h-12 w-auto -mt-4" />
               </Link>
 
               <div className="flex items-center gap-1">
