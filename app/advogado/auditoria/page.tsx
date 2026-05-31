@@ -63,7 +63,6 @@ export default function AuditorPage(): JSX.Element {
     } catch (err: any) {
       console.error("Erro ao analisar CNIS:", err)
       
-      // Lógica de categorização de erro baseada no retorno da API
       let errorType: "PASSWORD_PROTECTED" | "ILLEGIBLE" | "GENERIC" = "GENERIC"
       
       const errorMessage = err.message?.toLowerCase() || ""
