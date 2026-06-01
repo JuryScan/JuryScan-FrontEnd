@@ -4,7 +4,7 @@ import { type JSX, type ReactNode } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
-import { LayoutDashboard, FileText, LogOut, Locate } from "lucide-react"
+import { LayoutDashboard, FileText, LogOut, Locate, Store, CreditCard, Settings } from "lucide-react"
 
 interface AdvogadoLayoutProps {
   children: ReactNode
@@ -14,13 +14,15 @@ const navItems = [
   { href: "/advogado/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/advogado/auditoria", label: "Auditoria CNIS", icon: FileText },
   { href: "/advogado/buscador", label: "Localizar Clientes", icon: Locate },
+  { href: "/advogado/marketplace", label: "Marketplace", icon: Store },
+  { href: "/advogado/financeiro", label: "Financeiro", icon: CreditCard },
+  { href: "/advogado/configuracoes", label: "Configurações", icon: Settings },
 ]
 
 export default function AdvogadoLayout({ children }: AdvogadoLayoutProps): JSX.Element {
   const pathname = usePathname()
-  const { logout, isLoading, isAuthenticated, isAdvogado } = useAuth()
+  const { logout, isLoading } = useAuth()
 
-  // Enquanto está validando a sessão, podemos mostrar um skeleton ou nada
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -29,14 +31,8 @@ export default function AdvogadoLayout({ children }: AdvogadoLayoutProps): JSX.E
     )
   }
 
-  // Redundância de segurança caso o middleware falhe ou o usuário não seja advogado
-  // if (!isAuthenticated || !isAdvogado) {
-  //   return <div className="p-8 text-center">Redirecionando...</div>  
-  // }
-
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Header interno do advogado */}
       <nav className="bg-[#0A1F30] text-white border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
@@ -80,7 +76,6 @@ export default function AdvogadoLayout({ children }: AdvogadoLayoutProps): JSX.E
         </div>
       </nav>
 
-      {/* Conteúdo principal */}
       <main className="flex-grow">{children}</main>
     </div>
   )

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Search, Filter, MapPin, FileText, Star, Loader2, ShieldCheck } from "lucide-react"
+import { Search, Filter, MapPin, FileText, Loader2, ShieldCheck } from "lucide-react"
 import { get } from "@/lib/api"
 import type { ApiResponse } from "@/lib/types"
 
@@ -36,14 +36,14 @@ export default function BuscadorClientesPage() {
     return (
         <div className="min-h-screen bg-gray-50 pb-12 font-sans">
 
-            {/* Title */}
-            <div className="max-w-5xl mx-auto px-6 mt-8">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Encontre seu Cliente</h1>
-                    <p className="text-gray-600">Conecte-se com clientes que precisam de assistência previdenciária.</p>
+            <div className="bg-[#162D3F] text-white">
+                <div className="max-w-7xl mx-auto px-6 py-8">
+                    <h1 className="text-3xl font-bold mb-2">Localizar Clientes</h1>
+                    <p className="text-gray-400">Conecte-se com clientes que precisam de assistência previdenciária.</p>
                 </div>
+            </div>
 
-                {/* Search */}
+            <div className="max-w-5xl mx-auto px-6 mt-8">
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex gap-4 mb-6">
                     <div className="flex items-center flex-1 gap-3 bg-gray-50 rounded-xl px-4 border border-gray-200">
                         <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
@@ -61,7 +61,6 @@ export default function BuscadorClientesPage() {
                     </button>
                 </div>
 
-                {/* Lista de clientes */}
                 {isLoading ? (
                     <div className="flex justify-center items-center py-24">
                         <Loader2 className="size-10 animate-spin text-[#633B48]" />
@@ -114,7 +113,6 @@ export default function BuscadorClientesPage() {
                     </div>
                 )}
 
-                {/* Banner segurança */}
                 <div className="bg-[#0A1F30] rounded-2xl shadow-sm border border-[#14324a] p-8 text-white text-center mt-8">
                     <ShieldCheck className="w-10 h-10 text-[#FFB6E1] mx-auto mb-3" />
                     <h3 className="font-bold text-lg mb-2">Contratação 100% Segura</h3>

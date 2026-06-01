@@ -163,41 +163,41 @@ export default function MarketplaceLeadsPage() {
   )
 
   return (
-    <div className="space-y-6 p-6 max-w-7xl mx-auto">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold tracking-tight text-[#0A1F30]">
-          Marketplace de Leads
-        </h1>
-        <p className="text-sm text-[#633B48]">
-          Monitore novos potenciais clientes na sua região com pré-auditorias automatizadas de CNIS realizadas pelo JuryScan.
-        </p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-[#162D3F] text-white">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <h1 className="text-3xl font-bold mb-2">Marketplace de Leads</h1>
+          <p className="text-gray-400">Monitore novos potenciais clientes na sua região com pré-auditorias automatizadas de CNIS realizadas pelo JuryScan.</p>
+        </div>
       </div>
 
-      <Tabs defaultValue="todas" className="w-full">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-3">
-          <TabsList>
-            <TabsTrigger value="todas">Todas as Oportunidades</TabsTrigger>
-            <TabsTrigger value="novos">Novos Leads</TabsTrigger>
-            <TabsTrigger value="meus">Meus Clientes</TabsTrigger>
-          </TabsList>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <Tabs defaultValue="todas" className="w-full">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-3">
+            <TabsList>
+              <TabsTrigger value="todas">Todas as Oportunidades</TabsTrigger>
+              <TabsTrigger value="novos">Novos Leads</TabsTrigger>
+              <TabsTrigger value="meus">Meus Clientes</TabsTrigger>
+            </TabsList>
 
-          <Badge variant="outline" className="w-fit px-3 py-1 bg-white text-[#633B48] border-[#633B48] font-medium">
-            {oportunidades.filter(o => o.type === "platform_lead" && !leadsAceitos.includes(o.id)).length} Disponíveis na Região
-          </Badge>
-        </div>
+            <Badge variant="outline" className="w-fit px-3 py-1 bg-white text-[#633B48] border-[#633B48] font-medium">
+              {oportunidades.filter(o => o.type === "platform_lead" && !leadsAceitos.includes(o.id)).length} Disponíveis na Região
+            </Badge>
+          </div>
 
-        <TabsContent value="todas" className="outline-none">
-          {renderCards(oportunidades)}
-        </TabsContent>
+          <TabsContent value="todas" className="outline-none">
+            {renderCards(oportunidades)}
+          </TabsContent>
 
-        <TabsContent value="novos" className="outline-none">
-          {renderCards(oportunidades.filter(o => o.type === "platform_lead"))}
-        </TabsContent>
+          <TabsContent value="novos" className="outline-none">
+            {renderCards(oportunidades.filter(o => o.type === "platform_lead"))}
+          </TabsContent>
 
-        <TabsContent value="meus" className="outline-none">
-          {renderCards(oportunidades.filter(o => o.type === "office_client"))}
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="meus" className="outline-none">
+            {renderCards(oportunidades.filter(o => o.type === "office_client"))}
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   )
 }

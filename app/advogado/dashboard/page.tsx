@@ -17,6 +17,8 @@ import {
   Timer,
   Coins,
   Loader2,
+  Mail,
+  Phone,
 } from "lucide-react"
 import {
   LineChart,
@@ -72,7 +74,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
 
   return (
     <div className="flex flex-col font-sans">
-      <div className="bg-[#0A1F30] text-white">
+      <div className="bg-[#162D3F] text-white">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
@@ -159,7 +161,9 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                   <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                     <MessageSquare className="w-5 h-5 text-[#633B48]" /> Solicitações de Atendimento
                   </h2>
-                  <button className="text-sm text-[#633B48] font-bold hover:underline">Ver todos</button>
+                  <Link href="/advogado/clientes">
+                    <button className="text-sm text-[#633B48] font-bold hover:underline">Ver todos</button>
+                  </Link>
                 </div>
                 <div className="divide-y divide-gray-100">
                   {MOCK_RECENT_LEADS.map((lead) => (
@@ -175,10 +179,14 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                           <Clock className="w-3 h-3" /> {lead.date}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 mb-3 truncate">{lead.message}</p>
-                      <button className="text-sm font-bold text-[#633B48] flex items-center group-hover:underline">
-                        Responder <ArrowRight className="w-4 h-4 ml-1" />
-                      </button>
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+                        <span className="flex items-center gap-1.5">
+                          <Mail className="w-3.5 h-3.5" /> email@exemplo.com
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                          <Phone className="w-3.5 h-3.5" /> (81) 99999-9999
+                        </span>
+                      </div>
                     </div>
                   ))}
                 </div>
