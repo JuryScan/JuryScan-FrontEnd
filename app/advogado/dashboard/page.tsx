@@ -274,17 +274,16 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 <p className="text-sm text-blue-600 font-medium mt-1">Por análise processada</p>
               </div>
 
+              {/* Card alterado: Tokens Consumidos */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
                     <Coins className="w-5 h-5" />
                   </div>
-                  <h4 className="font-bold text-gray-900">Valor Recuperável</h4>
+                  <h4 className="font-bold text-gray-900">Tokens Consumidos</h4>
                 </div>
-                <p className="text-3xl font-bold text-gray-900">
-                  {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(MOCK_INTELLIGENCE_STATS.totalRecoverableValue)}
-                </p>
-                <p className="text-sm text-green-600 font-medium mt-1">Estimativa total aproximada</p>
+                <p className="text-3xl font-bold text-gray-900">133</p>
+                <p className="text-sm text-green-600 font-medium mt-1">Estimativa total</p>
               </div>
             </div>
 
