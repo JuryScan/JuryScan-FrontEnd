@@ -1,23 +1,48 @@
 "use client"
 
 import React, { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, CreditCard, QrCode, Lock, ShieldCheck, FileText, CheckCircle2 } from "lucide-react"
+import { post } from "@/lib/api"
+import type { ApiResponse } from "@/lib/types"
+import { toast } from "@/hooks/use-toast"
 
 export default function CheckoutPage() {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const analysisId = searchParams.get("analysisId")
     const [paymentMethod, setPaymentMethod] = useState("pix")
     const [isProcessing, setIsProcessing] = useState(false)
 
-    const handlePayment = (e: React.FormEvent) => {
-        e.preventDefault()
+    const handlePayment = async (e?: React.FormEvent) => {
+        e?.preventDefault()
         setIsProcessing(true)
-        
-        setTimeout(() => {
+
+        try {
+            const response = await post<ApiResponse<any>>("/product-checkout/checkout", {
+                name: "Desbloqueio de Relatório Individual",
+                amount: 2990, // R$ 29,90 em centavos
+                quantity: 1,
+                ...(analysisId ? { analysisId } : {}),
+            })
+
+            if (response.success && response.data?.sessionUrl) {
+                window.location.href = response.data.sessionUrl
+                return
+            }
+
+            // Sem sessionUrl (ex.: ambiente sem Stripe configurado): segue para o relatório.
+            router.push("/cliente/relatorio")
+        } catch (error) {
+            console.error("Erro no checkout:", error)
+            toast({
+                title: "Erro",
+                description: "Não foi possível iniciar o pagamento. Tente novamente.",
+                variant: "destructive",
+            })
+        } finally {
             setIsProcessing(false)
-            alert("Pagamento aprovado! O relatório completo foi desbloqueado.")
-            router.push("/cliente/relatorio") 
-        }, 2000)
+        }
     }
 
     return (
@@ -132,11 +157,8 @@ export default function CheckoutPage() {
                                 </div>
                             </div>
 
-                            <button 
-                                onClick={paymentMethod === "card" ? (e) => handlePayment(e) : () => {
-                                    setIsProcessing(true);
-                                    setTimeout(() => { setIsProcessing(false); router.push("/cliente/dashboard"); }, 2000);
-                                }}
+                            <button
+                                onClick={() => handlePayment()}
                                 disabled={isProcessing}
                                 className="w-full py-4 bg-[#633B48] hover:bg-[#300117] text-white rounded-xl font-bold text-lg flex items-center justify-center transition-all disabled:opacity-70"
                             >
