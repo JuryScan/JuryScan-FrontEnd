@@ -33,6 +33,7 @@ import {
   MOCK_DASHBOARD_STATS,
   MOCK_RECENT_LEADS,
   MOCK_INTELLIGENCE_STATS,
+  MOCK_RECENT_ANALYSES,
 } from "@/lib/mocks"
 import { useAuth } from "@/contexts/AuthContext"
 import { get } from "@/lib/api"
@@ -42,7 +43,9 @@ export default function AdvogadoDashboardPage(): JSX.Element {
   const { user } = useAuth()
   const [searchTerm, setSearchTerm] = useState("")
   const [viewMode, setViewMode] = useState<"general" | "intelligence">("general")
-  const [recentAnalyses, setRecentAnalyses] = useState<AuditRecord[]>([])
+  // Inicia com exemplos (CNIS analisados) enquanto a integração de dashboard não chega;
+  // é sobrescrito quando a API retornar análises reais.
+  const [recentAnalyses, setRecentAnalyses] = useState<AuditRecord[]>(MOCK_RECENT_ANALYSES)
   const [isLoadingAnalyses, setIsLoadingAnalyses] = useState(true)
   const [balance, setBalance] = useState<number | null>(null)
 
@@ -56,7 +59,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
         get<ApiResponse<number>>(`/wallets/user/${user.id}/balance`)
       ])
       
-      if (analysesRes.success && analysesRes.data?.items) {
+      if (analysesRes.success && analysesRes.data?.items?.length) {
         const mappedAnalyses: AuditRecord[] = analysesRes.data.items.map((item: any) => ({
           id: item.id,
           client: item.titulo || "Segurado",
@@ -124,10 +127,10 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 </button>
               </div>
 
-              <Link href="/advogado/auditoria">
+              <Link href="/advogado/analise">
                 <button className="bg-[#FFB6E1] hover:bg-[#ff9cd2] text-[#A50064] px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-transform hover:scale-105 shadow-lg whitespace-nowrap">
                   <Plus className="w-5 h-5" />
-                  Nova Auditoria
+                  Nova Análise
                 </button>
               </Link>
             </div>
@@ -244,7 +247,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 <div className="p-6 border-b border-gray-100 flex items-center justify-between gap-4">
                   <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
                     <FileText className="w-5 h-5 text-[#633B48]" />
-                    Auditorias Recentes
+                    Análises Recentes
                   </h2>
                   <div className="flex items-center gap-4 w-full justify-end">
                     <div className="relative hidden md:block w-full max-w-xs">
@@ -255,7 +258,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#633B48]"
-                        aria-label="Buscar cliente nas auditorias"
+                        aria-label="Buscar cliente nas análises"
                       />
                     </div>
                     <Link href="/advogado/historico" className="text-sm text-[#633B48] font-bold hover:underline whitespace-nowrap">
@@ -267,11 +270,11 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                   {isLoadingAnalyses ? (
                     <div className="p-12 flex flex-col items-center justify-center text-gray-400">
                       <Loader2 className="w-8 h-8 animate-spin mb-2" />
-                      <p className="text-sm">Carregando auditorias...</p>
+                      <p className="text-sm">Carregando análises...</p>
                     </div>
                   ) : filteredAnalyses.length === 0 ? (
                     <div className="p-12 text-center text-gray-400">
-                      <p className="text-sm">Nenhuma auditoria encontrada.</p>
+                      <p className="text-sm">Nenhuma análise encontrada.</p>
                     </div>
                   ) : (
                     filteredAnalyses.map((analysis) => (
@@ -296,7 +299,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                             </p>
                           </div>
                         </div>
-                        <Link href={`/advogado/auditoria/${analysis.id}`}>
+                        <Link href={`/advogado/analise/${analysis.id}`}>
                           <button
                             className="p-2 text-gray-400 hover:text-[#633B48] hover:bg-[#FFECF1] rounded-lg transition-colors"
                             title="Abrir Relatório"
