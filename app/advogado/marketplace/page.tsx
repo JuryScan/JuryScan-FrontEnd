@@ -1,13 +1,13 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Briefcase, MapPin, AlertTriangle, UserPlus, CheckCircle2 } from "lucide-react"
 
-// Simulação de dados baseada nas necessidades de auditoria de CNIS do JuryScan
 const MOCK_OPORTUNIDADES = [
   {
     id: "lead-1",
@@ -51,118 +51,153 @@ const MOCK_OPORTUNIDADES = [
 ]
 
 export default function MarketplaceLeadsPage() {
-  const [oportunidades, setOportunidades] = useState(MOCK_OPORTUNIDADES)
+  const router = useRouter()
+  const [oportunidades] = useState(MOCK_OPORTUNIDADES)
   const [leadsAceitos, setLeadsAceitos] = useState<string[]>([])
 
   const handleCapturarLead = (id: string) => {
-    // Integração futura: chamada para API ou Server Action para vincular o lead ao ID do advogado
     setLeadsAceitos((prev) => [...prev, id])
   }
 
+  const handleDesfazerCaptura = (id: string) => {
+    setLeadsAceitos((prev) => prev.filter((leadId) => leadId !== id))
+  }
+
+  const handleVerHistorico = () => {
+    router.push("/advogado/historico")
+  }
+
+  const renderCards = (listaFiltrada: typeof MOCK_OPORTUNIDADES) => (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6" style={{ alignItems: "stretch" }}>
+      {listaFiltrada.map((item) => {
+        const foiAceito = leadsAceitos.includes(item.id)
+        const ehDoEscritorio = item.type === "office_client"
+
+        return (
+          <div key={item.id} className="flex">
+            <Card className="w-full flex flex-col border-gray-200 bg-white hover:shadow-md transition-all">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-1">
+                    <CardTitle className="text-xl font-bold tracking-tight text-[#0A1F30]">
+                      {item.name}
+                    </CardTitle>
+                    <CardDescription className="flex items-center gap-1 text-xs text-[#633B48]">
+                      <MapPin className="h-3.5 w-3.5" />
+                      {item.city}, {item.state}
+                    </CardDescription>
+                  </div>
+                  <Badge
+                    className={`text-xs font-medium whitespace-nowrap text-white ${
+                      ehDoEscritorio ? "bg-[#633B48]" : "bg-green-600"
+                    }`}
+                  >
+                    {ehDoEscritorio ? "Do Meu Escritório" : "Disponível"}
+                  </Badge>
+                </div>
+              </CardHeader>
+
+              <CardContent className="space-y-4 flex-grow">
+                <p className="text-sm leading-relaxed text-[#0A1F30]">
+                  {item.description}
+                </p>
+                <div className="rounded-xl bg-amber-50 border border-amber-200 p-3.5">
+                  <h4 className="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1.5 mb-2.5">
+                    <AlertTriangle className="h-4 w-4 text-amber-600" />
+                    Auditoria CNIS Prévia ({item.inconsistencies.length})
+                  </h4>
+                  <ul className="text-xs text-amber-900 space-y-2 list-disc pl-4">
+                    {item.inconsistencies.map((inc, i) => (
+                      <li key={i} className="leading-snug">{inc}</li>
+                    ))}
+                  </ul>
+                </div>
+              </CardContent>
+
+              <CardFooter className="pt-4 bg-white flex items-center justify-between text-xs text-[#633B48] rounded-b-lg border-t mt-auto">
+                {ehDoEscritorio ? (
+                  <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-medium">
+                    Ativo
+                  </span>
+                ) : (
+                  <span>{item.createdAt}</span>
+                )}
+
+                {ehDoEscritorio ? (
+                  <Button
+                    size="sm"
+                    type="button"
+                    onClick={handleVerHistorico}
+                    className="w-[180px] justify-center gap-1.5 font-medium bg-transparent text-[#633B48] border-2 border-[#633B48] hover:bg-[#633B48] hover:text-white transition-colors duration-300"
+                  >
+                    <Briefcase className="h-4 w-4 shrink-0" />
+                    Ver Histórico
+                  </Button>
+                ) : foiAceito ? (
+                  <Button
+                    size="sm"
+                    type="button"
+                    onClick={() => handleDesfazerCaptura(item.id)}
+                    className="w-[180px] justify-center gap-1.5 font-medium text-white bg-emerald-600 hover:bg-emerald-700 transition-colors duration-300"
+                  >
+                    <CheckCircle2 className="h-4 w-4 shrink-0" />
+                    Lead Capturado
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    type="button"
+                    onClick={() => handleCapturarLead(item.id)}
+                    className="w-[180px] justify-center gap-1.5 font-medium text-white bg-[#633B48] hover:bg-[#4A2C38] transition-colors duration-300 hover:scale-[1.02]"
+                  >
+                    <UserPlus className="h-4 w-4 shrink-0" />
+                    Capturar Lead
+                  </Button>
+                )}
+              </CardFooter>
+            </Card>
+          </div>
+        )
+      })}
+    </div>
+  )
+
   return (
-    <div className="space-y-6 p-6 max-w-7xl mx-auto">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
-          Marketplace de Leads
-        </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          Monitore novos potenciais clientes na sua região com pré-auditorias automatizadas de CNIS realizadas pelo JuryScan.
-        </p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-[#162D3F] text-white">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <h1 className="text-3xl font-bold mb-2">Marketplace de Leads</h1>
+          <p className="text-gray-400">Monitore novos potenciais clientes na sua região com pré-auditorias automatizadas de CNIS realizadas pelo JuryScan.</p>
+        </div>
       </div>
 
-      <Tabs defaultValue="todas" className="w-full">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-3">
-          <TabsList>
-            <TabsTrigger value="todas">Todas as Oportunidades</TabsTrigger>
-            <TabsTrigger value="novos">Novos Leads</TabsTrigger>
-            <TabsTrigger value="meus">Meus Clientes</TabsTrigger>
-          </TabsList>
-          
-          <Badge variant="outline" className="w-fit px-3 py-1 bg-white dark:bg-slate-950">
-            {oportunidades.filter(o => o.type === "platform_lead" && !leadsAceitos.includes(o.id)).length} Disponíveis na Região
-          </Badge>
-        </div>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <Tabs defaultValue="todas" className="w-full">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-3">
+            <TabsList>
+              <TabsTrigger value="todas">Todas as Oportunidades</TabsTrigger>
+              <TabsTrigger value="novos">Novos Leads</TabsTrigger>
+              <TabsTrigger value="meus">Meus Clientes</TabsTrigger>
+            </TabsList>
 
-        {["todas", "novos", "meus"].map((aba) => {
-          // Filtragem de acordo com a aba selecionada
-          const listaFiltrada = oportunidades.filter((item) => {
-            if (aba === "novos") return item.type === "platform_lead"
-            if (aba === "meus") return item.type === "office_client"
-            return true
-          })
+            <Badge variant="outline" className="w-fit px-3 py-1 bg-white text-[#633B48] border-[#633B48] font-medium">
+              {oportunidades.filter(o => o.type === "platform_lead" && !leadsAceitos.includes(o.id)).length} Disponíveis na Região
+            </Badge>
+          </div>
 
-          return (
-            <TabsContent key={aba} value={aba} className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 outline-none">
-              {listaFiltrada.map((item) => {
-                const foiAceito = leadsAceitos.includes(item.id)
-                const ehDoEscritorio = item.type === "office_client"
+          <TabsContent value="todas" className="outline-none">
+            {renderCards(oportunidades)}
+          </TabsContent>
 
-                return (
-                  <Card key={item.id} className={`flex flex-col justify-between transition-all ${
-                    ehDoEscritorio 
-                      ? "border-blue-200 bg-blue-50/20 dark:border-blue-900/40 dark:bg-blue-950/5" 
-                      : "border-slate-200 dark:border-slate-800"
-                  }`}>
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="space-y-1">
-                          <CardTitle className="text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100">
-                            {item.name}
-                          </CardTitle>
-                          <CardDescription className="flex items-center gap-1 text-xs">
-                            <MapPin className="h-3.5 w-3.5 text-slate-400" />
-                            {item.city}, {item.state}
-                          </CardDescription>
-                        </div>
-                        <Badge variant={ehDoEscritorio ? "secondary" : "default"} className="text-xs font-medium whitespace-nowrap">
-                          {ehDoEscritorio ? "Do Meu Escritório" : "Lead Disponível"}
-                        </Badge>
-                      </div>
-                    </CardHeader>
+          <TabsContent value="novos" className="outline-none">
+            {renderCards(oportunidades.filter(o => o.type === "platform_lead"))}
+          </TabsContent>
 
-                    <CardContent className="space-y-4 flex-grow">
-                      <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                        {item.description}
-                      </p>
-
-                      {/* Box com o resumo gerado pelo motor de IA do JuryScan */}
-                      <div className="rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 p-3.5">
-                        <h4 className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1.5 mb-2.5">
-                          <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
-                          Auditoria CNIS Prvia ({item.inconsistencies.length})
-                        </h4>
-                        <ul className="text-xs text-amber-900 dark:text-amber-300 space-y-2 list-disc pl-4">
-                          {item.inconsistencies.map((inc, i) => (
-                            <li key={i} className="leading-snug">{inc}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </CardContent>
-
-                    <CardFooter className="border-t pt-4 bg-slate-50/50 dark:bg-slate-900/10 flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
-                      <span>{item.createdAt}</span>
-                      
-                      {ehDoEscritorio ? (
-                        <Button size="sm" variant="outline" className="gap-1.5 font-medium">
-                          <Briefcase className="h-4 w-4" /> Ver Histórico
-                        </Button>
-                      ) : foiAceito ? (
-                        <Button size="sm" disabled className="bg-emerald-600 hover:bg-emerald-600 disabled:opacity-100 text-white gap-1.5 font-medium">
-                          <CheckCircle2 className="h-4 w-4" /> Lead Capturado
-                        </Button>
-                      ) : (
-                        <Button size="sm" onClick={() => handleCapturarLead(item.id)} className="gap-1.5 font-medium">
-                          <UserPlus className="h-4 w-4" /> Capturar Lead
-                        </Button>
-                      )}
-                    </CardFooter>
-                  </Card>
-                )
-              })}
-            </TabsContent>
-          )
-        })}
-      </Tabs>
+          <TabsContent value="meus" className="outline-none">
+            {renderCards(oportunidades.filter(o => o.type === "office_client"))}
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   )
 }
