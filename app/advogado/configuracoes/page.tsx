@@ -127,7 +127,7 @@ export default function ConfiguracoesPage() {
     
     setIsDeleting(true)
     try {
-      const res = await del<ApiResponse<any>>(`/users/${user?.id}`)
+      const res = await del<ApiResponse<any>>(`/users/advogado/${user?.id}`)
       if (res.success) {
         toast({ title: "Conta Excluída", description: "Sentimos muito em ver você partir." })
         logout()
@@ -377,7 +377,7 @@ export default function ConfiguracoesPage() {
                   </button>
                 </div>
                 <p className="text-xs text-gray-400 leading-relaxed">
-                  Recomendamos fortemente a ativação do 2FA para garantir que apenas você tenha acesso às suas auditorias e dados financeiros.
+                  Recomendamos fortemente a ativação do 2FA para garantir que apenas você tenha acesso às suas análises e dados financeiros.
                 </p>
               </div>
             </div>
@@ -404,7 +404,7 @@ export default function ConfiguracoesPage() {
               <div className="pt-8 border-t border-gray-100">
                 <h4 className="text-lg font-bold text-red-600 mb-2">Zona de Perigo</h4>
                 <p className="text-sm text-gray-500 mb-6">
-                  Ao excluir sua conta, todas as suas auditorias, créditos e histórico de transações serão apagados permanentemente. 
+                  Ao excluir sua conta, todas as suas análises, créditos e histórico de transações serão apagados permanentemente. 
                   Esta ação não pode ser desfeita.
                 </p>
                 <Button 
