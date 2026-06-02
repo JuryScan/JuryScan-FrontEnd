@@ -177,7 +177,7 @@ export default function AnalysisResultComponent({
             <CheckCircle className="w-12 h-12 text-gray-300" />
           </div>
           <p className="text-lg font-bold text-[#0A1F30] mb-1">
-            Auditoria Pendente
+            Análise Pendente
           </p>
           <p className="text-sm">Faça o upload do documento ao lado.</p>
         </div>

@@ -17,7 +17,7 @@ export default function ServicesPage() {
             icon: Shield,
             title: "Auditor CNIS",
             description: "Nossa IA analisa o extrato previdenciário em segundos, identificando vínculos extemporâneos e falhas.",
-            link: "/advogado/auditoria",
+            link: "/advogado/analise",
             active: true
         },
         {
@@ -295,7 +295,7 @@ export default function ServicesPage() {
                                                 plan.cta === "Falar com Consultor"
                                                     ? "/contato"
                                                     : plan.isFree
-                                                        ? (user ? "/advogado/auditoria" : "/login")
+                                                        ? (user ? "/advogado/analise" : "/login")
                                                         : (user ? `/cliente/checkout?plan=${encodeURIComponent(plan.name)}&price=${encodeURIComponent(plan.price)}` : "/login")
                                             }
                                         >

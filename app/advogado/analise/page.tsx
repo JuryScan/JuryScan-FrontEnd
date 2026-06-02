@@ -40,7 +40,7 @@ export default function AuditorPage(): JSX.Element {
       const formData = new FormData()
       formData.append("file", file)
 
-      const response = await post<any>(`/analysis/user/${user.id}`, formData)
+      const response = await post<any>(`/analysis/upload`, formData)
       
       const backendData = response.data
 

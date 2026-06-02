@@ -48,14 +48,14 @@ export default function AnalysisHistoryPage() {
   }, [fetchHistory])
 
   const handleViewDetails = (id: string) => {
-    router.push(`/advogado/auditoria/${id}`)
+    router.push(`/advogado/analise/${id}`)
   }
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-[#0A1F30] mb-2">Histórico de Auditorias</h1>
+          <h1 className="text-3xl font-bold text-[#0A1F30] mb-2">Histórico de Análises</h1>
           <p className="text-gray-500">Consulte e gerencie todas as análises de CNIS realizadas.</p>
         </div>
 
@@ -83,7 +83,7 @@ export default function AnalysisHistoryPage() {
               <FileText className="w-10 h-10 text-gray-200" />
             </div>
             <h3 className="text-xl font-bold text-[#0A1F30] mb-2">Nenhuma análise encontrada</h3>
-            <p className="max-w-sm mx-auto">Você ainda não realizou nenhuma auditoria de CNIS ou o filtro não retornou resultados.</p>
+            <p className="max-w-sm mx-auto">Você ainda não realizou nenhuma análise de CNIS ou o filtro não retornou resultados.</p>
           </div>
         ) : (
           <>
