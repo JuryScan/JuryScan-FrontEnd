@@ -112,11 +112,11 @@ export default function FinanceiroPage() {
               </div>
               <div className="flex items-baseline gap-2">
                 <h2 className="text-5xl font-bold">{balance !== null ? balance : "--"}</h2>
-                <span className="text-xl text-gray-400 font-medium">Tokens</span>
+                <span className="text-xl text-gray-400 font-medium">Créditos</span>
               </div>
             </div>
             <div className="mt-8 relative z-10">
-              <p className="text-sm text-gray-400">Cada análise de CNIS consome 1 token.</p>
+              <p className="text-sm text-gray-400">Cada análise de CNIS consome 30 créditos.</p>
             </div>
             <Coins className="absolute -right-8 -bottom-8 w-40 h-40 text-white/5 rotate-12" />
           </div>
@@ -128,9 +128,9 @@ export default function FinanceiroPage() {
             </h3>
             <div className="grid sm:grid-cols-3 gap-4 items-stretch">
               {[
-                { tokens: 10, price: 19.90, label: "Básico", highlight: false },
-                { tokens: 50, price: 79.90, label: "Popular", highlight: true },
-                { tokens: 100, price: 149.90, label: "Profissional", highlight: false }
+                { tokens: 60, price: 19.90, label: "Básico", highlight: false },
+                { tokens: 120, price: 79.90, label: "Popular", highlight: true },
+                { tokens: 470, price: 149.90, label: "Profissional", highlight: false }
               ].map((plan) => (
                 <div
                   key={plan.tokens}
@@ -142,7 +142,7 @@ export default function FinanceiroPage() {
                     {plan.label}
                   </span>
                   <span className="text-3xl font-bold text-[#0A1F30] mb-1">{plan.tokens}</span>
-                  <span className="text-sm text-gray-500 mb-4">Tokens</span>
+                  <span className="text-sm text-gray-500 mb-4">Créditos</span>
                   <div className="text-xl font-bold text-[#0A1F30] mb-6">R$ {plan.price.toFixed(2).replace('.', ',')}</div>
                   <button
                     onClick={() => handleBuyCredits(plan.price, plan.tokens)}

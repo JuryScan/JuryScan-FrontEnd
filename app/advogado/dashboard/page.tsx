@@ -95,12 +95,12 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                   onClick={() => setViewMode("intelligence")}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${viewMode === "intelligence" ? "bg-[#FFB6E1] text-[#A50064]" : "text-gray-400 hover:text-white"}`}
                 >
-                  <BrainCircuit className="w-4 h-4" /> Inteligência
+                  <BrainCircuit className="w-4 h-4" /> Métricas
                 </button>
               </div>
               <Link href="/advogado/auditoria">
                 <button className="bg-[#FFB6E1] hover:bg-[#ff9cd2] text-[#A50064] px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-transform hover:scale-105 shadow-lg whitespace-nowrap">
-                  <Plus className="w-5 h-5" /> Nova Auditoria
+                  <Plus className="w-5 h-5" /> Nova Análise
                 </button>
               </Link>
             </div>
@@ -195,7 +195,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="p-6 border-b border-gray-100 flex items-center justify-between gap-4">
                   <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
-                    <FileText className="w-5 h-5 text-[#633B48]" /> Auditorias Recentes
+                    <FileText className="w-5 h-5 text-[#633B48]" /> Análises Recentes
                   </h2>
                   <div className="flex items-center gap-4 w-full justify-end">
                     <div className="relative hidden md:block w-full max-w-xs">
@@ -215,11 +215,11 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                   {isLoadingAnalyses ? (
                     <div className="p-12 flex flex-col items-center justify-center text-gray-400">
                       <Loader2 className="w-8 h-8 animate-spin mb-2" />
-                      <p className="text-sm">Carregando auditorias...</p>
+                      <p className="text-sm">Carregando análises...</p>
                     </div>
                   ) : filteredAnalyses.length === 0 ? (
                     <div className="p-12 text-center text-gray-400">
-                      <p className="text-sm">Nenhuma auditoria encontrada.</p>
+                      <p className="text-sm">Nenhuma análise encontrada.</p>
                     </div>
                   ) : (
                     filteredAnalyses.map((analysis) => (
@@ -233,7 +233,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                             <p className="text-xs text-gray-500 flex items-center gap-2 mt-1">
                               <span>Data: {analysis.date}</span>
                               <span>•</span>
-                              <span className="text-orange-600 font-medium">{analysis.issues} pendências</span>
+                              <span className="text-orange-600 font-medium">{analysis.issues} inconsistências</span>
                             </p>
                           </div>
                         </div>
@@ -260,7 +260,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                   <h4 className="font-bold text-gray-900">Total de Erros</h4>
                 </div>
                 <p className="text-3xl font-bold text-gray-900">{MOCK_INTELLIGENCE_STATS.totalErrors}</p>
-                <p className="text-sm text-red-600 font-medium mt-1">Pendências detectadas no total</p>
+                <p className="text-sm text-red-600 font-medium mt-1">Total de inconsistências detectadas</p>
               </div>
 
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
@@ -282,7 +282,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                   </div>
                   <h4 className="font-bold text-gray-900">Tokens Consumidos</h4>
                 </div>
-                <p className="text-3xl font-bold text-gray-900">133</p>
+                <p className="text-3xl font-bold text-gray-900">150</p>
                 <p className="text-sm text-green-600 font-medium mt-1">Estimativa total</p>
               </div>
             </div>
@@ -307,7 +307,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
 
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                 <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-[#633B48]" /> Tendência de Erros Detectados
+                  <AlertCircle className="w-5 h-5 text-[#633B48]" /> Ocorrência mensal de erros
                 </h3>
                 <div className="h-80 w-full">
                   <ResponsiveContainer width="100%" height="100%">

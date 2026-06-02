@@ -89,10 +89,10 @@ export default function MarketplaceLeadsPage() {
                   </div>
                   <Badge
                     className={`text-xs font-medium whitespace-nowrap text-white ${
-                      ehDoEscritorio ? "bg-[#633B48]" : "bg-green-600"
+                      ehDoEscritorio ? "bg-[#5bbffc]" : "bg-green-600"
                     }`}
                   >
-                    {ehDoEscritorio ? "Do Meu Escritório" : "Disponível"}
+                    {ehDoEscritorio ? "Adquirido" : "Disponível"}
                   </Badge>
                 </div>
               </CardHeader>
@@ -115,14 +115,6 @@ export default function MarketplaceLeadsPage() {
               </CardContent>
 
               <CardFooter className="pt-4 bg-white flex items-center justify-between text-xs text-[#633B48] rounded-b-lg border-t mt-auto">
-                {ehDoEscritorio ? (
-                  <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-medium">
-                    Ativo
-                  </span>
-                ) : (
-                  <span>{item.createdAt}</span>
-                )}
-
                 {ehDoEscritorio ? (
                   <Button
                     size="sm"
@@ -151,7 +143,7 @@ export default function MarketplaceLeadsPage() {
                     className="w-[180px] justify-center gap-1.5 font-medium text-white bg-[#633B48] hover:bg-[#4A2C38] transition-colors duration-300 hover:scale-[1.02]"
                   >
                     <UserPlus className="h-4 w-4 shrink-0" />
-                    Capturar Lead
+                    Adquirir Lead
                   </Button>
                 )}
               </CardFooter>

@@ -118,8 +118,7 @@ export default function ClienteDashboardPage(): JSX.Element {
             Olá! Vamos analisar seu INSS?
           </h1>
           <p className="text-gray-600 text-lg">
-            Envie seu extrato (CNIS) e nossa Inteligência Artificial vai traduzir
-            tudo de forma simples.
+            Envie seu extrato (CNIS) e nossa Inteligência Artificial fará a análise do documento, identificando e informando eventuais inconsistências.
           </p>
         </div>
 
@@ -184,7 +183,7 @@ export default function ClienteDashboardPage(): JSX.Element {
               >
                 {isAnalyzing
                   ? "Processando..."
-                  : "Traduzir meu CNIS"}
+                  : "Analisar meu CNIS"}
               </button>
             </div>
           </div>
@@ -315,7 +314,7 @@ export default function ClienteDashboardPage(): JSX.Element {
 
                 <Link href="/cliente/advogados" className="w-full">
                   <button className="w-full py-5 rounded-xl bg-[#300117] hover:bg-[#1a000c] text-white border border-[#FFECF1]/20 font-bold text-lg flex items-center justify-center transition-transform hover:scale-[1.02] shadow-md">
-                    Contratar Advogado Parceiro{" "}
+                    Solicitar Advogado Parceiro{" "}
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </button>
                 </Link>
