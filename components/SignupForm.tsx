@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "./ui/button"
-import { post } from "@/lib/api"
+import { useAuth } from "@/contexts/AuthContext"
 import {
   signupStep1Schema,
   signupStep2Schema,
@@ -14,7 +14,7 @@ import {
   type SignupStep2Schema,
   type SignupStep3Schema,
 } from "@/lib/schemas"
-import type { UserType } from "@/lib/types"
+import type { UserType, SignupComumPayload, SignupAdvogadoPayload } from "@/lib/types"
 import { TextInput } from "./forms/TextInput"
 import { CpfCnpjInput } from "./forms/CpfCnpjInput"
 import { DateInput } from "./forms/DateInput"
@@ -36,6 +36,7 @@ interface FormData {
 
 export default function SignupForm({ defaultEmail = "" }: { defaultEmail?: string }): JSX.Element {
   const router = useRouter()
+  const { signupComum, signupAdvogado } = useAuth()
   const [step, setStep] = useState<number>(1)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -54,6 +55,7 @@ export default function SignupForm({ defaultEmail = "" }: { defaultEmail?: strin
       numeroOab: "",
     },
     mode: "onBlur",
+    shouldFocusError: true,
   })
 
   const step2 = useForm<SignupStep2Schema>({
@@ -65,6 +67,7 @@ export default function SignupForm({ defaultEmail = "" }: { defaultEmail?: strin
       descricao: "",
     },
     mode: "onBlur",
+    shouldFocusError: true,
   })
 
   const step3 = useForm<SignupStep3Schema>({
@@ -74,6 +77,7 @@ export default function SignupForm({ defaultEmail = "" }: { defaultEmail?: strin
       confirmarSenha: "",
     },
     mode: "onBlur",
+    shouldFocusError: true,
   })
 
   const handleNext = async () => {
@@ -83,8 +87,18 @@ export default function SignupForm({ defaultEmail = "" }: { defaultEmail?: strin
 
     if (step === 1) {
       isValid = await step1.trigger()
+      if (!isValid) {
+        const errors = step1.formState.errors
+        const firstError = Object.values(errors)[0]?.message
+        if (firstError) setError(firstError as string)
+      }
     } else if (step === 2) {
       isValid = await step2.trigger()
+      if (!isValid) {
+        const errors = step2.formState.errors
+        const firstError = Object.values(errors)[0]?.message
+        if (firstError) setError(firstError as string)
+      }
     }
 
     if (isValid && step < 3) {
@@ -129,39 +143,50 @@ export default function SignupForm({ defaultEmail = "" }: { defaultEmail?: strin
     setIsLoading(true)
 
     try {
-      const dataIso = data.dataNascimento
-        ? new Date(data.dataNascimento).toISOString()
-        : new Date().toISOString()
-
-      const basePayload = {
-        nomeCompleto: data.nomeCompleto,
-        email: data.email,
-        telefone: data.telefone,
-        senha: data.senha,
-        dataNascimento: dataIso,
-        cpf: data.cpf.replace(/\D/g, ""),
-        recaptchaToken,
+      // Converter data de dd/mm/yyyy para ISO
+      let dataIso = new Date().toISOString()
+      if (data.dataNascimento) {
+        const parts = data.dataNascimento.split("/")
+        if (parts.length === 3) {
+          const day = parseInt(parts[0], 10)
+          const month = parseInt(parts[1], 10)
+          const year = parseInt(parts[2], 10)
+          const date = new Date(year, month - 1, day)
+          dataIso = date.toISOString()
+        }
       }
 
-      let endpoint = "/users/comum/register"
-      const finalPayload = {
-        ...basePayload,
-        ...(userType === "advogado"
-          ? {
-              numeroOab: data.numeroOab,
-              experiencia: data.experiencia,
-              descricao: data.descricao,
-            }
-          : {}),
+      const cpfLimpo = data.cpf.replace(/\D/g, "")
+      const telefoneLimpo = data.telefone.replace(/\D/g, "")
+
+      if (userType === "comum") {
+        const payload: SignupComumPayload = {
+          nomeCompleto: data.nomeCompleto,
+          email: data.email,
+          telefone: telefoneLimpo,
+          senha: data.senha,
+          dataNascimento: dataIso,
+          cpf: cpfLimpo,
+          recaptchaToken,
+        }
+        await signupComum(payload)
+        router.push("/cliente/dashboard")
+      } else {
+        const payload: SignupAdvogadoPayload = {
+          nomeCompleto: data.nomeCompleto,
+          email: data.email,
+          telefone: telefoneLimpo,
+          senha: data.senha,
+          dataNascimento: dataIso,
+          cpf: cpfLimpo,
+          numeroOab: data.numeroOab || "",
+          experiencia: data.experiencia || "",
+          descricao: data.descricao || "",
+          recaptchaToken,
+        }
+        await signupAdvogado(payload)
+        router.push("/advogado/dashboard")
       }
-
-      if (userType === "advogado") {
-        endpoint = "/users/advogado/register"
-      }
-
-      await post(endpoint, finalPayload)
-
-      router.push("/login")
     } catch (err: unknown) {
       recaptchaRef.current?.reset()
       setRecaptchaToken(null)
