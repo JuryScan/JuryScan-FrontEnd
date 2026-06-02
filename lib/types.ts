@@ -9,21 +9,26 @@
 export interface LoginCredentials {
   email: string
   password: string
+  recaptchaToken: string
 }
 
 export interface User {
-  id?: string
+  id: string
   nomeCompleto: string
   email: string
-  telefone?: string
-  cpf?: string
-  dataNascimento?: string
-  tipoUsuario?: "COMUM" | "ADVOGADO" | "ADMIN"
-  status?: string
+  telefone: string
+  emailRecuperacao: string
+  dataNascimento: string
+  cpf: string
+  status: "ATIVO" | "INATIVO" | "BLOQUEADO"
+  emailVerificado: boolean
+  enderecoUrl: string
+  tipoUsuario: "COMUM" | "ADVOGADO" | "ADMIN"
+  descricao?: string
   numeroOab?: string
   experiencia?: string
-  descricao?: string
-  [key: string]: unknown
+  dataCriacao: string
+  dataUltimaAtualizacao: string
 }
 
 export interface LoginResponse {
@@ -32,6 +37,53 @@ export interface LoginResponse {
   message: string
   status: number
   user: User
+}
+
+// ============================================================
+// Cadastro (Signup)
+// ============================================================
+
+export interface SignupComumPayload {
+  nomeCompleto: string
+  email: string
+  telefone: string
+  senha: string
+  dataNascimento: string
+  cpf: string
+  recaptchaToken: string
+}
+
+export interface SignupAdvogadoPayload {
+  nomeCompleto: string
+  email: string
+  telefone: string
+  senha: string
+  dataNascimento: string
+  cpf: string
+  descricao: string
+  numeroOab: string
+  experiencia: string
+  recaptchaToken: string
+}
+
+export interface SignupComumResponse {
+  success: boolean
+  message: string
+  data: {
+    token: string
+    userComum: User
+  }
+  status: number
+}
+
+export interface SignupAdvogadoResponse {
+  success: boolean
+  message: string
+  data: {
+    token: string
+    userAdvogado: User
+  }
+  status: number
 }
 
 export interface ApiResponse<T = unknown> {
@@ -47,12 +99,6 @@ export interface PageResponse<T> {
   totalPages: number
   pageSize: number
   totalElements: number
-}
-
-export interface UserAdvogado extends User {
-  numeroOab?: string
-  experiencia?: string
-  descricao?: string
 }
 
 // ============================================================

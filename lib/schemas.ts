@@ -24,23 +24,50 @@ export type LoginSchema = z.infer<typeof loginSchema>
 // Cadastro (multi-step)
 // ============================================================
 
+// Helper para converter dd/mm/yyyy para Date válida
+const parseDataBR = (dateStr: string): Date | null => {
+  if (!dateStr || dateStr.length < 8) return null
+  const parts = dateStr.split("/")
+  if (parts.length !== 3) return null
+  
+  const day = parseInt(parts[0], 10)
+  const month = parseInt(parts[1], 10)
+  const year = parseInt(parts[2], 10)
+  
+  if (isNaN(day) || isNaN(month) || isNaN(year)) return null
+  if (month < 1 || month > 12) return null
+  if (day < 1 || day > 31) return null
+  if (year < 1900 || year > new Date().getFullYear()) return null
+  
+  const date = new Date(year, month - 1, day)
+  return date.getDate() === day && date.getMonth() === month - 1 ? date : null
+}
+
 // Passo 1: dados pessoais
 export const signupStep1Schema = z.object({
   nomeCompleto: z
     .string()
+    .min(1, "Nome é obrigatório")
     .min(3, "Nome deve ter pelo menos 3 caracteres"),
   cpf: z
     .string()
-    .min(11, "CPF inválido")
-    .max(14, "CPF inválido"),
+    .min(1, "CPF é obrigatório")
+    .refine(
+      (cpf) => cpf.replace(/\D/g, "").length === 11,
+      "CPF deve ter 11 dígitos"
+    ),
   dataNascimento: z
     .string()
-    .min(1, "Data de nascimento é obrigatória"),
-  numeroOab: z.string().optional(),
+    .min(1, "Data de nascimento é obrigatória")
+    .refine(
+      (date) => parseDataBR(date) !== null,
+      "Data de nascimento inválida (use dd/mm/aaaa)"
+    ),
+  numeroOab: z.string().optional().catch(undefined),
 }).refine(
   (data) => {
     // Se não tem OAB, é comum — válido
-    if (!data.numeroOab) return true
+    if (!data.numeroOab || data.numeroOab.trim() === "") return true
     // Se tem OAB, deve ter pelo menos 5 caracteres
     return data.numeroOab.length >= 5
   },
@@ -58,20 +85,26 @@ export const signupStep2Schema = z.object({
     .email("E-mail inválido"),
   telefone: z
     .string()
-    .min(10, "Telefone inválido")
-    .max(15, "Telefone inválido"),
-  experiencia: z.string().optional(),
-  descricao: z.string().optional(),
+    .min(1, "Telefone é obrigatório")
+    .refine(
+      (tel) => tel.replace(/\D/g, "").length >= 10,
+      "Telefone deve ter pelo menos 10 dígitos"
+    ),
+  experiencia: z.string().optional().catch(undefined),
+  descricao: z.string().optional().catch(undefined),
 })
 
 // Passo 3: senha
 export const signupStep3Schema = z.object({
   senha: z
     .string()
+    .min(1, "Senha é obrigatória")
     .min(8, "Senha deve ter pelo menos 8 caracteres")
     .regex(/[A-Za-z]/, "Senha deve conter pelo menos uma letra")
     .regex(/[0-9]/, "Senha deve conter pelo menos um número"),
-  confirmarSenha: z.string(),
+  confirmarSenha: z
+    .string()
+    .min(1, "Confirmação de senha é obrigatória"),
 }).refine((data) => data.senha === data.confirmarSenha, {
   message: "As senhas não coincidem",
   path: ["confirmarSenha"],
