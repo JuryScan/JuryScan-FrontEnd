@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "./ui/button"
+import { AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { useAuth } from "@/contexts/AuthContext"
 import { loginSchema, type LoginSchema } from "@/lib/schemas"
@@ -78,23 +79,17 @@ export default function LoginForm(): JSX.Element {
   }
 
   return (
-    <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-sm">
+    <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
       <div className="flex justify-center mb-8">
         <img src="/logo.svg" alt="JuryScan" className="w-40 object-contain" />
       </div>
       <h1 className="text-3xl font-bold text-center text-[#0A1F30] mb-6">Entrar</h1>
 
-      {error && (
-        <p className="text-red-500 text-sm mb-4 w-full text-center" role="alert">
-          {error}
-        </p>
-      )}
-
       <FormProvider {...methods}>
         <form className="w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <button
             type="button"
-            className="w-full flex items-center justify-center gap-3 py-3 border border-gray-300 rounded-md text-[#A50064] font-semibold hover:bg-gray-50 transition-colors"
+            className="hidden w-full flex items-center justify-center gap-3 py-3 border border-gray-300 rounded-md text-[#A50064] font-semibold hover:bg-gray-50 transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -123,7 +118,7 @@ export default function LoginForm(): JSX.Element {
             <span>Continuar com o Google</span>
           </button>
 
-          <div className="text-center text-gray-400 text-sm py-2">ou</div>
+          <div className="hidden text-center text-gray-400 text-sm py-2">ou</div>
 
           <TextInput
             name="email"
@@ -137,6 +132,39 @@ export default function LoginForm(): JSX.Element {
             label="Senha"
             placeholder="Digite sua senha"
           />
+
+          {error && (
+            <div
+              className={`p-4 rounded-lg border flex gap-3 animate-in fade-in duration-300 ${
+                error.includes("incorretos")
+                  ? "bg-amber-50 border-amber-300"
+                  : "bg-red-50 border-red-300"
+              }`}
+              role="alert"
+            >
+              <div className="flex-shrink-0 mt-0.5">
+                <AlertCircle
+                  className={`w-5 h-5 ${
+                    error.includes("incorretos")
+                      ? "text-amber-600"
+                      : "text-red-600"
+                  }`}
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="flex-1">
+                <p
+                  className={`text-sm font-medium ${
+                    error.includes("incorretos")
+                      ? "text-amber-800"
+                      : "text-red-800"
+                  }`}
+                >
+                  {error}
+                </p>
+              </div>
+            </div>
+          )}
 
           <div className="flex justify-center py-2">
             {recaptchaSiteKey ? (
@@ -165,7 +193,7 @@ export default function LoginForm(): JSX.Element {
               href="#"
               className="text-[#A50064] hover:underline font-medium"
             >
-              Campanha / Esqueci minha senha
+              Esqueci minha senha
             </Link>
             <div className="text-gray-500">
               Sem conta?{" "}
