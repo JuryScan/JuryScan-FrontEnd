@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { LayoutDashboard, Users, FileSearch, CreditCard, Settings, FileText } from 'lucide-react'
+import { LayoutDashboard, Store, FileSearch, CreditCard, Settings, FileText } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -35,15 +35,14 @@ function ShellContent({ children }: { children: React.ReactNode }) {
   const menuItems: MenuItem[] = user?.tipoUsuario === 'ADVOGADO'
     ? [
         { href: '/advogado/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { href: '/advogado/auditoria', label: 'Analisar CNIS', icon: FileSearch },
+        { href: '/advogado/analise', label: 'Análise', icon: FileSearch },
         { href: '/advogado/historico', label: 'Histórico', icon: FileText },
-        { href: '/advogado/clientes', label: 'Clientes', icon: Users },
+        { href: '/advogado/marketplace', label: 'Marketplace', icon: Store },
         { href: '/advogado/financeiro', label: 'Financeiro', icon: CreditCard },
         { href: '/advogado/configuracoes', label: 'Configurações', icon: Settings },
       ]
     : [
         { href: '/cliente/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { href: '/cliente/advogados', label: 'Advogados', icon: Users },
         { href: '/cliente/relatorio', label: 'Relatórios', icon: FileText },
       ]
 
