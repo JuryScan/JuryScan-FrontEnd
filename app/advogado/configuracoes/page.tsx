@@ -356,7 +356,7 @@ export default function ConfiguracoesPage() {
                   </div>
                 </div>
                 <div className="pt-8 border-t border-gray-100">
-                  <h4 className="text-lg font-bold text-red-600 mb-2">Zona de Perigo</h4>
+                  <h4 className="text-lg font-bold text-red-600 mb-2">Aviso!</h4>
                   <p className="text-sm text-gray-500 mb-6">
                     Ao excluir sua conta, todas as suas auditorias, créditos e histórico de transações serão apagados permanentemente. Esta ação não pode ser desfeita.
                   </p>

@@ -78,8 +78,8 @@ export default function AuditorPage(): JSX.Element {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <div className="bg-[#162D3F] text-white">
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <h1 className="text-3xl font-bold mb-2">Auditoria CNIS</h1>
-          <p className="text-gray-400">Faça o upload do CNIS para iniciar a análise.</p>
+          <h1 className="text-3xl font-bold mb-2">Análise CNIS</h1>
+          <p className="text-gray-400">Faça o upload do seu documento CNIS para iniciar a análise.</p>
         </div>
       </div>
 
