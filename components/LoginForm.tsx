@@ -1,12 +1,13 @@
 "use client"
 
 import { useState, type JSX, useRef } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useForm, FormProvider } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "./ui/button"
 import Link from "next/link"
 import { useAuth } from "@/contexts/AuthContext"
+import { getUser } from "@/lib/auth"
 import { loginSchema, type LoginSchema } from "@/lib/schemas"
 import { TextInput } from "./forms/TextInput"
 import { PasswordInput } from "./forms/PasswordInput"
@@ -14,7 +15,8 @@ import ReCAPTCHA from "react-google-recaptcha"
 
 export default function LoginForm(): JSX.Element {
   const router = useRouter()
-  const { login, isAdvogado } = useAuth()
+  const searchParams = useSearchParams()
+  const { login } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const recaptchaRef = useRef<ReCAPTCHA>(null)
@@ -55,7 +57,17 @@ export default function LoginForm(): JSX.Element {
     try {
       await login(data.email, data.senha, recaptchaToken)
 
-      if (isAdvogado) {
+      // Lê o usuário recém-gravado (cookie) para decidir o destino por papel,
+      // evitando depender do estado do contexto no mesmo ciclo de render.
+      const loggedUser = getUser()
+      const tipo = loggedUser?.tipoUsuario
+      const callbackUrl = searchParams.get("callbackUrl")
+
+      if (callbackUrl && callbackUrl.startsWith("/")) {
+        router.push(callbackUrl)
+      } else if (tipo === "ADMIN") {
+        router.push("/admin/dashboard")
+      } else if (tipo === "ADVOGADO") {
         router.push("/advogado/dashboard")
       } else {
         router.push("/cliente/dashboard")
