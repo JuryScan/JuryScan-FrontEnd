@@ -25,7 +25,10 @@ export default function AnalysisHistoryPage() {
   const [data, setData] = useState<PageResponse<AnalysisResult> | null>(null)
 
   const fetchHistory = useCallback(async () => {
-    if (!user?.id) return
+    if (!user?.id) {
+      setIsLoading(false)
+      return
+    }
 
     setIsLoading(true)
     try {
@@ -102,7 +105,7 @@ export default function AnalysisHistoryPage() {
                     <tr key={analysis.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-[#FFECF1] text-[#A50064] rounded-lg flex items-center justify-center flex-shrink-0">
+                          <div className="w-10 h-10 bg-[#F5EEF0] text-[#633B48] rounded-lg flex items-center justify-center flex-shrink-0">
                             <FileText className="w-5 h-5" />
                           </div>
                           <div>
@@ -136,7 +139,7 @@ export default function AnalysisHistoryPage() {
                       <td className="px-6 py-5 text-right">
                         <button
                           onClick={() => handleViewDetails(analysis.id ?? "")}
-                          className="px-4 py-2 bg-gray-100 hover:bg-[#633B48] text-gray-700 hover:text-white rounded-lg text-sm font-bold transition-all flex items-center gap-2 ml-auto"
+                          className="px-4 py-2 bg-[#633B48] hover:bg-[#4A2C38] text-white rounded-lg text-sm font-bold transition-all flex items-center gap-2 ml-auto"
                         >
                           Ver Detalhes
                           <ArrowRight className="w-4 h-4" />
