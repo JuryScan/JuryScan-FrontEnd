@@ -4,7 +4,6 @@ import {
   AlertCircle,
   Info,
   FileText,
-  Download,
   Lock,
   FileX,
   RefreshCcw,
@@ -245,16 +244,6 @@ export default function AnalysisResultComponent({
                 <p>Nenhuma inconsistência grave foi detectada neste documento.</p>
               </div>
             )}
-          </div>
-
-          <div className="mt-8 pt-6 border-t border-gray-100">
-            <button
-              className="w-full py-4 border-2 border-[#633B48] text-[#633B48] hover:bg-[#633B48] hover:text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
-              aria-label="Exportar laudo técnico em PDF"
-            >
-              <Download className="w-5 h-5" />
-              Exportar Laudo em PDF
-            </button>
           </div>
         </div>
       )}

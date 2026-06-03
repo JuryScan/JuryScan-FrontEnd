@@ -16,6 +16,7 @@ import { useAuth } from "@/contexts/AuthContext"
 import { get, post } from "@/lib/api"
 import type { ApiResponse, PageResponse } from "@/lib/types"
 import { toast } from "@/hooks/use-toast"
+import PurchaseConfirmationModal from "@/components/PurchaseConfirmationModal"
 
 interface Transaction {
   id: string
@@ -35,6 +36,12 @@ export default function FinanceiroPage() {
   const [isBuying, setIsBuying] = useState(false)
   const [filterType, setFilterType] = useState<string>("todos")
   const [filterMonth, setFilterMonth] = useState<string>("todos")
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<{
+    tokens: number
+    price: number
+    label: string
+  } | null>(null)
 
   useEffect(() => {
     if (searchParams.get("success") === "true") {
@@ -78,17 +85,37 @@ export default function FinanceiroPage() {
     toast({ title: "Gerando Recibo", description: "O download do recibo PDF começará em instantes." })
   }
 
-  const handleBuyCredits = async (amount: number, tokens: number) => {
+  const handleBuyClick = (price: number, tokens: number, label: string) => {
+    setSelectedPlan({
+      tokens,
+      price,
+      label,
+    })
+    setIsModalOpen(true)
+  }
+
+  const handleBuyCredits = async () => {
+    if (!selectedPlan) return
+
     setIsBuying(true)
     try {
       const response = await post<ApiResponse<any>>("/product-checkout/checkout", {
-        name: `${tokens} Créditos JuryScan`,
-        amount: amount * 100,
+        name: `${selectedPlan.tokens} Créditos JuryScan`,
+        amount: selectedPlan.price * 100,
         quantity: 1
       })
-      if (response.success && response.data.sessionUrl) window.location.href = response.data.sessionUrl
+      if (response.success && response.data.sessionUrl) {
+        setIsModalOpen(false)
+        window.open(response.data.sessionUrl, "_blank")
+      }
     } catch (error) {
       console.error("Erro ao iniciar checkout:", error)
+      toast({
+        title: "Erro ao processar pagamento",
+        description: "Tente novamente em alguns instantes.",
+        variant: "destructive"
+      })
+    } finally {
       setIsBuying(false)
     }
   }
@@ -145,7 +172,7 @@ export default function FinanceiroPage() {
                   <span className="text-sm text-gray-500 mb-4">Créditos</span>
                   <div className="text-xl font-bold text-[#0A1F30] mb-6">R$ {plan.price.toFixed(2).replace('.', ',')}</div>
                   <button
-                    onClick={() => handleBuyCredits(plan.price, plan.tokens)}
+                    onClick={() => handleBuyClick(plan.price, plan.tokens, plan.label)}
                     disabled={isBuying}
                     className={`w-full h-10 rounded-lg font-bold text-sm transition-colors flex items-center justify-center gap-2 ${
                       plan.highlight ? "bg-[#633B48] text-white hover:bg-[#4A2C38]" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -253,6 +280,14 @@ export default function FinanceiroPage() {
           )}
         </div>
       </div>
+
+      <PurchaseConfirmationModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        plan={selectedPlan}
+        onConfirm={handleBuyCredits}
+        isLoading={isBuying}
+      />
     </div>
   )
 }

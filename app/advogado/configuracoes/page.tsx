@@ -18,8 +18,6 @@ import {
   Camera,
   KeyRound,
   ShieldEllipsis,
-  ToggleLeft,
-  ToggleRight
 } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 import { get, put, post, del } from "@/lib/api"
@@ -35,7 +33,6 @@ export default function ConfiguracoesPage() {
   const { user, refreshUser, logout } = useAuth()
   const [activeTab, setActiveTab] = useState<"perfil" | "endereco" | "seguranca" | "privacidade">("perfil")
   const [isLoading, setIsLoading] = useState(false)
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false)
   const [address, setAddress] = useState<any>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -359,27 +356,6 @@ export default function ConfiguracoesPage() {
                   {isLoading ? <Loader2 className="animate-spin" /> : "Atualizar Senha"}
                 </Button>
               </form>
-
-              <div className="space-y-6">
-                <h4 className="font-bold text-gray-900 flex items-center gap-2">
-                  <ShieldCheck className="size-4 text-green-600" /> Autenticação de Dois Fatores (2FA)
-                </h4>
-                <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-between">
-                  <div>
-                    <p className="font-bold text-gray-900 text-sm">Verificação via App/E-mail</p>
-                    <p className="text-xs text-gray-500 mt-1 max-w-[200px]">Adicione uma camada extra de proteção ao seu login.</p>
-                  </div>
-                  <button 
-                    onClick={() => setIs2FAEnabled(!is2FAEnabled)}
-                    className="text-[#633B48]"
-                  >
-                    {is2FAEnabled ? <ToggleRight className="size-10" /> : <ToggleLeft className="size-10 text-gray-300" />}
-                  </button>
-                </div>
-                <p className="text-xs text-gray-400 leading-relaxed">
-                  Recomendamos fortemente a ativação do 2FA para garantir que apenas você tenha acesso às suas análises e dados financeiros.
-                </p>
-              </div>
             </div>
           </div>
         ) : (

@@ -2,9 +2,17 @@
 
 import { type JSX, type ReactNode } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
-import { LayoutDashboard, FileSearch, FileText, Store, CreditCard, Settings, LogOut } from "lucide-react"
+import { LayoutDashboard, FileSearch, FileText, Store, CreditCard, Settings, LogOut, ChevronDown } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu"
 
 interface AdvogadoLayoutProps {
   children: ReactNode
@@ -21,7 +29,13 @@ const navItems = [
 
 export default function AdvogadoLayout({ children }: AdvogadoLayoutProps): JSX.Element {
   const pathname = usePathname()
-  const { logout, isLoading, isAuthenticated, isAdvogado } = useAuth()
+  const router = useRouter()
+  const { logout: authLogout, isLoading, isAuthenticated, isAdvogado, user } = useAuth()
+
+  const logout = () => {
+    authLogout()
+    router.push("/login")
+  }
 
   // Enquanto está validando a sessão, podemos mostrar um skeleton ou nada
   if (isLoading) {
@@ -32,10 +46,20 @@ export default function AdvogadoLayout({ children }: AdvogadoLayoutProps): JSX.E
     )
   }
 
-  // Redundância de segurança caso o middleware falhe ou o usuário não seja advogado
-  // if (!isAuthenticated || !isAdvogado) {
-  //   return <div className="p-8 text-center">Redirecionando...</div>  
-  // }
+  // Segurança: valida se o usuário está autenticado e é advogado
+  if (!isAuthenticated || !isAdvogado) {
+    // Redireciona usuários não autorizados
+    if (isAuthenticated && !isAdvogado) {
+      router.push("/cliente/dashboard")
+    } else {
+      router.push("/login")
+    }
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#A50064]"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -71,14 +95,43 @@ export default function AdvogadoLayout({ children }: AdvogadoLayoutProps): JSX.E
               </div>
             </div>
 
-            <button
-              onClick={logout}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-              aria-label="Sair da conta"
-            >
-              <LogOut className="w-4 h-4" />
-              Sair
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer group">
+                  {user?.fotoUrl ? (
+                    <img
+                      src={user.fotoUrl}
+                      alt={user.nomeCompleto}
+                      className="w-8 h-8 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-lg bg-[#A50064] flex items-center justify-center text-white font-bold text-sm">
+                      {user?.nomeCompleto?.charAt(0) || "A"}
+                    </div>
+                  )}
+                  <span className="hidden sm:inline truncate max-w-[150px]">{user?.nomeCompleto || "Usuário"}</span>
+                  <ChevronDown className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel className="text-xs text-gray-500">Conta</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <Link href="/advogado/configuracoes">
+                  <DropdownMenuItem className="cursor-pointer flex items-center gap-2">
+                    <Settings className="w-4 h-4" />
+                    <span>Configurações</span>
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={logout}
+                  className="cursor-pointer flex items-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </nav>

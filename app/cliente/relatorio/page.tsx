@@ -1,21 +1,12 @@
 "use client"
 
-import React, { useState } from "react"
+import React from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Download, CheckCircle2, FileText, ArrowRight, ShieldAlert, Info, AlertTriangle } from "lucide-react"
+import { ArrowLeft, CheckCircle2, FileText, ArrowRight, ShieldAlert, Info, AlertTriangle } from "lucide-react"
 
 export default function RelatorioDesbloqueadoPage() {
     const router = useRouter()
-    const [isDownloading, setIsDownloading] = useState(false)
-
-    const handleDownload = () => {
-        setIsDownloading(true)
-        setTimeout(() => {
-            setIsDownloading(false)
-            alert("Download do PDF iniciado com sucesso!")
-        }, 1500)
-    }
 
     return (
         <div className="min-h-screen bg-gray-50 pb-12 font-sans">
@@ -33,14 +24,6 @@ export default function RelatorioDesbloqueadoPage() {
                     >
                         <ArrowLeft className="w-5 h-5 mr-2" />
                         Voltar ao Início
-                    </button>
-                    <button 
-                        onClick={handleDownload}
-                        disabled={isDownloading}
-                        className="hidden md:flex items-center gap-2 bg-[#FFECF1] text-[#633B48] px-4 py-2 rounded-lg font-bold hover:bg-[#ffd6e4] transition-colors disabled:opacity-70"
-                    >
-                        {isDownloading ? "Gerando..." : "Baixar PDF"}
-                        <Download className="w-4 h-4" />
                     </button>
                 </div>
             </div>
@@ -114,15 +97,6 @@ export default function RelatorioDesbloqueadoPage() {
                     </div>
 
                 </div>
-
-                <button 
-                    onClick={handleDownload}
-                    disabled={isDownloading}
-                    className="md:hidden w-full mt-6 py-4 flex items-center justify-center gap-2 bg-[#FFECF1] text-[#633B48] rounded-xl font-bold shadow-sm border border-[#ffd6e4] active:scale-[0.98]"
-                >
-                    {isDownloading ? "Gerando Relatório..." : "Baixar Relatório em PDF"}
-                    <Download className="w-5 h-5" />
-                </button>
 
                 <div className="mt-12 bg-[#0A1F30] rounded-2xl p-8 md:p-10 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-8 border border-[#14324a]">
                     <div className="text-center md:text-left flex-1">
