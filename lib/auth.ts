@@ -117,3 +117,41 @@ export function clearAuth(): void {
   removeToken()
   removeUser()
 }
+
+/**
+ * Decodifica o payload JWT sem validar assinatura.
+ * Retorna o payload ou null se inválido.
+ */
+interface JWTPayload {
+  exp?: number
+  [key: string]: unknown
+}
+
+export function decodeJWT(token: string): JWTPayload | null {
+  try {
+    const parts = token.split(".")
+    if (parts.length !== 3) return null
+    
+    const payload = parts[1]
+    const decoded = Buffer.from(payload, "base64").toString("utf-8")
+    return JSON.parse(decoded) as JWTPayload
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Verifica se o token JWT está expirado.
+ * Retorna true se expirado, false se válido.
+ */
+export function isTokenExpired(token?: string | null): boolean {
+  const tokenToCheck = token ?? getToken()
+  if (!tokenToCheck) return true
+  
+  const payload = decodeJWT(tokenToCheck)
+  if (!payload || !payload.exp) return true
+  
+  // exp está em segundos, Date.now() retorna millisegundos
+  const currentTime = Math.floor(Date.now() / 1000)
+  return currentTime >= payload.exp
+}

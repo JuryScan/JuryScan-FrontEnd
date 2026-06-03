@@ -9,8 +9,7 @@ import {
   ArrowDownLeft, 
   Loader2, 
   Coins,
-  Wallet,
-  ArrowRight
+  Wallet
 } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 import { get, post } from "@/lib/api"
@@ -81,10 +80,6 @@ export default function FinanceiroPage() {
     setFilteredTransactions(result)
   }, [transactions, filterType, filterMonth])
 
-  const handleDownloadReceipt = (transactionId: string) => {
-    toast({ title: "Gerando Recibo", description: "O download do recibo PDF começará em instantes." })
-  }
-
   const handleBuyClick = (price: number, tokens: number, label: string) => {
     setSelectedPlan({
       tokens,
@@ -137,10 +132,17 @@ export default function FinanceiroPage() {
                 <Wallet className="w-5 h-5" />
                 Saldo Disponível
               </div>
-              <div className="flex items-baseline gap-2">
-                <h2 className="text-5xl font-bold">{balance !== null ? balance : "--"}</h2>
-                <span className="text-xl text-gray-400 font-medium">Créditos</span>
-              </div>
+              {isLoading ? (
+                <div className="flex items-center gap-3">
+                  <div className="h-12 bg-white/10 rounded-lg animate-pulse w-32"></div>
+                  <Loader2 className="w-5 h-5 animate-spin text-[#FFB6E1]" />
+                </div>
+              ) : (
+                <div className="flex items-baseline gap-2">
+                  <h2 className="text-5xl font-bold">{balance !== null ? balance : "--"}</h2>
+                  <span className="text-xl text-gray-400 font-medium">Créditos</span>
+                </div>
+              )}
             </div>
             <div className="mt-8 relative z-10">
               <p className="text-sm text-gray-400">Cada análise de CNIS consome 30 créditos.</p>
@@ -155,9 +157,9 @@ export default function FinanceiroPage() {
             </h3>
             <div className="grid sm:grid-cols-3 gap-4 items-stretch">
               {[
-                { tokens: 60, price: 19.90, label: "Básico", highlight: false },
-                { tokens: 120, price: 79.90, label: "Popular", highlight: true },
-                { tokens: 470, price: 149.90, label: "Profissional", highlight: false }
+                { tokens: 90, price: 18.00, label: "Básico", highlight: false },
+                { tokens: 180, price: 36.00, label: "Popular", highlight: true },
+                { tokens: 470, price: 94.00, label: "Profissional", highlight: false }
               ].map((plan) => (
                 <div
                   key={plan.tokens}
@@ -242,7 +244,6 @@ export default function FinanceiroPage() {
                     <th className="px-6 py-4">Data</th>
                     <th className="px-6 py-4">Tipo</th>
                     <th className="px-6 py-4">Quantidade</th>
-                    <th className="px-6 py-4">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -262,15 +263,6 @@ export default function FinanceiroPage() {
                       </td>
                       <td className="px-6 py-5 font-bold text-[#0A1F30]">
                         {t.tipoTransacao === "COMPRA" ? "+" : "-"}{t.quantidade} tokens
-                      </td>
-                      <td className="px-6 py-5">
-                        <button
-                          onClick={() => handleDownloadReceipt(t.id)}
-                          className="text-[#633B48] hover:text-[#4A2C38] font-bold text-xs flex items-center gap-1 group"
-                        >
-                          <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
-                          Recibo
-                        </button>
                       </td>
                     </tr>
                   ))}

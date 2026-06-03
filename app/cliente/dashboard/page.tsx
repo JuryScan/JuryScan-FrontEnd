@@ -109,19 +109,16 @@ export default function ClienteDashboardPage(): JSX.Element {
   const ocultas = Math.max(totalFalhas - 1, 0)
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-12 font-sans flex flex-col items-center">
-      <div className="w-full max-w-5xl">
-        <div className="mb-10 text-center md:text-left">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Olá! Vamos analisar seu INSS?
-          </h1>
-          <p className="text-gray-600 text-lg">
-            Envie seu extrato (CNIS) e nossa Inteligência Artificial vai traduzir
-            tudo de forma simples.
-          </p>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <div className="bg-[#162D3F] text-white">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <h1 className="text-3xl font-bold mb-2">Análise CNIS</h1>
+          <p className="text-gray-400">Envie o seu extrato previdenciário e nossa Inteligência Artificial vai traduzir tudo de forma simples e clara, identificando pendências e próximos passos.</p>
         </div>
-
-        <div className="grid lg:grid-cols-2 gap-8 items-stretch mb-8">
+      </div>
+      <div className="p-6 md:p-12 font-sans flex flex-col items-center flex-grow">
+        <div className="w-full max-w-5xl">
+          <div className="grid lg:grid-cols-2 gap-8 items-stretch mb-8">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 flex flex-col h-full">
             <div className="mb-6 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#FFECF1] flex items-center justify-center">
@@ -327,6 +324,7 @@ export default function ClienteDashboardPage(): JSX.Element {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   )
