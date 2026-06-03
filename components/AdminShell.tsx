@@ -15,10 +15,33 @@ const menuItems: MenuItem[] = [
 ]
 
 function AdminShellContent({ children }: { children: React.ReactNode }) {
-  const { logout, user } = useAuth()
+  const { logout, user, isLoading, isAuthenticated, isAdmin } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
+
+  // Validação de segurança: verifica se o usuário é admin
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#A50064]"></div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated || !isAdmin) {
+    // Redireciona usuários não autorizados
+    if (isAuthenticated) {
+      router.push("/advogado/dashboard")
+    } else {
+      router.push("/login")
+    }
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#A50064]"></div>
+      </div>
+    )
+  }
 
   const handleLogout = () => { logout(); router.push('/login') }
 

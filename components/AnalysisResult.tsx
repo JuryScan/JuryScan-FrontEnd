@@ -4,7 +4,6 @@ import {
   AlertCircle,
   Info,
   FileText,
-  Download,
   Lock,
   FileX,
   RefreshCcw,
@@ -177,7 +176,7 @@ export default function AnalysisResultComponent({
             <CheckCircle className="w-12 h-12 text-gray-300" />
           </div>
           <p className="text-lg font-bold text-[#0A1F30] mb-1">
-            Auditoria Pendente
+            Análise Pendente
           </p>
           <p className="text-sm">Faça o upload do documento ao lado.</p>
         </div>
@@ -245,16 +244,6 @@ export default function AnalysisResultComponent({
                 <p>Nenhuma inconsistência grave foi detectada neste documento.</p>
               </div>
             )}
-          </div>
-
-          <div className="mt-8 pt-6 border-t border-gray-100">
-            <button
-              className="w-full py-4 border-2 border-[#633B48] text-[#633B48] hover:bg-[#633B48] hover:text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
-              aria-label="Exportar laudo técnico em PDF"
-            >
-              <Download className="w-5 h-5" />
-              Exportar Laudo em PDF
-            </button>
           </div>
         </div>
       )}

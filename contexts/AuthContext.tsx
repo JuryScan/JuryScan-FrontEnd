@@ -40,6 +40,9 @@ interface AuthContextType {
   refreshUser: () => Promise<void>
   isAuthenticated: boolean
   isAdvogado: boolean
+  isComum: boolean
+  isAdmin: boolean
+  hasRole: (role: "COMUM" | "ADVOGADO" | "ADMIN") => boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -199,6 +202,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user, token, isLoading, login, signupComum, signupAdvogado, logout, refreshUser,
       isAuthenticated: !!token,
       isAdvogado: user?.tipoUsuario === "ADVOGADO",
+      isComum: user?.tipoUsuario === "COMUM",
+      isAdmin: user?.tipoUsuario === "ADMIN",
+      hasRole: (role: "COMUM" | "ADVOGADO" | "ADMIN") => user?.tipoUsuario === role,
     }}>
       {children}
     </AuthContext.Provider>

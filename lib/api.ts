@@ -17,7 +17,9 @@ const DEFAULT_HEADERS: Record<string, string> = {
   "Content-Type": "application/json",
 }
 
-const TIMEOUT_MS = 20000 // 20 segundos
+// Timeout padrão aumentado para 120s para suportar análise de documentos (~60s)
+// Operações mais rápidas geralmente completam em <5s
+const TIMEOUT_MS = 120000 // 120 segundos (2 minutos)
 
 export interface ApiRequestOptions extends RequestInit {
   timeout?: number
