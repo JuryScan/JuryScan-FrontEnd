@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { useRouter, useParams } from "next/navigation"
+import { useRouter, useParams, useSearchParams } from "next/navigation"
 import { 
     ArrowLeft, Star, ShieldCheck, MapPin, Briefcase, 
     MessageCircle, CheckCircle2, Clock, Scale, Loader2 
@@ -13,6 +13,8 @@ import { toast } from "@/hooks/use-toast"
 export default function PerfilAdvogadoPage() {
     const router = useRouter()
     const params = useParams()
+    const searchParams = useSearchParams()
+    const analysisId = searchParams.get("analysisId")
     const [lawyer, setLawyer] = useState<any>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [isSendingLead, setIsSendingLead] = useState(false)
@@ -21,7 +23,7 @@ export default function PerfilAdvogadoPage() {
         const fetchLawyer = async () => {
             if (!params.id) return
             try {
-                const res = await get<ApiResponse<any>>(`/users/advogados/${params.id}`)
+                const res = await get<ApiResponse<any>>(`/users/advogado/${params.id}`)
                 if (res.success) {
                     setLawyer(res.data)
                 }
@@ -36,17 +38,25 @@ export default function PerfilAdvogadoPage() {
     }, [params.id])
 
     const handleSolicitarAtendimento = async () => {
+        if (!analysisId) {
+            toast({
+                title: "Análise necessária",
+                description: "Faça uma análise do seu CNIS antes de solicitar um advogado.",
+                variant: "destructive",
+            })
+            return
+        }
         setIsSendingLead(true)
         try {
-            // Simulação de criação de Lead/Chat
-            await post(`/leads`, { lawyerId: params.id })
-            toast({ 
-                title: "Solicitação Enviada!", 
-                description: "O advogado recebeu seu interesse e entrará em contato em breve.",
-                variant: "default" 
+            // Cria o lead a partir da análise; ele entra no marketplace dos advogados.
+            await post(`/leads/request`, { analysisId })
+            toast({
+                title: "Solicitação Enviada!",
+                description: "Seu caso foi enviado e advogados parceiros poderão atendê-lo em breve.",
+                variant: "default"
             })
-        } catch (error) {
-            toast({ title: "Erro", description: "Falha ao enviar solicitação.", variant: "destructive" })
+        } catch (error: any) {
+            toast({ title: "Erro", description: error?.message || "Falha ao enviar solicitação.", variant: "destructive" })
         } finally {
             setIsSendingLead(false)
         }

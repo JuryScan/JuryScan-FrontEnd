@@ -1,195 +1,278 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Briefcase, MapPin, AlertTriangle, UserPlus, CheckCircle2 } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog"
+import { AlertTriangle, UserPlus, CheckCircle2, FileText, Loader2, Coins, Briefcase, User } from "lucide-react"
+import { get, post } from "@/lib/api"
+import type { ApiResponse, PageResponse } from "@/lib/types"
+import { toast } from "@/hooks/use-toast"
 
-const MOCK_OPORTUNIDADES = [
-  {
-    id: "lead-1",
-    name: "Carlos Alberto Silva",
-    city: "Recife",
-    state: "PE",
-    createdAt: "Há 12 min",
-    type: "platform_lead",
-    inconsistencies: [
-      "Indicador ACI_REG sem data de encerramento",
-      "Recolhimento abaixo do salário mínimo (Competência 2024)",
-      "Vínculos concomitantes pendentes de unificação"
-    ],
-    description: "Possui 15 anos de contribuição em regime CLT, mas identificou que três contratos antigos não constam no extrato do CNIS extraído do Meu INSS."
-  },
-  {
-    id: "lead-2",
-    name: "Mariana Souza Santos",
-    city: "Olinda",
-    state: "PE",
-    createdAt: "Há 2 horas",
-    type: "platform_lead",
-    inconsistencies: [
-      "Período especial (Insalubridade) sem conversão",
-      "Divergência de NIT/CPF no cadastro do Extrato Previdenciário"
-    ],
-    description: "Enfermeira buscando realizar a conversão de tempo especial para comum para fins de aposentadoria por tempo de contribuição."
-  },
-  {
-    id: "client-1",
-    name: "Roberto de Oliveira",
-    city: "Jaboatão dos Guararapes",
-    state: "PE",
-    createdAt: "Ativo",
-    type: "office_client",
-    inconsistencies: [
-      "Contribuição facultativa pendente de validação pela agência"
-    ],
-    description: "Processo de planejamento previdenciário e auditoria de vínculos já iniciado pelo escritório."
-  }
-]
+interface Lead {
+  id: string
+  nomeCliente?: string
+  tituloAnalise?: string
+  status?: string
+  custoCreditos?: number
+  dataCriacao?: string
+  analiseId?: string
+}
 
-export default function MarketplaceLeadsPage() {
-  const router = useRouter()
-  const [oportunidades] = useState(MOCK_OPORTUNIDADES)
-  const [leadsAceitos, setLeadsAceitos] = useState<string[]>([])
+function formatDate(value?: string): string {
+  if (!value) return ""
+  const d = new Date(value)
+  return isNaN(d.getTime()) ? "" : d.toLocaleDateString("pt-BR")
+}
 
-  const handleCapturarLead = (id: string) => {
-    setLeadsAceitos((prev) => [...prev, id])
-  }
+// Modal "Ver Histórico": busca os detalhes do lead (cliente + análise/CNIS analisado).
+function LeadHistoryDialog({ lead }: { lead: Lead }) {
+  const [open, setOpen] = useState(false)
+  const [details, setDetails] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
 
-  const handleDesfazerCaptura = (id: string) => {
-    setLeadsAceitos((prev) => prev.filter((leadId) => leadId !== id))
-  }
-
-  const handleVerHistorico = () => {
-    router.push("/advogado/historico")
-  }
-
-  const renderCards = (listaFiltrada: typeof MOCK_OPORTUNIDADES) => (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6" style={{ alignItems: "stretch" }}>
-      {listaFiltrada.map((item) => {
-        const foiAceito = leadsAceitos.includes(item.id)
-        const ehDoEscritorio = item.type === "office_client"
-
-        return (
-          <div key={item.id} className="flex">
-            <Card className="w-full flex flex-col border-gray-200 bg-white hover:shadow-md transition-all">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="space-y-1">
-                    <CardTitle className="text-xl font-bold tracking-tight text-[#0A1F30]">
-                      {item.name}
-                    </CardTitle>
-                    <CardDescription className="flex items-center gap-1 text-xs text-[#633B48]">
-                      <MapPin className="h-3.5 w-3.5" />
-                      {item.city}, {item.state}
-                    </CardDescription>
-                  </div>
-                  <Badge
-                    className={`text-xs font-medium whitespace-nowrap text-white ${
-                      ehDoEscritorio ? "bg-[#5bbffc]" : "bg-green-600"
-                    }`}
-                  >
-                    {ehDoEscritorio ? "Adquirido" : "Disponível"}
-                  </Badge>
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-4 flex-grow">
-                <p className="text-sm leading-relaxed text-[#0A1F30]">
-                  {item.description}
-                </p>
-                <div className="rounded-xl bg-amber-50 border border-amber-200 p-3.5">
-                  <h4 className="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1.5 mb-2.5">
-                    <AlertTriangle className="h-4 w-4 text-amber-600" />
-                    Auditoria CNIS Prévia ({item.inconsistencies.length})
-                  </h4>
-                  <ul className="text-xs text-amber-900 space-y-2 list-disc pl-4">
-                    {item.inconsistencies.map((inc, i) => (
-                      <li key={i} className="leading-snug">{inc}</li>
-                    ))}
-                  </ul>
-                </div>
-              </CardContent>
-
-              <CardFooter className="pt-4 bg-white flex items-center justify-between text-xs text-[#633B48] rounded-b-lg border-t mt-auto">
-                {ehDoEscritorio ? (
-                  <Button
-                    size="sm"
-                    type="button"
-                    onClick={handleVerHistorico}
-                    className="w-[180px] justify-center gap-1.5 font-medium bg-transparent text-[#633B48] border-2 border-[#633B48] hover:bg-[#633B48] hover:text-white transition-colors duration-300"
-                  >
-                    <Briefcase className="h-4 w-4 shrink-0" />
-                    Ver Histórico
-                  </Button>
-                ) : foiAceito ? (
-                  <Button
-                    size="sm"
-                    type="button"
-                    onClick={() => handleDesfazerCaptura(item.id)}
-                    className="w-[180px] justify-center gap-1.5 font-medium text-white bg-emerald-600 hover:bg-emerald-700 transition-colors duration-300"
-                  >
-                    <CheckCircle2 className="h-4 w-4 shrink-0" />
-                    Lead Capturado
-                  </Button>
-                ) : (
-                  <Button
-                    size="sm"
-                    type="button"
-                    onClick={() => handleCapturarLead(item.id)}
-                    className="w-[180px] justify-center gap-1.5 font-medium text-white bg-[#633B48] hover:bg-[#4A2C38] transition-colors duration-300 hover:scale-[1.02]"
-                  >
-                    <UserPlus className="h-4 w-4 shrink-0" />
-                    Adquirir Lead
-                  </Button>
-                )}
-              </CardFooter>
-            </Card>
-          </div>
-        )
-      })}
-    </div>
-  )
+  const fetchDetails = useCallback(async () => {
+    setLoading(true)
+    try {
+      const res = await get<ApiResponse<any>>(`/leads/${lead.id}/details`)
+      if (res?.success) setDetails(res.data)
+    } catch (e) {
+      console.error("Erro ao buscar detalhes do lead:", e)
+    } finally {
+      setLoading(false)
+    }
+  }, [lead.id])
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-[#162D3F] text-white">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <h1 className="text-3xl font-bold mb-2">Marketplace de Leads</h1>
-          <p className="text-gray-400">Monitore novos potenciais clientes na sua região com pré-auditorias automatizadas de CNIS realizadas pelo JuryScan.</p>
-        </div>
-      </div>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v)
+        if (v && !details) fetchDetails()
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline" className="gap-1.5 font-medium">
+          <Briefcase className="h-4 w-4" /> Ver Histórico
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Histórico de Análises — {details?.nomeCompleto || lead.nomeCliente || "Cliente"}</DialogTitle>
+          <DialogDescription>CNIS analisado automaticamente pela IA do JuryScan.</DialogDescription>
+        </DialogHeader>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <Tabs defaultValue="todas" className="w-full">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-3">
-            <TabsList>
-              <TabsTrigger value="todas">Todas as Oportunidades</TabsTrigger>
-              <TabsTrigger value="novos">Novos Leads</TabsTrigger>
-              <TabsTrigger value="meus">Meus Clientes</TabsTrigger>
-            </TabsList>
-
-            <Badge variant="outline" className="w-fit px-3 py-1 bg-white text-[#633B48] border-[#633B48] font-medium">
-              {oportunidades.filter(o => o.type === "platform_lead" && !leadsAceitos.includes(o.id)).length} Disponíveis na Região
-            </Badge>
+        {loading ? (
+          <div className="py-10 flex justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-[#633B48]" />
           </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FFECF1] text-[#A50064]">
+                  <FileText className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                    {details?.analise?.titulo || lead.tituloAnalise || "Análise de CNIS"}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {details?.email || ""}
+                    {details?.telefone ? ` · ${details.telefone}` : ""}
+                  </p>
+                </div>
+              </div>
+              <Badge variant="secondary" className="gap-1">
+                <CheckCircle2 className="h-3 w-3" /> Concluída
+              </Badge>
+            </div>
 
-          <TabsContent value="todas" className="outline-none">
-            {renderCards(oportunidades)}
-          </TabsContent>
+            {Array.isArray(details?.analise?.falhas) && details.analise.falhas.length > 0 ? (
+              <div className="rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 p-3.5">
+                <h4 className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1.5 mb-2.5">
+                  <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+                  Inconsistências encontradas ({details.analise.falhas.length})
+                </h4>
+                <ul className="text-xs text-amber-900 dark:text-amber-300 space-y-2 list-disc pl-4">
+                  {details.analise.falhas.map((f: any, i: number) => (
+                    <li key={f.id || i} className="leading-snug">{f.titulo || f.descricao}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500">Sem detalhes de análise disponíveis para este lead.</p>
+            )}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
 
-          <TabsContent value="novos" className="outline-none">
-            {renderCards(oportunidades.filter(o => o.type === "platform_lead"))}
-          </TabsContent>
+export default function MarketplaceLeadsPage() {
+  const [available, setAvailable] = useState<Lead[]>([])
+  const [acquired, setAcquired] = useState<Lead[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [acquiringId, setAcquiringId] = useState<string | null>(null)
 
-          <TabsContent value="meus" className="outline-none">
-            {renderCards(oportunidades.filter(o => o.type === "office_client"))}
-          </TabsContent>
-        </Tabs>
+  const fetchLeads = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const [av, acq] = await Promise.all([
+        get<ApiResponse<PageResponse<Lead>>>(`/leads/available?page=0&page_size=50`).catch(() => null),
+        get<ApiResponse<PageResponse<Lead>>>(`/leads/acquired?page=0&page_size=50`).catch(() => null),
+      ])
+      setAvailable(av?.success && av.data?.items ? av.data.items : [])
+      setAcquired(acq?.success && acq.data?.items ? acq.data.items : [])
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchLeads()
+  }, [fetchLeads])
+
+  const handleAcquire = async (id: string) => {
+    setAcquiringId(id)
+    try {
+      const res = await post<ApiResponse<any>>(`/leads/${id}/acquire`)
+      if (res?.success) {
+        toast({ title: "Lead adquirido!", description: "O lead foi movido para 'Meus Leads'." })
+        await fetchLeads()
+      }
+    } catch (e: any) {
+      toast({ title: "Erro", description: e?.message || "Não foi possível adquirir o lead.", variant: "destructive" })
+    } finally {
+      setAcquiringId(null)
+    }
+  }
+
+  return (
+    <div className="space-y-6 p-6 max-w-7xl mx-auto">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Marketplace de Leads</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          Capture potenciais clientes da sua região com pré-análises automatizadas de CNIS realizadas pelo JuryScan.
+        </p>
       </div>
+
+      <Tabs defaultValue="disponiveis" className="w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-3">
+          <TabsList>
+            <TabsTrigger value="disponiveis">Disponíveis</TabsTrigger>
+            <TabsTrigger value="meus">Meus Leads</TabsTrigger>
+          </TabsList>
+
+          <Badge variant="outline" className="w-fit px-3 py-1 bg-white dark:bg-slate-950">
+            {available.length} Disponíveis
+          </Badge>
+        </div>
+
+        {isLoading ? (
+          <div className="py-20 flex flex-col items-center justify-center text-slate-400">
+            <Loader2 className="h-10 w-10 animate-spin mb-4" />
+            <p>Carregando leads...</p>
+          </div>
+        ) : (
+          <>
+            <TabsContent value="disponiveis" className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 outline-none">
+              {available.length === 0 ? (
+                <div className="col-span-full py-16 text-center text-slate-400">
+                  <UserPlus className="h-10 w-10 mx-auto mb-3 opacity-30" />
+                  <p>Nenhum lead disponível na sua região no momento.</p>
+                </div>
+              ) : (
+                available.map((lead) => (
+                  <Card key={lead.id} className="flex flex-col justify-between border-slate-200 dark:border-slate-800">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="space-y-1">
+                          <CardTitle className="text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100">
+                            {lead.nomeCliente || "Cliente"}
+                          </CardTitle>
+                          <CardDescription className="flex items-center gap-1 text-xs">
+                            <FileText className="h-3.5 w-3.5 text-slate-400" />
+                            {lead.tituloAnalise || "Análise de CNIS"}
+                          </CardDescription>
+                        </div>
+                        <Badge variant="default" className="text-xs font-medium whitespace-nowrap">Lead Disponível</Badge>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="flex-grow">
+                      <div className="rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 p-3.5 flex items-center gap-2 text-sm text-amber-900 dark:text-amber-300">
+                        <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500 flex-shrink-0" />
+                        Pré-análise de CNIS gerada pelo JuryScan disponível.
+                      </div>
+                    </CardContent>
+
+                    <CardFooter className="border-t pt-4 bg-slate-50/50 dark:bg-slate-900/10 flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
+                      <span className="flex items-center gap-1">
+                        <Coins className="h-3.5 w-3.5" /> {lead.custoCreditos ?? 1} crédito(s)
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => handleAcquire(lead.id)}
+                        disabled={acquiringId === lead.id}
+                        className="gap-1.5 font-medium"
+                      >
+                        {acquiringId === lead.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <UserPlus className="h-4 w-4" />
+                        )}
+                        Capturar Lead
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))
+              )}
+            </TabsContent>
+
+            <TabsContent value="meus" className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 outline-none">
+              {acquired.length === 0 ? (
+                <div className="col-span-full py-16 text-center text-slate-400">
+                  <User className="h-10 w-10 mx-auto mb-3 opacity-30" />
+                  <p>Você ainda não capturou nenhum lead.</p>
+                </div>
+              ) : (
+                acquired.map((lead) => (
+                  <Card key={lead.id} className="flex flex-col justify-between border-blue-200 bg-blue-50/20 dark:border-blue-900/40 dark:bg-blue-950/5">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="space-y-1">
+                          <CardTitle className="text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100">
+                            {lead.nomeCliente || "Cliente"}
+                          </CardTitle>
+                          <CardDescription className="flex items-center gap-1 text-xs">
+                            <FileText className="h-3.5 w-3.5 text-slate-400" />
+                            {lead.tituloAnalise || "Análise de CNIS"}
+                          </CardDescription>
+                        </div>
+                        <Badge variant="secondary" className="text-xs font-medium whitespace-nowrap">
+                          {lead.status || "Capturado"}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="flex-grow text-sm text-slate-600 dark:text-slate-300">
+                      Capturado em {formatDate(lead.dataCriacao) || "—"}.
+                    </CardContent>
+
+                    <CardFooter className="border-t pt-4 bg-slate-50/50 dark:bg-slate-900/10 flex items-center justify-end">
+                      <LeadHistoryDialog lead={lead} />
+                    </CardFooter>
+                  </Card>
+                ))
+              )}
+            </TabsContent>
+          </>
+        )}
+      </Tabs>
     </div>
   )
 }

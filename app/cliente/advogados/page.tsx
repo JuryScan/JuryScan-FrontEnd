@@ -2,12 +2,15 @@
 
 import React, { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { Search, MapPin, Star, Award, ShieldCheck, ArrowRight, Filter, Loader2, MapPinned } from "lucide-react"
 import { get } from "@/lib/api"
 import type { Lawyer, ApiResponse } from "@/lib/types"
 import { toast } from "@/hooks/use-toast"
 
 export default function MarketplaceAdvogados() {
+    const searchParams = useSearchParams()
+    const analysisId = searchParams.get("analysisId")
     const [lawyers, setLawyers] = useState<Lawyer[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState("")
@@ -55,10 +58,16 @@ export default function MarketplaceAdvogados() {
             if (filters.cidade) params.append("cidade", filters.cidade)
             if (filters.estado) params.append("estado", filters.estado)
             if (filters.disponibilidade) params.append("disponibilidade", "true")
+            params.append("page", "0")
+            params.append("page_size", "50")
 
-            const response = await get<ApiResponse<Lawyer[]>>(`/users/advogados?${params.toString()}`)
-            if (response.success) {
-                setLawyers(response.data)
+            // Backend expõe /users/advogado/ (paginado). Filtros geo/busca ainda não
+            // são suportados pelo back; mantemos os params (ignorados) e a busca textual local.
+            const response = await get<ApiResponse<any>>(`/users/advogado/?${params.toString()}`)
+            if (response?.success && response.data?.items) {
+                setLawyers(response.data.items)
+            } else {
+                setLawyers([])
             }
         } catch (error) {
             console.error("Erro ao buscar advogados:", error)
@@ -200,12 +209,14 @@ export default function MarketplaceAdvogados() {
                                     <h3 className="text-lg font-bold text-gray-900">{lawyer.nomeCompleto}</h3>
                                     <p className="text-sm text-gray-500 font-medium">{lawyer.numeroOab}</p>
                                     
-                                    <div className="flex items-center gap-1 mt-2 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-200">
-                                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                        <span className="text-sm font-bold text-yellow-700">{lawyer.rating}</span>
-                                        <span className="text-xs text-yellow-600">({lawyer.reviews} avaliações)</span>
-                                    </div>
-                                    
+                                    {lawyer.rating ? (
+                                      <div className="flex items-center gap-1 mt-2 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-200">
+                                          <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                                          <span className="text-sm font-bold text-yellow-700">{lawyer.rating}</span>
+                                          <span className="text-xs text-yellow-600">({lawyer.reviews ?? 0} avaliações)</span>
+                                      </div>
+                                    ) : null}
+
                                     {lawyer.distancia && (
                                         <span className="mt-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">
                                             Aprox. {lawyer.distancia.toFixed(1)}km de você
@@ -218,20 +229,20 @@ export default function MarketplaceAdvogados() {
                                         <Award className="w-5 h-5 text-[#633B48] flex-shrink-0 mt-0.5" />
                                         <div>
                                             <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">Especialidade</p>
-                                            <p className="text-sm text-gray-800 font-medium">{lawyer.especialidade}</p>
+                                            <p className="text-sm text-gray-800 font-medium">{lawyer.especialidade || "Direito Previdenciário"}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-start gap-3">
                                         <MapPin className="w-5 h-5 text-[#633B48] flex-shrink-0 mt-0.5" />
                                         <div>
                                             <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">Localização</p>
-                                            <p className="text-sm text-gray-800 font-medium">{lawyer.localizacao}</p>
+                                            <p className="text-sm text-gray-800 font-medium">{lawyer.localizacao || "Atendimento online"}</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="p-6 pt-0 mt-auto">
-                                    <Link href={`/cliente/advogados/${lawyer.id}`} className="w-full py-3 bg-white border-2 border-[#633B48] text-[#633B48] hover:bg-[#633B48] hover:text-white rounded-xl font-bold flex items-center justify-center transition-colors group">
+                                    <Link href={`/cliente/advogados/${lawyer.id}${analysisId ? `?analysisId=${analysisId}` : ""}`} className="w-full py-3 bg-white border-2 border-[#633B48] text-[#633B48] hover:bg-[#633B48] hover:text-white rounded-xl font-bold flex items-center justify-center transition-colors group">
                                         Ver Perfil
                                         <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
                                     </Link>

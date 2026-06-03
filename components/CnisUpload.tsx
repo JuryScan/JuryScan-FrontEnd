@@ -78,9 +78,9 @@ export default function CnisUpload({ onAnalyze }: CnisUploadProps): JSX.Element 
           className="w-full bg-[#633B48] hover:bg-[#300117] text-white py-4 rounded-xl font-bold text-lg transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
           onClick={handleAnalyzeClick}
           disabled={!file}
-          aria-label="Executar auditoria com inteligência artificial"
+          aria-label="Executar análise com inteligência artificial"
         >
-          Executar Auditoria IA
+          Executar Análise IA
         </button>
       </div>
     </div>

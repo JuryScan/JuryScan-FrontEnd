@@ -17,8 +17,6 @@ import {
   Timer,
   Coins,
   Loader2,
-  Mail,
-  Phone,
 } from "lucide-react"
 import {
   LineChart,
@@ -35,28 +33,46 @@ import {
   MOCK_DASHBOARD_STATS,
   MOCK_RECENT_LEADS,
   MOCK_INTELLIGENCE_STATS,
+  MOCK_RECENT_ANALYSES,
 } from "@/lib/mocks"
 import { useAuth } from "@/contexts/AuthContext"
-import type { AuditRecord } from "@/lib/types"
+import { get } from "@/lib/api"
+import type { ApiResponse, AuditRecord } from "@/lib/types"
 
 export default function AdvogadoDashboardPage(): JSX.Element {
   const { user } = useAuth()
   const [searchTerm, setSearchTerm] = useState("")
   const [viewMode, setViewMode] = useState<"general" | "intelligence">("general")
-  const [recentAnalyses, setRecentAnalyses] = useState<AuditRecord[]>([])
+  // Inicia com exemplos (CNIS analisados) enquanto a integração de dashboard não chega;
+  // é sobrescrito quando a API retornar análises reais.
+  const [recentAnalyses, setRecentAnalyses] = useState<AuditRecord[]>(MOCK_RECENT_ANALYSES)
   const [isLoadingAnalyses, setIsLoadingAnalyses] = useState(true)
   const [balance, setBalance] = useState<number | null>(null)
 
   const fetchData = useCallback(async () => {
-    if (!user?.id && process.env.NODE_ENV === 'production') return
+    if (!user?.id) return
+
     setIsLoadingAnalyses(true)
     try {
-      setRecentAnalyses([
-        { id: "1", client: "Carlos Silva", date: "01/05/2026", issues: 3, status: "Concluído" },
-        { id: "2", client: "Maria Santos", date: "28/04/2026", issues: 1, status: "Concluído" },
-        { id: "3", client: "João Oliveira", date: "25/04/2026", issues: 5, status: "Concluído" },
+      const [analysesRes, balanceRes] = await Promise.all([
+        get<ApiResponse<any>>(`/analysis/user/${user.id}?page=0&page_size=5`),
+        get<ApiResponse<number>>(`/wallets/user/${user.id}/balance`)
       ])
-      setBalance(42)
+      
+      if (analysesRes.success && analysesRes.data?.items?.length) {
+        const mappedAnalyses: AuditRecord[] = analysesRes.data.items.map((item: any) => ({
+          id: item.id,
+          client: item.titulo || "Segurado",
+          date: new Date(item.dataCriacao).toLocaleDateString("pt-BR"),
+          issues: item.falhas?.length || 0,
+          status: "Concluído"
+        }))
+        setRecentAnalyses(mappedAnalyses)
+      }
+
+      if (balanceRes.success) {
+        setBalance(balanceRes.data)
+      }
     } catch (error) {
       console.error("Erro ao buscar dados do dashboard:", error)
     } finally {
@@ -68,39 +84,53 @@ export default function AdvogadoDashboardPage(): JSX.Element {
     fetchData()
   }, [fetchData])
 
-  const filteredAnalyses = recentAnalyses.filter(analysis =>
+  const filteredAnalyses = recentAnalyses.filter(analysis => 
     analysis.client.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (
     <div className="flex flex-col font-sans">
-      <div className="bg-[#162D3F] text-white">
+      <div className="bg-[#0A1F30] text-white">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <h1 className="text-3xl font-bold mb-2">Painel de Controle</h1>
               <p className="text-gray-400">
-                Bem-vindo de volta, {user?.nomeCompleto || "Dr(a). Ana Clara"}. Aqui está o resumo do seu escritório hoje.
+                Bem-vindo de volta, {user?.nomeCompleto || "Dr(a). Ana Clara"}. Aqui está o resumo do seu
+                escritório hoje.
               </p>
             </div>
+            
             <div className="flex flex-wrap items-center gap-4">
               <div className="bg-[#162D3F] p-1 rounded-xl flex">
                 <button
                   onClick={() => setViewMode("general")}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${viewMode === "general" ? "bg-[#FFB6E1] text-[#A50064]" : "text-gray-400 hover:text-white"}`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                    viewMode === "general"
+                      ? "bg-[#FFB6E1] text-[#A50064]"
+                      : "text-gray-400 hover:text-white"
+                  }`}
                 >
-                  <LayoutDashboard className="w-4 h-4" /> Geral
+                  <LayoutDashboard className="w-4 h-4" />
+                  Geral
                 </button>
                 <button
                   onClick={() => setViewMode("intelligence")}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${viewMode === "intelligence" ? "bg-[#FFB6E1] text-[#A50064]" : "text-gray-400 hover:text-white"}`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                    viewMode === "intelligence"
+                      ? "bg-[#FFB6E1] text-[#A50064]"
+                      : "text-gray-400 hover:text-white"
+                  }`}
                 >
-                  <BrainCircuit className="w-4 h-4" /> Métricas
+                  <BrainCircuit className="w-4 h-4" />
+                  Inteligência
                 </button>
               </div>
-              <Link href="/advogado/auditoria">
+
+              <Link href="/advogado/analise">
                 <button className="bg-[#FFB6E1] hover:bg-[#ff9cd2] text-[#A50064] px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-transform hover:scale-105 shadow-lg whitespace-nowrap">
-                  <Plus className="w-5 h-5" /> Nova Análise
+                  <Plus className="w-5 h-5" />
+                  Nova Análise
                 </button>
               </Link>
             </div>
@@ -117,8 +147,12 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                   <Users className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 font-medium mb-1">Clientes Ativos</p>
-                  <h3 className="text-2xl font-bold text-gray-900">{MOCK_DASHBOARD_STATS.activeClients}</h3>
+                  <p className="text-sm text-gray-500 font-medium mb-1">
+                    Clientes Ativos
+                  </p>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {MOCK_DASHBOARD_STATS.activeClients}
+                  </h3>
                 </div>
               </div>
 
@@ -127,8 +161,12 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                   <MessageSquare className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 font-medium mb-1">Novos Leads</p>
-                  <h3 className="text-2xl font-bold text-gray-900">{MOCK_DASHBOARD_STATS.newLeads}</h3>
+                  <p className="text-sm text-gray-500 font-medium mb-1">
+                    Novos Leads
+                  </p>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {MOCK_DASHBOARD_STATS.newLeads}
+                  </h3>
                 </div>
               </div>
 
@@ -137,8 +175,12 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                   <FileText className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 font-medium mb-1">Análises no Mês</p>
-                  <h3 className="text-2xl font-bold text-gray-900">{MOCK_DASHBOARD_STATS.analysesThisMonth}</h3>
+                  <p className="text-sm text-gray-500 font-medium mb-1">
+                    Análises no Mês
+                  </p>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {MOCK_DASHBOARD_STATS.analysesThisMonth}
+                  </h3>
                 </div>
               </div>
 
@@ -148,8 +190,12 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                   <Coins className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 font-medium mb-1">Saldo de Tokens</p>
-                  <h3 className="text-2xl font-bold text-gray-900">{balance !== null ? balance : "--"}</h3>
+                  <p className="text-sm text-gray-500 font-medium mb-1">
+                    Saldo de Tokens
+                  </p>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {balance !== null ? balance : "--"}
+                  </h3>
                 </div>
                 <ArrowRight className="w-4 h-4 ml-auto text-gray-300 group-hover:text-[#A50064] transition-colors" />
               </div>
@@ -159,34 +205,39 @@ export default function AdvogadoDashboardPage(): JSX.Element {
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="p-6 border-b border-gray-100 flex items-center justify-between">
                   <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <MessageSquare className="w-5 h-5 text-[#633B48]" /> Solicitações de Atendimento
+                    <MessageSquare className="w-5 h-5 text-[#633B48]" />
+                    Solicitações de Atendimento
                   </h2>
-                  <Link href="/advogado/clientes">
-                    <button className="text-sm text-[#633B48] font-bold hover:underline">Ver todos</button>
-                  </Link>
+                  <button className="text-sm text-[#633B48] font-bold hover:underline">
+                    Ver todos
+                  </button>
                 </div>
                 <div className="divide-y divide-gray-100">
                   {MOCK_RECENT_LEADS.map((lead) => (
-                    <div key={lead.id} className="p-6 hover:bg-gray-50 transition-colors cursor-pointer group">
+                    <div
+                      key={lead.id}
+                      className="p-6 hover:bg-gray-50 transition-colors cursor-pointer group"
+                    >
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex items-center gap-2">
                           <h4 className="font-bold text-gray-900">{lead.name}</h4>
                           {lead.status === "Novo" && (
-                            <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Novo</span>
+                            <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                              Novo
+                            </span>
                           )}
                         </div>
                         <span className="text-xs text-gray-400 flex items-center gap-1">
                           <Clock className="w-3 h-3" /> {lead.date}
                         </span>
                       </div>
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
-                        <span className="flex items-center gap-1.5">
-                          <Mail className="w-3.5 h-3.5" /> email@exemplo.com
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                          <Phone className="w-3.5 h-3.5" /> (81) 99999-9999
-                        </span>
-                      </div>
+                      <p className="text-sm text-gray-600 mb-3 truncate">
+                        {lead.message}
+                      </p>
+                      <button className="text-sm font-bold text-[#633B48] flex items-center group-hover:underline">
+                        Responder{" "}
+                        <ArrowRight className="w-4 h-4 ml-1" />
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -195,7 +246,8 @@ export default function AdvogadoDashboardPage(): JSX.Element {
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="p-6 border-b border-gray-100 flex items-center justify-between gap-4">
                   <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
-                    <FileText className="w-5 h-5 text-[#633B48]" /> Análises Recentes
+                    <FileText className="w-5 h-5 text-[#633B48]" />
+                    Análises Recentes
                   </h2>
                   <div className="flex items-center gap-4 w-full justify-end">
                     <div className="relative hidden md:block w-full max-w-xs">
@@ -206,9 +258,12 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#633B48]"
+                        aria-label="Buscar cliente nas análises"
                       />
                     </div>
-                    <Link href="/advogado/historico" className="text-sm text-[#633B48] font-bold hover:underline whitespace-nowrap">Ver todos</Link>
+                    <Link href="/advogado/historico" className="text-sm text-[#633B48] font-bold hover:underline whitespace-nowrap">
+                      Ver todos
+                    </Link>
                   </div>
                 </div>
                 <div className="divide-y divide-gray-100">
@@ -223,22 +278,33 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                     </div>
                   ) : (
                     filteredAnalyses.map((analysis) => (
-                      <div key={analysis.id} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                      <div
+                        key={analysis.id}
+                        className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                      >
                         <div className="flex items-center gap-4">
                           <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 font-bold">
                             {analysis.client.charAt(0)}
                           </div>
                           <div>
-                            <h4 className="font-bold text-gray-900">{analysis.client}</h4>
+                            <h4 className="font-bold text-gray-900">
+                              {analysis.client}
+                            </h4>
                             <p className="text-xs text-gray-500 flex items-center gap-2 mt-1">
                               <span>Data: {analysis.date}</span>
                               <span>•</span>
-                              <span className="text-orange-600 font-medium">{analysis.issues} inconsistências</span>
+                              <span className="text-orange-600 font-medium">
+                                {analysis.issues} pendências
+                              </span>
                             </p>
                           </div>
                         </div>
-                        <Link href={`/advogado/auditoria/${analysis.id}`}>
-                          <button className="p-2 text-gray-400 hover:text-[#633B48] hover:bg-[#FFECF1] rounded-lg transition-colors">
+                        <Link href={`/advogado/analise/${analysis.id}`}>
+                          <button
+                            className="p-2 text-gray-400 hover:text-[#633B48] hover:bg-[#FFECF1] rounded-lg transition-colors"
+                            title="Abrir Relatório"
+                            aria-label={`Abrir relatório de ${analysis.client}`}
+                          >
                             <ArrowRight className="w-5 h-5" />
                           </button>
                         </Link>
@@ -259,8 +325,12 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                   </div>
                   <h4 className="font-bold text-gray-900">Total de Erros</h4>
                 </div>
-                <p className="text-3xl font-bold text-gray-900">{MOCK_INTELLIGENCE_STATS.totalErrors}</p>
-                <p className="text-sm text-red-600 font-medium mt-1">Total de inconsistências detectadas</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {MOCK_INTELLIGENCE_STATS.totalErrors}
+                </p>
+                <p className="text-sm text-red-600 font-medium mt-1">
+                  Pendências detectadas no total
+                </p>
               </div>
 
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
@@ -270,27 +340,38 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                   </div>
                   <h4 className="font-bold text-gray-900">Tempo Médio</h4>
                 </div>
-                <p className="text-3xl font-bold text-gray-900">{MOCK_INTELLIGENCE_STATS.avgAnalysisTime}</p>
-                <p className="text-sm text-blue-600 font-medium mt-1">Por análise processada</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {MOCK_INTELLIGENCE_STATS.avgAnalysisTime}
+                </p>
+                <p className="text-sm text-blue-600 font-medium mt-1">
+                  Por análise processada
+                </p>
               </div>
 
-              {/* Card alterado: Tokens Consumidos */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
                     <Coins className="w-5 h-5" />
                   </div>
-                  <h4 className="font-bold text-gray-900">Tokens Consumidos</h4>
+                  <h4 className="font-bold text-gray-900">Valor Recuperável</h4>
                 </div>
-                <p className="text-3xl font-bold text-gray-900">150</p>
-                <p className="text-sm text-green-600 font-medium mt-1">Estimativa total</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {new Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(MOCK_INTELLIGENCE_STATS.totalRecoverableValue)}
+                </p>
+                <p className="text-sm text-green-600 font-medium mt-1">
+                  Estimativa total aproximada
+                </p>
               </div>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-8">
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                 <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-[#633B48]" /> Volume de Análises Mensais
+                  <TrendingUp className="w-5 h-5 text-[#633B48]" />
+                  Volume de Análises Mensais
                 </h3>
                 <div className="h-80 w-full">
                   <ResponsiveContainer width="100%" height="100%">
@@ -298,7 +379,9 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                       <CartesianGrid strokeDasharray="3 3" vertical={false} />
                       <XAxis dataKey="month" axisLine={false} tickLine={false} />
                       <YAxis axisLine={false} tickLine={false} />
-                      <Tooltip contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }} />
+                      <Tooltip
+                        contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }}
+                      />
                       <Bar dataKey="analyses" fill="#0A1F30" radius={[4, 4, 0, 0]} name="Análises" />
                     </BarChart>
                   </ResponsiveContainer>
@@ -307,7 +390,8 @@ export default function AdvogadoDashboardPage(): JSX.Element {
 
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                 <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-[#633B48]" /> Ocorrência mensal de erros
+                  <AlertCircle className="w-5 h-5 text-[#633B48]" />
+                  Tendência de Erros Detectados
                 </h3>
                 <div className="h-80 w-full">
                   <ResponsiveContainer width="100%" height="100%">
@@ -315,8 +399,18 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                       <CartesianGrid strokeDasharray="3 3" vertical={false} />
                       <XAxis dataKey="month" axisLine={false} tickLine={false} />
                       <YAxis axisLine={false} tickLine={false} />
-                      <Tooltip contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }} />
-                      <Line type="monotone" dataKey="errors" stroke="#A50064" strokeWidth={3} dot={{ r: 6, fill: "#A50064", strokeWidth: 2, stroke: "#fff" }} activeDot={{ r: 8 }} name="Erros" />
+                      <Tooltip
+                        contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="errors"
+                        stroke="#A50064"
+                        strokeWidth={3}
+                        dot={{ r: 6, fill: "#A50064", strokeWidth: 2, stroke: "#fff" }}
+                        activeDot={{ r: 8 }}
+                        name="Erros"
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
@@ -328,3 +422,4 @@ export default function AdvogadoDashboardPage(): JSX.Element {
     </div>
   )
 }
+

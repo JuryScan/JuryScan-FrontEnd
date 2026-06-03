@@ -35,7 +35,7 @@ const routeLabelMap: Record<string, string> = {
   'analisar-cnis': 'Analisar CNIS',
   financeiro: 'Financeiro',
   configuracoes: 'Configurações',
-  auditoria: 'Auditoria',
+  analise: 'Análise',
 }
 
 const DashboardUserContext = React.createContext<DashboardUserContextType | undefined>(undefined)

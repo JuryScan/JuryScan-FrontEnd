@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-const DEMO_MODE = true
+const DEMO_MODE = false
 
 const PROTECTED_ROUTES = ["/advogado", "/cliente", "/dashboard", "/admin"]
 const AUTH_ROUTES = ["/login", "/cadastro"]
