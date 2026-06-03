@@ -14,7 +14,6 @@ import {
   LayoutDashboard,
   BrainCircuit,
   AlertCircle,
-  Timer,
   Coins,
   Loader2,
 } from "lucide-react"
@@ -317,7 +316,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
           </>
         ) : (
           <div className="animate-in fade-in duration-500">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center">
@@ -330,21 +329,6 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 </p>
                 <p className="text-sm text-red-600 font-medium mt-1">
                   Pendências detectadas no total
-                </p>
-              </div>
-
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-                    <Timer className="w-5 h-5" />
-                  </div>
-                  <h4 className="font-bold text-gray-900">Tempo Médio</h4>
-                </div>
-                <p className="text-3xl font-bold text-gray-900">
-                  {MOCK_INTELLIGENCE_STATS.avgAnalysisTime}
-                </p>
-                <p className="text-sm text-blue-600 font-medium mt-1">
-                  Por análise processada
                 </p>
               </div>
 

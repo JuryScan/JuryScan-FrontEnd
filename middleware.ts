@@ -11,6 +11,38 @@ interface UserCookie {
   [key: string]: unknown
 }
 
+interface JWTPayload {
+  exp?: number
+  [key: string]: unknown
+}
+
+/**
+ * Decodifica o payload JWT sem validar assinatura.
+ */
+function decodeJWT(token: string): JWTPayload | null {
+  try {
+    const parts = token.split(".")
+    if (parts.length !== 3) return null
+    
+    const payload = parts[1]
+    const decoded = Buffer.from(payload, "base64").toString("utf-8")
+    return JSON.parse(decoded) as JWTPayload
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Verifica se o token JWT está expirado.
+ */
+function isTokenExpired(token: string): boolean {
+  const payload = decodeJWT(token)
+  if (!payload || !payload.exp) return true
+  
+  const currentTime = Math.floor(Date.now() / 1000)
+  return currentTime >= payload.exp
+}
+
 /**
  * Valida se o usuário tem acesso à rota baseado em sua role
  */
@@ -52,6 +84,15 @@ export function middleware(request: NextRequest) {
     } catch {
       // Se falhar ao decodificar, trata como não autenticado
     }
+  }
+
+  // Se existe token, verifica se está expirado
+  if (token && isTokenExpired(token)) {
+    const response = NextResponse.redirect(new URL("/auth/session-expired", request.url))
+    // Limpa os cookies de autenticação
+    response.cookies.set("juryscan_token", "", { maxAge: 0 })
+    response.cookies.set("juryscan_user", "", { maxAge: 0 })
+    return response
   }
 
   // Verificação de rotas protegidas

@@ -49,6 +49,8 @@ export default function AuditorPage(): JSX.Element {
         titulo: backendData.titulo,
         descricaoGeral: backendData.descricaoGeral,
         dataCriacao: backendData.dataCriacao,
+        sumario: backendData.sumario,
+        relatorioSumarioJuridico: backendData.relatorioSumarioJuridico,
         issues: backendData.falhas?.map((f: any) => ({
           id: f.id,
           titulo: f.titulo,
@@ -81,6 +83,12 @@ export default function AuditorPage(): JSX.Element {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      <div className="bg-[#162D3F] text-white">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <h1 className="text-3xl font-bold mb-2">Análise CNIS</h1>
+          <p className="text-gray-400">Envie o extrato previdenciário para uma análise detalhada com identificação de inconsistências e relatório jurídico.</p>
+        </div>
+      </div>
       <main className="flex-grow py-8 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-6 items-start">
