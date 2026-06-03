@@ -134,6 +134,8 @@ export interface AnalysisResult {
   descricaoGeral?: string
   dataCriacao?: string
   summary?: AnalysisSummary
+  sumario?: string
+  relatorioSumarioJuridico?: string
   issues?: AnalysisIssue[]
 }
 

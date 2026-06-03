@@ -64,7 +64,7 @@ export default function ClienteLayout({ children }: ClienteLayoutProps): JSX.Ele
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
               <Link href="/cliente/dashboard" className="flex items-center gap-2">
-                <img src="/LogoBranca.svg" alt="JuryScan" className="h-12 w-auto -mt-4" />
+                <img src="/logo.svg" alt="JuryScan" className="h-8 w-auto" />
               </Link>
 
               <div className="hidden md:flex items-center gap-1">
