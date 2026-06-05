@@ -4,7 +4,7 @@ import { type JSX, type ReactNode } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
-import { LayoutDashboard, FileText, Settings, LogOut } from "lucide-react"
+import { LayoutDashboard, FileText, Inbox, Settings, LogOut } from "lucide-react"
 
 interface ClienteLayoutProps {
   children: ReactNode
@@ -12,6 +12,7 @@ interface ClienteLayoutProps {
 
 const navItems = [
   { href: "/cliente/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/cliente/meus-pedidos", label: "Meus Pedidos", icon: Inbox },
   { href: "/cliente/relatorio", label: "Relatórios", icon: FileText },
 ]
 
@@ -39,9 +40,9 @@ export default function ClienteLayout({ children }: ClienteLayoutProps): JSX.Ele
       <nav className="bg-[#0A1F30] text-white border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-2">
               <Link href="/cliente/dashboard" className="flex items-center gap-2">
-                <img src="/logo.svg" alt="JuryScan" className="h-8 w-auto" />
+                <img src="/LogoBranca.svg" alt="JuryScan" className="h-12 w-auto -mt-4" />
               </Link>
 
               <div className="hidden md:flex items-center gap-1">

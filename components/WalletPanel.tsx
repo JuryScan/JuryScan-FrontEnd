@@ -1,123 +1,149 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
-import { useRouter } from "next/navigation"
-import {
-  Coins,
-  Loader2,
-  ArrowDownLeft,
-  ArrowUpRight,
-  Plus,
-  History,
-  Wallet,
-} from "lucide-react"
-import { useAuth } from "@/contexts/AuthContext"
-import { get } from "@/lib/api"
-import type { ApiResponse, PageResponse } from "@/lib/types"
+import { useRouter } from "next/navigation";
 
-interface Transaction {
-  id: string
-  tipoTransacao: "COMPRA" | "CONSUMO" | "AQUISICAO_LEAD"
-  quantidade: number
-  dataCriacao: string
+
+export interface ClienteType {
+    nome: string;
+    imagemPerfil: string | null;
 }
 
-export default function WalletPanel() {
-  const router = useRouter()
-  const { user } = useAuth()
-  const [balance, setBalance] = useState<number | null>(null)
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+export interface WalletDataType {
+    creditos: number;
+    valorReais: number;
+    usado: number;
+    restante: number;
+    plano: string;
+}
 
-  const fetchData = useCallback(async () => {
-    if (!user?.id) {
-      setIsLoading(false)
-      return
-    }
-    setIsLoading(true)
-    try {
-      const [balanceRes, txRes] = await Promise.all([
-        get<ApiResponse<number>>(`/wallets/user/${user.id}/balance`),
-        get<ApiResponse<PageResponse<Transaction>>>(
-          `/transactions/user/${user.id}?page=0&page_size=10`
-        ),
-      ])
-      if (balanceRes.success) setBalance(balanceRes.data)
-      if (txRes.success && txRes.data?.items) setTransactions(txRes.data.items)
-    } catch (error) {
-      console.error("Erro ao carregar carteira:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [user?.id])
+interface WalletPanelProps {
+    cliente?: ClienteType | null;
+    walletData?: WalletDataType | null;
+}
+
+
+export default function WalletPanel({
+    cliente = { nome: "Fulano", imagemPerfil: null },
+    walletData = { creditos: 400, valorReais: 200, usado: 50, restante: 350, plano: "Básico" }
+}: WalletPanelProps) {
+    const router = useRouter();
 
   useEffect(() => {
     fetchData()
   }, [fetchData])
 
-  const usedThisMonth = transactions
-    .filter((t) => t.tipoTransacao !== "COMPRA")
-    .filter((t) => {
-      const d = new Date(t.dataCriacao)
-      const now = new Date()
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
-    })
-    .reduce((sum, t) => sum + t.quantidade, 0)
+    // Tela de carregamento teste para dados não injetados 
+    if (!cliente || !walletData) {
+        return <p style={{ textAlign: "center", marginTop: "50px", fontFamily: "sans-serif", color: "#666" }}>Carregando dados da carteira...</p>;
+    }
+
+
+    const formatarMoeda = (valor: number) => {
+        return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="w-8 h-8 animate-spin text-[#633B48]" />
-      </div>
-    )
-  }
+        <div style={{
+            maxWidth: "700px",
+            margin: "50px auto",
+            padding: "30px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "30px",
+            fontFamily: "sans-serif"
+        }}>
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-12 px-6 font-sans">
-      <div className="max-w-3xl mx-auto flex flex-col gap-8">
-        <div className="flex items-center gap-3">
-          <Wallet className="w-7 h-7 text-[#633B48]" />
-          <h1 className="text-2xl font-bold text-gray-900">Minha Carteira</h1>
-        </div>
-
-        {/* Saldo */}
-        <div className="bg-[#0A1F30] rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
-          <div className="relative z-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 text-[#FFB6E1] mb-2 font-medium">
-                <Coins className="w-5 h-5" />
-                Saldo Disponível
-              </div>
-              <div className="flex items-baseline gap-2">
-                <h2 className="text-5xl font-bold">{balance !== null ? balance : "--"}</h2>
-                <span className="text-xl text-gray-400 font-medium">créditos</span>
-              </div>
-              <p className="text-sm text-gray-400 mt-3">
-                Usados este mês: <strong className="text-white">{usedThisMonth}</strong> créditos
-              </p>
+            <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+                <div style={{
+                    width: "70px",
+                    height: "70px",
+                    borderRadius: "50%",
+                    backgroundColor: "#f0f0f0",
+                    border: "2px solid #633B48",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    overflow: "hidden"
+                }}>
+                    {cliente.imagemPerfil ? (
+                        <img src={cliente.imagemPerfil} alt="Foto de perfil" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ) : (
+                        <span style={{ color: "#633B48", fontWeight: "bold", fontSize: "24px" }}>
+                            {cliente.nome[0]?.toUpperCase() || "C"}
+                        </span>
+                    )}
+                </div>
+                <h2 style={{ fontSize: "24px", fontWeight: "bold", color: "#333" }}>Olá, {cliente.nome}!</h2>
             </div>
-            <button
-              onClick={() => router.push("/cliente/checkout")}
-              className="bg-[#FFB6E1] hover:bg-[#ff9cd2] text-[#A50064] px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-transform hover:scale-105 shadow-lg whitespace-nowrap"
-            >
-              <Plus className="w-5 h-5" />
-              Comprar créditos
-            </button>
-          </div>
-          <Coins className="absolute -right-8 -bottom-8 w-40 h-40 text-white/5 rotate-12" />
-        </div>
 
-        {/* Histórico */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-6 border-b border-gray-100 flex items-center gap-2">
-            <History className="w-5 h-5 text-[#633B48]" />
-            <h3 className="text-lg font-bold text-gray-900">Histórico de Transações</h3>
-          </div>
 
-          {transactions.length === 0 ? (
-            <div className="p-12 text-center text-gray-400">
-              <History className="w-10 h-10 mx-auto mb-3 opacity-20" />
-              <p className="text-sm">Nenhuma transação ainda.</p>
+            <div style={{
+                width: "100%",
+                backgroundColor: "#fff",
+                borderRadius: "20px",
+                boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+                padding: "30px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "25px"
+            }}>
+                <div style={{ display: "flex", justifyContent: "space-between", textAlign: "center" }}>
+
+                    <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: "14px", color: "#666", marginBottom: "5px" }}>Saldo Atual</p>
+                        <p style={{ fontWeight: "bold", fontSize: "22px", color: "#633B48" }}>{walletData.creditos} créditos</p>
+                        <p style={{ fontSize: "14px", color: "#999" }}>({formatarMoeda(walletData.valorReais)})</p>
+                    </div>
+
+                    <div style={{ width: "1px", backgroundColor: "#ccc", margin: "0 20px" }} />
+
+
+                    <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: "14px", color: "#666", marginBottom: "5px" }}>Usado Este Mês</p>
+                        <p style={{ fontWeight: "bold", fontSize: "22px", color: "#633B48" }}>{walletData.usado} créditos</p>
+                    </div>
+
+                    <div style={{ width: "1px", backgroundColor: "#ccc", margin: "0 20px" }} />
+
+
+                    <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: "14px", color: "#666", marginBottom: "5px" }}>Restante no Plano</p>
+                        <p style={{ fontWeight: "bold", fontSize: "22px", color: "#633B48" }}>{walletData.restante} créditos</p>
+                    </div>
+                </div>
+
+                <div style={{
+                    width: "100%",
+                    padding: "15px 0",
+                    borderTop: "1px solid #eee",
+                    borderBottom: "1px solid #eee",
+                    textAlign: "center",
+                    fontSize: "16px",
+                    fontWeight: "bold",
+                    color: "#633B48"
+                }}>
+                    Plano Atual: {walletData.plano}
+                </div>
+
+
+                <button
+                    onClick={handleUpgrade}
+                    style={{
+                        width: "100%",
+                        padding: "16px",
+                        borderRadius: "12px",
+                        backgroundColor: "#633B48",
+                        color: "#fff",
+                        fontSize: "18px",
+                        fontWeight: "bold",
+                        border: "none",
+                        cursor: "pointer"
+                    }}
+                >
+                    Fazer Upgrade / Ver Outros Planos
+                </button>
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
