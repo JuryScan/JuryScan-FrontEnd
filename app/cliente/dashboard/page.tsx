@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, type JSX, type ChangeEvent } from "react"
+import { useState, useEffect, useCallback, type JSX, type ChangeEvent } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
@@ -11,11 +11,11 @@ import {
   AlertCircle,
   Clock,
   Lock,
-  Unlock,
+  Coins,
 } from "lucide-react"
 
 import { useAuth } from "@/contexts/AuthContext"
-import { post } from "@/lib/api"
+import { get, post } from "@/lib/api"
 import type { ApiResponse } from "@/lib/types"
 import { toast } from "@/hooks/use-toast"
 
@@ -36,6 +36,21 @@ export default function ClienteDashboardPage(): JSX.Element {
   const [stepLabel, setStepLabel] = useState("")
   const [error, setError] = useState<"PASSWORD_PROTECTED" | "ILLEGIBLE" | "GENERIC" | null>(null)
   const [analysis, setAnalysis] = useState<ClientAnalysis | null>(null)
+  const [balance, setBalance] = useState<number | null>(null)
+
+  const fetchBalance = useCallback(async () => {
+    if (!user?.id) return
+    try {
+      const res = await get<ApiResponse<number>>(`/wallets/user/${user.id}/balance`)
+      if (res.success) setBalance(res.data)
+    } catch {
+      /* saldo é apenas contexto */
+    }
+  }, [user?.id])
+
+  useEffect(() => {
+    fetchBalance()
+  }, [fetchBalance])
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
@@ -98,10 +113,10 @@ export default function ClienteDashboardPage(): JSX.Element {
     setFile(null)
   }
 
-  const handleUnlock = () => {
-    // Vai para a página de pagamentos (antiga aba "Pagamentos"), levando a análise a desbloquear.
+  const handleViewReport = () => {
+    // A análise já consome 1 crédito no upload e retorna o relatório completo.
     const query = analysis?.id ? `?analysisId=${analysis.id}` : ""
-    router.push(`/cliente/checkout${query}`)
+    router.push(`/cliente/relatorio${query}`)
   }
 
   const totalFalhas = analysis?.falhas.length ?? 0
@@ -111,14 +126,33 @@ export default function ClienteDashboardPage(): JSX.Element {
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-12 font-sans flex flex-col items-center">
       <div className="w-full max-w-5xl">
-        <div className="mb-10 text-center md:text-left">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Olá! Vamos analisar seu INSS?
-          </h1>
-          <p className="text-gray-600 text-lg">
-            Envie seu extrato (CNIS) e nossa Inteligência Artificial vai traduzir
-            tudo de forma simples.
-          </p>
+        <div className="mb-10 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+          <div className="text-center md:text-left">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Olá! Vamos analisar seu INSS?
+            </h1>
+            <p className="text-gray-600 text-lg">
+              Envie seu extrato (CNIS) e nossa Inteligência Artificial vai traduzir
+              tudo de forma simples.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm self-center md:self-start">
+            <div className="w-10 h-10 rounded-lg bg-[#FFECF1] flex items-center justify-center">
+              <Coins className="w-5 h-5 text-[#A50064]" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Seus créditos</p>
+              <p className="font-bold text-gray-900 leading-tight">
+                {balance !== null ? balance : "--"}
+              </p>
+            </div>
+            <Link
+              href="/cliente/checkout"
+              className="ml-2 text-sm font-bold text-[#633B48] hover:underline whitespace-nowrap"
+            >
+              Comprar
+            </Link>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 items-stretch mb-8">
@@ -307,11 +341,11 @@ export default function ClienteDashboardPage(): JSX.Element {
 
               <div className="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
                 <button
-                  onClick={handleUnlock}
+                  onClick={handleViewReport}
                   className="w-full py-5 rounded-xl bg-white hover:bg-gray-100 text-[#633B48] font-bold text-lg flex items-center justify-center transition-transform hover:scale-[1.02] shadow-md"
                 >
-                  <Unlock className="w-5 h-5 mr-2" />
-                  Desbloquear Relatório (R$ 29,90)
+                  <FileText className="w-5 h-5 mr-2" />
+                  Ver Relatório Completo
                 </button>
 
                 <Link
