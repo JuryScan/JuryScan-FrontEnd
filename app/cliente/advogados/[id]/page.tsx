@@ -48,15 +48,15 @@ export default function PerfilAdvogadoPage() {
         }
         setIsSendingLead(true)
         try {
-            // Cria o lead a partir da análise; ele entra no marketplace dos advogados.
+            // Cria o lead a partir da análise; ele entra no marketplace aberto dos advogados.
             await post(`/leads/request`, { analysisId })
             toast({
-                title: "Solicitação Enviada!",
-                description: "Seu caso foi enviado e advogados parceiros poderão atendê-lo em breve.",
-                variant: "default"
+                title: "Caso publicado!",
+                description: "Seu caso foi publicado no marketplace. Acompanhe em 'Meus Pedidos'.",
             })
+            router.push("/cliente/meus-pedidos")
         } catch (error: any) {
-            toast({ title: "Erro", description: error?.message || "Falha ao enviar solicitação.", variant: "destructive" })
+            toast({ title: "Erro", description: error?.message || "Falha ao publicar o caso.", variant: "destructive" })
         } finally {
             setIsSendingLead(false)
         }
@@ -158,20 +158,20 @@ export default function PerfilAdvogadoPage() {
                         <div className="bg-[#0A1F30] rounded-2xl shadow-sm border border-[#14324a] p-8 text-white">
                             <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
                                 <ShieldCheck className="w-5 h-5 text-[#FFB6E1]" />
-                                Como funciona a contratação?
+                                Como funciona?
                             </h2>
                             <ul className="space-y-4 text-sm text-gray-300">
                                 <li className="flex gap-3">
                                     <div className="w-6 h-6 rounded-full bg-[#14324a] flex items-center justify-center flex-shrink-0 font-bold text-[#FFB6E1]">1</div>
-                                    <p>Você solicita o atendimento enviando seu relatório gerado pela nossa IA.</p>
+                                    <p>Você publica seu caso anexando o relatório gerado pela nossa IA.</p>
                                 </li>
                                 <li className="flex gap-3">
                                     <div className="w-6 h-6 rounded-full bg-[#14324a] flex items-center justify-center flex-shrink-0 font-bold text-[#FFB6E1]">2</div>
-                                    <p>O advogado analisa o caso e envia uma proposta de honorários pelo chat.</p>
+                                    <p>Seu caso entra no marketplace e um advogado parceiro o assume.</p>
                                 </li>
                                 <li className="flex gap-3">
                                     <div className="w-6 h-6 rounded-full bg-[#14324a] flex items-center justify-center flex-shrink-0 font-bold text-[#FFB6E1]">3</div>
-                                    <p>O pagamento inicial fica retido e protegido pela JuryScan até o serviço começar.</p>
+                                    <p>O advogado entra em contato para dar andamento, com a segurança da JuryScan.</p>
                                 </li>
                             </ul>
                         </div>
@@ -180,8 +180,8 @@ export default function PerfilAdvogadoPage() {
                     <div className="md:col-span-1">
                         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sticky top-24">
                             <div className="text-center mb-6">
-                                <h3 className="font-bold text-gray-900 text-lg mb-1">Gostou do profissional?</h3>
-                                <p className="text-sm text-gray-500">Envie uma mensagem e anexe seu relatório do INSS gratuitamente.</p>
+                                <h3 className="font-bold text-gray-900 text-lg mb-1">Publique seu caso</h3>
+                                <p className="text-sm text-gray-500">Seu relatório fica disponível no marketplace para advogados parceiros (incluindo este) assumirem. É gratuito.</p>
                             </div>
 
                             <button 
@@ -192,7 +192,7 @@ export default function PerfilAdvogadoPage() {
                                 {isSendingLead ? <Loader2 className="size-6 animate-spin" /> : (
                                     <>
                                         <MessageCircle className="w-5 h-5 mr-2" />
-                                        Solicitar Atendimento
+                                        Publicar meu caso
                                     </>
                                 )}
                             </button>
