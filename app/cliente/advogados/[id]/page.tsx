@@ -1,23 +1,20 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { useRouter, useParams, useSearchParams } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { 
-    ArrowLeft, Star, ShieldCheck, MapPin, Briefcase, 
-    MessageCircle, CheckCircle2, Clock, Scale, Loader2 
+    ArrowLeft, ShieldCheck, MapPin, Briefcase, 
+    CheckCircle2, Scale, Loader2, Mail, Phone 
 } from "lucide-react"
-import { get, post } from "@/lib/api"
+import { get } from "@/lib/api"
 import type { ApiResponse, Lawyer } from "@/lib/types"
 import { toast } from "@/hooks/use-toast"
 
 export default function PerfilAdvogadoPage() {
     const router = useRouter()
     const params = useParams()
-    const searchParams = useSearchParams()
-    const analysisId = searchParams.get("analysisId")
     const [lawyer, setLawyer] = useState<any>(null)
     const [isLoading, setIsLoading] = useState(true)
-    const [isSendingLead, setIsSendingLead] = useState(false)
 
     useEffect(() => {
         const fetchLawyer = async () => {
@@ -37,30 +34,7 @@ export default function PerfilAdvogadoPage() {
         fetchLawyer()
     }, [params.id])
 
-    const handleSolicitarAtendimento = async () => {
-        if (!analysisId) {
-            toast({
-                title: "Análise necessária",
-                description: "Faça uma análise do seu CNIS antes de solicitar um advogado.",
-                variant: "destructive",
-            })
-            return
-        }
-        setIsSendingLead(true)
-        try {
-            // Cria o lead a partir da análise; ele entra no marketplace dos advogados.
-            await post(`/leads/request`, { analysisId })
-            toast({
-                title: "Solicitação Enviada!",
-                description: "Seu caso foi enviado e advogados parceiros poderão atendê-lo em breve.",
-                variant: "default"
-            })
-        } catch (error: any) {
-            toast({ title: "Erro", description: error?.message || "Falha ao enviar solicitação.", variant: "destructive" })
-        } finally {
-            setIsSendingLead(false)
-        }
-    }
+
 
     if (isLoading) {
         return (
@@ -117,16 +91,9 @@ export default function PerfilAdvogadoPage() {
                                     </div>
                                     <p className="text-[#633B48] font-semibold mb-3">{lawyer.numeroOab}</p>
                                     
-                                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-gray-600">
-                                        <div className="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-200">
-                                            <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                            <span className="font-bold text-yellow-700">{lawyer.rating || "5.0"}</span>
-                                            <span className="text-yellow-600">({lawyer.reviews || "0"} avaliações)</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <MapPin className="w-4 h-4" />
-                                            {lawyer.localizacao || "Atendimento Online"}
-                                        </div>
+                                    <div className="flex items-center gap-1 text-sm text-gray-600">
+                                        <MapPin className="w-4 h-4" />
+                                        {lawyer.localizacao || "Atendimento Online"}
                                     </div>
                                 </div>
                             </div>
@@ -154,52 +121,36 @@ export default function PerfilAdvogadoPage() {
                                 ))}
                             </div>
                         </div>
-
-                        <div className="bg-[#0A1F30] rounded-2xl shadow-sm border border-[#14324a] p-8 text-white">
-                            <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <ShieldCheck className="w-5 h-5 text-[#FFB6E1]" />
-                                Como funciona a contratação?
-                            </h2>
-                            <ul className="space-y-4 text-sm text-gray-300">
-                                <li className="flex gap-3">
-                                    <div className="w-6 h-6 rounded-full bg-[#14324a] flex items-center justify-center flex-shrink-0 font-bold text-[#FFB6E1]">1</div>
-                                    <p>Você solicita o atendimento enviando seu relatório gerado pela nossa IA.</p>
-                                </li>
-                                <li className="flex gap-3">
-                                    <div className="w-6 h-6 rounded-full bg-[#14324a] flex items-center justify-center flex-shrink-0 font-bold text-[#FFB6E1]">2</div>
-                                    <p>O advogado analisa o caso e envia uma proposta de honorários pelo chat.</p>
-                                </li>
-                                <li className="flex gap-3">
-                                    <div className="w-6 h-6 rounded-full bg-[#14324a] flex items-center justify-center flex-shrink-0 font-bold text-[#FFB6E1]">3</div>
-                                    <p>O pagamento inicial fica retido e protegido pela JuryScan até o serviço começar.</p>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
 
                     <div className="md:col-span-1">
                         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sticky top-24">
-                            <div className="text-center mb-6">
-                                <h3 className="font-bold text-gray-900 text-lg mb-1">Gostou do profissional?</h3>
-                                <p className="text-sm text-gray-500">Envie uma mensagem e anexe seu relatório do INSS gratuitamente.</p>
-                            </div>
-
-                            <button 
-                                onClick={handleSolicitarAtendimento}
-                                disabled={isSendingLead}
-                                className="w-full py-4 bg-[#633B48] hover:bg-[#300117] text-white rounded-xl font-bold text-lg flex items-center justify-center transition-all shadow-md mb-4 disabled:opacity-70"
-                            >
-                                {isSendingLead ? <Loader2 className="size-6 animate-spin" /> : (
-                                    <>
-                                        <MessageCircle className="w-5 h-5 mr-2" />
-                                        Solicitar Atendimento
-                                    </>
+                            <h3 className="font-bold text-gray-900 text-lg mb-6">Dados de Contato</h3>
+                            
+                            <div className="space-y-4">
+                                <a 
+                                    href={`mailto:${lawyer.email}`}
+                                    className="w-full flex items-center gap-3 p-4 bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-200 transition-colors group"
+                                >
+                                    <Mail className="w-5 h-5 text-[#633B48] flex-shrink-0 group-hover:scale-110 transition-transform" />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-xs text-gray-500 font-medium">Email</p>
+                                        <p className="text-sm font-semibold text-gray-900 truncate">{lawyer.email || "Não informado"}</p>
+                                    </div>
+                                </a>
+                                
+                                {lawyer.telefone && (
+                                    <a 
+                                        href={`tel:${lawyer.telefone}`}
+                                        className="w-full flex items-center gap-3 p-4 bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-200 transition-colors group"
+                                    >
+                                        <Phone className="w-5 h-5 text-[#633B48] flex-shrink-0 group-hover:scale-110 transition-transform" />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-xs text-gray-500 font-medium">Telefone</p>
+                                            <p className="text-sm font-semibold text-gray-900 truncate">{lawyer.telefone}</p>
+                                        </div>
+                                    </a>
                                 )}
-                            </button>
-
-                            <div className="flex items-center justify-center gap-2 text-xs text-gray-400 mb-6">
-                                <Clock className="w-4 h-4" />
-                                Tempo de resposta: aprox. 2 horas
                             </div>
                         </div>
                     </div>

@@ -205,10 +205,10 @@ export default function AnalysisResultComponent({
                 </span>
               </p>
             </div>
-            {result.issues && (
+            {(result.issues || result.falhas) && (
               <div className="bg-orange-100 text-orange-800 px-4 py-2 rounded-lg text-sm font-bold border border-orange-200 flex items-center gap-2">
                 <AlertTriangle size={16} />
-                {result.issues.length} Inconsistências
+                {(result.issues?.length ?? result.falhas?.length ?? 0)} Inconsistências
               </div>
             )}
           </div>
@@ -280,8 +280,8 @@ export default function AnalysisResultComponent({
 
             <TabsContent value="issues" className="flex-1 overflow-hidden">
               <div className="space-y-4 flex-grow overflow-y-auto max-h-[450px] pr-2 custom-scrollbar">
-                {result.issues && result.issues.length > 0 ? (
-                  result.issues.map((issue) => {
+                {(result.issues || result.falhas) && (result.issues?.length ?? result.falhas?.length ?? 0) > 0 ? (
+                  (result.issues || result.falhas)!.map((issue) => {
                     const styles = getSeverityStyles(issue.severidade ?? "INFO")
                     const confidencePercentage = issue.confianca 
                       ? Math.round(issue.confianca * 100) 

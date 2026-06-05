@@ -132,7 +132,7 @@ export default function AnalysisHistoryPage() {
                         <div className="flex items-center gap-2">
                           <AlertTriangle className="w-4 h-4 text-orange-500" />
                           <span className="text-sm font-bold text-gray-700">
-                            {analysis.issues?.length || 0} Inconsistências
+                            {(analysis.issues?.length ?? analysis.falhas?.length ?? 0)} Inconsistências
                           </span>
                         </div>
                       </td>
