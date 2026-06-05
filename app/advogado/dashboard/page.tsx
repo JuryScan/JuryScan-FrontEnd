@@ -27,14 +27,9 @@ import {
   BarChart,
   Bar,
 } from "recharts"
-import {
-  MOCK_DASHBOARD_STATS,
-  MOCK_INTELLIGENCE_STATS,
-  MOCK_RECENT_ANALYSES,
-} from "@/lib/mocks"
 import { useAuth } from "@/contexts/AuthContext"
 import { get } from "@/lib/api"
-import type { ApiResponse, AuditRecord } from "@/lib/types"
+import type { ApiResponse, AuditRecord, DashboardMetrics } from "@/lib/types"
 
 export default function AdvogadoDashboardPage(): JSX.Element {
   const { user } = useAuth()
@@ -43,17 +38,23 @@ export default function AdvogadoDashboardPage(): JSX.Element {
   const [recentAnalyses, setRecentAnalyses] = useState<AuditRecord[]>([])
   const [isLoadingAnalyses, setIsLoadingAnalyses] = useState(true)
   const [balance, setBalance] = useState<number | null>(null)
+  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
 
   const fetchData = useCallback(async () => {
     if (!user?.id) return
 
     setIsLoadingAnalyses(true)
     try {
-      const [analysesRes, balanceRes] = await Promise.all([
+      const [analysesRes, balanceRes, metricsRes] = await Promise.all([
         get<ApiResponse<any>>(`/analysis/user/${user.id}?page=0&page_size=5`),
-        get<ApiResponse<number>>(`/wallets/user/${user.id}/balance`)
+        get<ApiResponse<number>>(`/wallets/user/${user.id}/balance`),
+        get<ApiResponse<DashboardMetrics>>(`/dashboard/metrics/me`),
       ])
-      
+
+      if (metricsRes.success) {
+        setMetrics(metricsRes.data)
+      }
+
       if (analysesRes.success && analysesRes.data?.items?.length) {
         const mappedAnalyses: AuditRecord[] = analysesRes.data.items.map((item: any) => ({
           id: item.id,
@@ -79,9 +80,19 @@ export default function AdvogadoDashboardPage(): JSX.Element {
     fetchData()
   }, [fetchData])
 
-  const filteredAnalyses = recentAnalyses.filter(analysis => 
+  const filteredAnalyses = recentAnalyses.filter(analysis =>
     analysis.client.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  // Série mensal dos gráficos: mescla análises e erros por mês (mesmos 6 meses do backend).
+  const chartData = (metrics?.analisesPorMes ?? []).map((m, i) => ({
+    month: m.label,
+    analyses: m.count,
+    errors: metrics?.errosPorMes?.[i]?.count ?? 0,
+  }))
+
+  const taxaConversao =
+    metrics?.taxaConversao != null ? `${Math.round(metrics.taxaConversao * 100)}%` : "--"
 
   return (
     <div className="flex flex-col font-sans">
@@ -146,7 +157,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                     Leads Adquiridos
                   </p>
                   <h3 className="text-2xl font-bold text-gray-900">
-                    {MOCK_DASHBOARD_STATS.activeClients}
+                    {metrics ? metrics.leadsAdquiridos : "--"}
                   </h3>
                 </div>
               </div>
@@ -160,7 +171,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                     Leads Disponíveis
                   </p>
                   <h3 className="text-2xl font-bold text-gray-900">
-                    {MOCK_DASHBOARD_STATS.newLeads}
+                    {metrics ? metrics.leadsDisponiveis : "--"}
                   </h3>
                 </div>
               </div>
@@ -174,7 +185,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                     Análises no Mês
                   </p>
                   <h3 className="text-2xl font-bold text-gray-900">
-                    {MOCK_DASHBOARD_STATS.analysesThisMonth}
+                    {metrics ? metrics.analisesNoMes : "--"}
                   </h3>
                 </div>
               </div>
@@ -278,7 +289,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                   <h4 className="font-bold text-gray-900">Total de Erros</h4>
                 </div>
                 <p className="text-3xl font-bold text-gray-900">
-                  {MOCK_INTELLIGENCE_STATS.totalErrors}
+                  {metrics ? metrics.totalErros : "--"}
                 </p>
                 <p className="text-sm text-red-600 font-medium mt-1">
                   Pendências detectadas no total
@@ -288,18 +299,15 @@ export default function AdvogadoDashboardPage(): JSX.Element {
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
-                    <Coins className="w-5 h-5" />
+                    <TrendingUp className="w-5 h-5" />
                   </div>
-                  <h4 className="font-bold text-gray-900">Valor Recuperável</h4>
+                  <h4 className="font-bold text-gray-900">Taxa de Conversão</h4>
                 </div>
                 <p className="text-3xl font-bold text-gray-900">
-                  {new Intl.NumberFormat("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  }).format(MOCK_INTELLIGENCE_STATS.totalRecoverableValue)}
+                  {taxaConversao}
                 </p>
                 <p className="text-sm text-green-600 font-medium mt-1">
-                  Estimativa total aproximada
+                  Clientes atendidos por lead adquirido
                 </p>
               </div>
             </div>
@@ -312,7 +320,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 </h3>
                 <div className="h-80 w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={MOCK_INTELLIGENCE_STATS.monthlyData}>
+                    <BarChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} />
                       <XAxis dataKey="month" axisLine={false} tickLine={false} />
                       <YAxis axisLine={false} tickLine={false} />
@@ -332,7 +340,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 </h3>
                 <div className="h-80 w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={MOCK_INTELLIGENCE_STATS.monthlyData}>
+                    <LineChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} />
                       <XAxis dataKey="month" axisLine={false} tickLine={false} />
                       <YAxis axisLine={false} tickLine={false} />
