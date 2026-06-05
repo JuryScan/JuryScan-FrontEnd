@@ -129,6 +129,32 @@ export interface IntelligenceStats {
   }[]
 }
 
+// Ponto de série temporal mensal (espelha MonthlyCountDTO do backend)
+export interface MonthlyCount {
+  ano: number
+  mes: number
+  label: string
+  count: number
+}
+
+// Resposta de GET /dashboard/advogado/me (espelha DashboardAdvogadoResponseDTO)
+export interface DashboardAdvogado {
+  advogadoId: string
+  clientesAtivos: number
+  leadsAdquiridosTotais: number
+  leadsAdquiridosNoMes: number
+  leadsDisponiveis: number
+  analisesTotais: number
+  analisesNoMes: number
+  saldoTokens: number
+  totalGastoEmLeads: number
+  totalErros: number
+  taxaConversao: number | null
+  leadsPorMes: MonthlyCount[]
+  analisesPorMes: MonthlyCount[]
+  errosPorMes: MonthlyCount[]
+}
+
 // ============================================================
 // Formulários
 // ============================================================
