@@ -39,7 +39,6 @@ export default function Header({ mockUser }: HeaderProps): JSX.Element {
 
   const navLinks = [
     { href: "/", label: "Início" },
-    { href: "/plans", label: "Planos" },
     { href: "/sobre", label: "Sobre" },
     { href: "/servicos", label: "Serviços" },
     { href: "/contato", label: "Contato" },

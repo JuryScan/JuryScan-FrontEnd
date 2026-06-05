@@ -4,7 +4,7 @@ import { type JSX, type ReactNode } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
-import { LayoutDashboard, FileText, Settings, LogOut, ChevronDown } from "lucide-react"
+import { LayoutDashboard, FileText, Settings, LogOut, ChevronDown, Users } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -21,6 +21,7 @@ interface ClienteLayoutProps {
 const navItems = [
   { href: "/cliente/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/cliente/relatorio", label: "Relatórios", icon: FileText },
+  { href: "/cliente/advogados", label: "Advogados", icon: Users },
 ]
 
 export default function ClienteLayout({ children }: ClienteLayoutProps): JSX.Element {
@@ -91,17 +92,6 @@ export default function ClienteLayout({ children }: ClienteLayoutProps): JSX.Ele
             </div>
 
             <div className="flex items-center gap-1">
-              <Link
-                href="/cliente/configuracoes"
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  pathname === "/cliente/configuracoes"
-                    ? "bg-[#FFB6E1] text-[#A50064]"
-                    : "text-gray-300 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                <Settings className="w-4 h-4" />
-                <span className="hidden sm:inline">Configurações</span>
-              </Link>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer group">

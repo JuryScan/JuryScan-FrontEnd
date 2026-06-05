@@ -137,6 +137,7 @@ export interface AnalysisResult {
   sumario?: string
   relatorioSumarioJuridico?: string
   issues?: AnalysisIssue[]
+  falhas?: AnalysisIssue[]
 }
 
 // ============================================================

@@ -113,13 +113,15 @@ async function apiFetch<T = unknown>(
           ? (errorData as Record<string, string>).message
           : `Erro ${response.status}: ${response.statusText}`
 
-      // Interceptar erro 401 (token expirado/inválido) e redirecionar para login
-      if (response.status === 401 && typeof window !== "undefined") {
+      // Interceptar erro 401 apenas para sessões que estavam autenticadas
+      // Se havia um token válido antes, significa que expirou
+      // Se não havia token, é apenas um erro de credenciais (não redireciona)
+      if (response.status === 401 && typeof window !== "undefined" && getToken()) {
         // Limpar autenticação
         import("./auth").then(({ clearAuth }) => {
           clearAuth()
         })
-        // Redirecionar para página de sessão expirada
+        // Redirecionar para página de sessão expirada apenas se havia sessão ativa
         window.location.href = "/auth/session-expired"
         // Retornar erro mas será tratado pelo redirect
         throw new ApiError(response.status, message, errorData)

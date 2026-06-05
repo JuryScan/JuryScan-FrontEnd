@@ -10,7 +10,6 @@ import {
   Plus,
   ArrowRight,
   Search,
-  Clock,
   LayoutDashboard,
   BrainCircuit,
   AlertCircle,
@@ -30,7 +29,6 @@ import {
 } from "recharts"
 import {
   MOCK_DASHBOARD_STATS,
-  MOCK_RECENT_LEADS,
   MOCK_INTELLIGENCE_STATS,
   MOCK_RECENT_ANALYSES,
 } from "@/lib/mocks"
@@ -42,9 +40,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
   const { user } = useAuth()
   const [searchTerm, setSearchTerm] = useState("")
   const [viewMode, setViewMode] = useState<"general" | "intelligence">("general")
-  // Inicia com exemplos (CNIS analisados) enquanto a integração de dashboard não chega;
-  // é sobrescrito quando a API retornar análises reais.
-  const [recentAnalyses, setRecentAnalyses] = useState<AuditRecord[]>(MOCK_RECENT_ANALYSES)
+  const [recentAnalyses, setRecentAnalyses] = useState<AuditRecord[]>([])
   const [isLoadingAnalyses, setIsLoadingAnalyses] = useState(true)
   const [balance, setBalance] = useState<number | null>(null)
 
@@ -147,7 +143,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 font-medium mb-1">
-                    Clientes Ativos
+                    Leads Adquiridos
                   </p>
                   <h3 className="text-2xl font-bold text-gray-900">
                     {MOCK_DASHBOARD_STATS.activeClients}
@@ -161,7 +157,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 font-medium mb-1">
-                    Novos Leads
+                    Leads Disponíveis
                   </p>
                   <h3 className="text-2xl font-bold text-gray-900">
                     {MOCK_DASHBOARD_STATS.newLeads}
@@ -200,117 +196,74 @@ export default function AdvogadoDashboardPage(): JSX.Element {
               </div>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-8 items-start">
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                  <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <MessageSquare className="w-5 h-5 text-[#633B48]" />
-                    Solicitações de Atendimento
-                  </h2>
-                  <button className="text-sm text-[#633B48] font-bold hover:underline">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="p-6 border-b border-gray-100 flex items-center justify-between gap-4">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
+                  <FileText className="w-5 h-5 text-[#633B48]" />
+                  Análises Recentes
+                </h2>
+                <div className="flex items-center gap-4 w-full justify-end">
+                  <div className="relative hidden md:block w-full max-w-xs">
+                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Buscar cliente..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#633B48]"
+                      aria-label="Buscar cliente nas análises"
+                    />
+                  </div>
+                  <Link href="/advogado/historico" className="text-sm text-[#633B48] font-bold hover:underline whitespace-nowrap">
                     Ver todos
-                  </button>
-                </div>
-                <div className="divide-y divide-gray-100">
-                  {MOCK_RECENT_LEADS.map((lead) => (
-                    <div
-                      key={lead.id}
-                      className="p-6 hover:bg-gray-50 transition-colors cursor-pointer group"
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-gray-900">{lead.name}</h4>
-                          {lead.status === "Novo" && (
-                            <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                              Novo
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-xs text-gray-400 flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> {lead.date}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-3 truncate">
-                        {lead.message}
-                      </p>
-                      <button className="text-sm font-bold text-[#633B48] flex items-center group-hover:underline">
-                        Responder{" "}
-                        <ArrowRight className="w-4 h-4 ml-1" />
-                      </button>
-                    </div>
-                  ))}
+                  </Link>
                 </div>
               </div>
-
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="p-6 border-b border-gray-100 flex items-center justify-between gap-4">
-                  <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
-                    <FileText className="w-5 h-5 text-[#633B48]" />
-                    Análises Recentes
-                  </h2>
-                  <div className="flex items-center gap-4 w-full justify-end">
-                    <div className="relative hidden md:block w-full max-w-xs">
-                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                      <input
-                        type="text"
-                        placeholder="Buscar cliente..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#633B48]"
-                        aria-label="Buscar cliente nas análises"
-                      />
-                    </div>
-                    <Link href="/advogado/historico" className="text-sm text-[#633B48] font-bold hover:underline whitespace-nowrap">
-                      Ver todos
-                    </Link>
+              <div className="divide-y divide-gray-100">
+                {isLoadingAnalyses ? (
+                  <div className="p-12 flex flex-col items-center justify-center text-gray-400">
+                    <Loader2 className="w-8 h-8 animate-spin mb-2" />
+                    <p className="text-sm">Carregando análises...</p>
                   </div>
-                </div>
-                <div className="divide-y divide-gray-100">
-                  {isLoadingAnalyses ? (
-                    <div className="p-12 flex flex-col items-center justify-center text-gray-400">
-                      <Loader2 className="w-8 h-8 animate-spin mb-2" />
-                      <p className="text-sm">Carregando análises...</p>
-                    </div>
-                  ) : filteredAnalyses.length === 0 ? (
-                    <div className="p-12 text-center text-gray-400">
-                      <p className="text-sm">Nenhuma análise encontrada.</p>
-                    </div>
-                  ) : (
-                    filteredAnalyses.map((analysis) => (
-                      <div
-                        key={analysis.id}
-                        className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 font-bold">
-                            {analysis.client.charAt(0)}
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-gray-900">
-                              {analysis.client}
-                            </h4>
-                            <p className="text-xs text-gray-500 flex items-center gap-2 mt-1">
-                              <span>Data: {analysis.date}</span>
-                              <span>•</span>
-                              <span className="text-orange-600 font-medium">
-                                {analysis.issues} pendências
-                              </span>
-                            </p>
-                          </div>
+                ) : filteredAnalyses.length === 0 ? (
+                  <div className="p-12 text-center text-gray-400">
+                    <p className="text-sm">Nenhuma análise encontrada.</p>
+                  </div>
+                ) : (
+                  filteredAnalyses.map((analysis) => (
+                    <div
+                      key={analysis.id}
+                      className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 font-bold">
+                          {analysis.client.charAt(0)}
                         </div>
-                        <Link href={`/advogado/analise/${analysis.id}`}>
-                          <button
-                            className="p-2 text-gray-400 hover:text-[#633B48] hover:bg-[#FFECF1] rounded-lg transition-colors"
-                            title="Abrir Relatório"
-                            aria-label={`Abrir relatório de ${analysis.client}`}
-                          >
-                            <ArrowRight className="w-5 h-5" />
-                          </button>
-                        </Link>
+                        <div>
+                          <h4 className="font-bold text-gray-900">
+                            {analysis.client}
+                          </h4>
+                          <p className="text-xs text-gray-500 flex items-center gap-2 mt-1">
+                            <span>Data: {analysis.date}</span>
+                            <span>•</span>
+                            <span className="text-orange-600 font-medium">
+                              {analysis.issues} pendências
+                            </span>
+                          </p>
+                        </div>
                       </div>
-                    ))
-                  )}
-                </div>
+                      <Link href={`/advogado/analise/${analysis.id}`}>
+                        <button
+                          className="p-2 text-gray-400 hover:text-[#633B48] hover:bg-[#FFECF1] rounded-lg transition-colors"
+                          title="Abrir Relatório"
+                          aria-label={`Abrir relatório de ${analysis.client}`}
+                        >
+                          <ArrowRight className="w-5 h-5" />
+                        </button>
+                      </Link>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </>

@@ -21,7 +21,12 @@ export default function AnalysisDetailsPage() {
       const response = await get<ApiResponse<AnalysisResultType>>(`/analysis/${id}`)
       
       if (response.success) {
-        setAnalysis(response.data)
+        const analysisData = response.data
+        // Mapear 'falhas' da API para 'issues' esperado pelo componente
+        if (analysisData.falhas && !analysisData.issues) {
+          analysisData.issues = analysisData.falhas
+        }
+        setAnalysis(analysisData)
       }
     } catch (error) {
       console.error("Erro ao buscar detalhes da análise:", error)
