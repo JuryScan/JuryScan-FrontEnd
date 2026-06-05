@@ -178,6 +178,31 @@ export interface IntelligenceStats {
   }[]
 }
 
+// Ponto de uma série temporal mensal (espelha o MonthlyCountDTO do backend).
+export interface MonthlyCount {
+  ano: number
+  mes: number
+  label: string
+  count: number
+}
+
+// Métricas reais do dashboard do advogado (GET /dashboard/metrics/me).
+export interface DashboardMetrics {
+  leadsAdquiridos: number
+  leadsAdquiridosNoMes: number
+  leadsDisponiveis: number
+  clientesAtivos: number
+  analisesNoMes: number
+  analisesTotais: number
+  totalErros: number
+  totalGastoEmCreditos: number
+  saldoCreditos: number
+  taxaConversao: number | null
+  leadsPorMes: MonthlyCount[]
+  analisesPorMes: MonthlyCount[]
+  errosPorMes: MonthlyCount[]
+}
+
 // ============================================================
 // Formulários
 // ============================================================
@@ -225,4 +250,24 @@ export interface Lawyer {
   fotoUrl: string
   verificado: boolean
   distancia?: number
+}
+
+// ============================================================
+// Leads (pedidos do cliente no marketplace)
+// ============================================================
+
+export type LeadStatus = "DISPONIVEL" | "ADQUIRIDO" | "EXPIRADO" | "CANCELADO"
+
+// Espelha o LeadResponseDTO do backend (GET /leads/my-requests).
+export interface LeadRequest {
+  id: string
+  usuarioClienteId?: string
+  nomeCliente?: string
+  analiseId?: string
+  tituloAnalise?: string
+  status: LeadStatus
+  custoCreditos?: number
+  dataCriacao?: string
+  dataAquisicao?: string
+  advogadoId?: string | null
 }

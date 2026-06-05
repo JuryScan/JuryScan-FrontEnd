@@ -4,7 +4,7 @@ import { type JSX, type ReactNode } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
-import { LayoutDashboard, FileText, Settings, LogOut, ChevronDown, Users } from "lucide-react"
+import { LayoutDashboard, FileText, Settings, LogOut, ChevronDown, Users, Inbox } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -22,6 +22,7 @@ const navItems = [
   { href: "/cliente/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/cliente/relatorio", label: "Relatórios", icon: FileText },
   { href: "/cliente/advogados", label: "Advogados", icon: Users },
+  { href: "/cliente/meus-pedidos", label: "Meus Pedidos", icon: Inbox },
 ]
 
 export default function ClienteLayout({ children }: ClienteLayoutProps): JSX.Element {

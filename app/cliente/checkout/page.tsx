@@ -1,183 +1,174 @@
 "use client"
 
-import React, { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowLeft, CreditCard, QrCode, Lock, ShieldCheck, FileText, CheckCircle2 } from "lucide-react"
-import { post } from "@/lib/api"
+import React, { useCallback, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { ArrowLeft, ShieldCheck, Coins, Loader2, Check, Wallet } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
+import { get, post } from "@/lib/api"
 import type { ApiResponse } from "@/lib/types"
 import { toast } from "@/hooks/use-toast"
 
-export default function CheckoutPage() {
-    const router = useRouter()
-    const searchParams = useSearchParams()
-    const analysisId = searchParams.get("analysisId")
-    const [paymentMethod, setPaymentMethod] = useState("pix")
-    const [isProcessing, setIsProcessing] = useState(false)
+// Pacotes de créditos. Preço honesto: R$ 0,20 por crédito (o webhook credita amount/20).
+// Cada análise de CNIS consome 30 créditos.
+const CREDITOS_POR_ANALISE = 30
 
-    const handlePayment = async (e?: React.FormEvent) => {
-        e?.preventDefault()
-        setIsProcessing(true)
+interface Pacote {
+  creditos: number
+  preco: number
+  label: string
+  destaque: boolean
+}
 
-        try {
-            const response = await post<ApiResponse<any>>("/product-checkout/checkout", {
-                name: "Desbloqueio de Relatório Individual",
-                amount: 2990, // R$ 29,90 em centavos
-                quantity: 1,
-                ...(analysisId ? { analysisId } : {}),
-            })
+const PACOTES: Pacote[] = [
+  { creditos: 30, preco: 6.0, label: "Inicial", destaque: false },
+  { creditos: 90, preco: 18.0, label: "Mais popular", destaque: true },
+  { creditos: 300, preco: 60.0, label: "Avançado", destaque: false },
+]
 
-            if (response.success && response.data?.sessionUrl) {
-                window.location.href = response.data.sessionUrl
-                return
-            }
+const formatBRL = (valor: number) =>
+  valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
 
-            // Sem sessionUrl (ex.: ambiente sem Stripe configurado): segue para o relatório.
-            router.push("/cliente/relatorio")
-        } catch (error) {
-            console.error("Erro no checkout:", error)
-            toast({
-                title: "Erro",
-                description: "Não foi possível iniciar o pagamento. Tente novamente.",
-                variant: "destructive",
-            })
-        } finally {
-            setIsProcessing(false)
-        }
+export default function CheckoutCreditosPage() {
+  const router = useRouter()
+  const { user } = useAuth()
+  const [balance, setBalance] = useState<number | null>(null)
+  const [processingCreditos, setProcessingCreditos] = useState<number | null>(null)
+
+  const fetchBalance = useCallback(async () => {
+    if (!user?.id) return
+    try {
+      const res = await get<ApiResponse<number>>(`/wallets/user/${user.id}/balance`)
+      if (res.success) setBalance(res.data)
+    } catch {
+      // saldo é apenas informativo nesta tela; ignora falha
     }
+  }, [user?.id])
 
-    return (
-        <div className="min-h-screen bg-gray-50 pb-12 font-sans flex flex-col items-center">
-            
-            <div className="w-full bg-white border-b border-gray-200 sticky top-0 z-10">
-                <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-                    <button 
-                        onClick={() => router.back()}
-                        className="flex items-center text-gray-600 hover:text-[#633B48] transition-colors font-medium"
-                    >
-                        <ArrowLeft className="w-5 h-5 mr-2" />
-                        Voltar
-                    </button>
-                    <div className="flex items-center gap-2 text-green-600 font-medium text-sm">
-                        <Lock className="w-4 h-4" />
-                        Ambiente Seguro
-                    </div>
-                </div>
-            </div>
+  useEffect(() => {
+    fetchBalance()
+  }, [fetchBalance])
 
-            <div className="w-full max-w-5xl px-6 mt-8">
-                <div className="text-center md:text-left mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Finalize seu pedido</h1>
-                    <p className="text-gray-600">Escolha a forma de pagamento para liberar sua análise completa.</p>
-                </div>
+  const handleComprar = async (pacote: Pacote) => {
+    setProcessingCreditos(pacote.creditos)
+    try {
+      const response = await post<ApiResponse<{ sessionUrl?: string }>>("/product-checkout/checkout", {
+        name: `${pacote.creditos} créditos JuryScan`,
+        amount: Math.round(pacote.preco * 100),
+        quantity: 1,
+      })
 
-                <div className="grid md:grid-cols-3 gap-8 items-start">
-                    
-                    <div className="md:col-span-2 space-y-6">
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
-                            <h2 className="text-xl font-bold text-gray-900 mb-6">Método de Pagamento</h2>
-                            
-                            <div className="grid grid-cols-2 gap-4 mb-8">
-                                <button 
-                                    onClick={() => setPaymentMethod("pix")}
-                                    className={`py-4 flex flex-col items-center justify-center rounded-xl border-2 transition-all ${paymentMethod === "pix" ? "border-[#633B48] bg-[#FFECF1]/50 text-[#633B48]" : "border-gray-200 text-gray-500 hover:bg-gray-50"}`}
-                                >
-                                    <QrCode className="w-6 h-6 mb-2" />
-                                    <span className="font-bold">PIX</span>
-                                </button>
-                                <button 
-                                    onClick={() => setPaymentMethod("card")}
-                                    className={`py-4 flex flex-col items-center justify-center rounded-xl border-2 transition-all ${paymentMethod === "card" ? "border-[#633B48] bg-[#FFECF1]/50 text-[#633B48]" : "border-gray-200 text-gray-500 hover:bg-gray-50"}`}
-                                >
-                                    <CreditCard className="w-6 h-6 mb-2" />
-                                    <span className="font-bold">Cartão de Crédito</span>
-                                </button>
-                            </div>
+      if (response.success && response.data?.sessionUrl) {
+        window.location.href = response.data.sessionUrl
+        return
+      }
 
-                            {paymentMethod === "pix" && (
-                                <div className="text-center py-6 animate-in fade-in duration-300">
-                                    <div className="bg-gray-50 p-6 rounded-xl inline-block mb-4 border border-gray-200">
-                                        <div className="w-48 h-48 bg-white border-8 border-white shadow-sm flex items-center justify-center">
-                                            <QrCode className="w-32 h-32 text-gray-800" />
-                                        </div>
-                                    </div>
-                                    <p className="text-gray-600 mb-4 text-sm">Escaneie o QR Code ou copie o código abaixo:</p>
-                                    <div className="flex bg-gray-100 rounded-lg p-1 max-w-sm mx-auto border border-gray-200">
-                                        <input type="text" readOnly value="00020126580014br.gov.bcb.pix..." className="bg-transparent flex-1 text-xs text-gray-500 px-3 outline-none" />
-                                        <button className="bg-white text-[#633B48] px-4 py-2 rounded-md text-sm font-bold shadow-sm hover:bg-gray-50 border border-gray-200">Copiar</button>
-                                    </div>
-                                </div>
-                            )}
+      toast({
+        title: "Pagamento indisponível",
+        description: "Não foi possível iniciar o pagamento. Tente novamente em instantes.",
+        variant: "destructive",
+      })
+    } catch (error) {
+      console.error("Erro no checkout:", error)
+      toast({
+        title: "Erro",
+        description: "Não foi possível iniciar o pagamento. Tente novamente.",
+        variant: "destructive",
+      })
+    } finally {
+      setProcessingCreditos(null)
+    }
+  }
 
-                            {paymentMethod === "card" && (
-                                <form className="space-y-4 animate-in fade-in duration-300" onSubmit={handlePayment}>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Número do Cartão</label>
-                                        <input type="text" placeholder="0000 0000 0000 0000" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#633B48] focus:border-transparent outline-none" />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Validade</label>
-                                            <input type="text" placeholder="MM/AA" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#633B48] focus:border-transparent outline-none" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">CVV</label>
-                                            <input type="text" placeholder="123" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#633B48] focus:border-transparent outline-none" />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Nome no Cartão</label>
-                                        <input type="text" placeholder="Como impresso no cartão" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#633B48] focus:border-transparent outline-none" />
-                                    </div>
-                                </form>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="md:col-span-1">
-                        <div className="bg-[#0A1F30] rounded-2xl shadow-lg border border-[#14324a] p-6 text-white sticky top-24">
-                            <h3 className="font-bold text-xl mb-6 border-b border-[#14324a] pb-4">Resumo do Pedido</h3>
-                            
-                            <div className="flex items-start justify-between gap-4 mb-6">
-                                <div className="flex items-start gap-3">
-                                    <div className="bg-[#14324a] p-2 rounded-lg">
-                                        <FileText className="w-5 h-5 text-[#FFB6E1]" />
-                                    </div>
-                                    <div>
-                                        <p className="font-bold">Desbloqueio de Relatório CNIS</p>
-                                        <p className="text-xs text-gray-400 mt-1">Acesso imediato às pendências ocultas</p>
-                                    </div>
-                                </div>
-                                <span className="font-bold">R$ 29,90</span>
-                            </div>
-
-                            <div className="border-t border-[#14324a] pt-4 mb-6">
-                                <div className="flex justify-between items-center text-lg font-bold">
-                                    <span>Total</span>
-                                    <span className="text-[#FFB6E1]">R$ 29,90</span>
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={() => handlePayment()}
-                                disabled={isProcessing}
-                                className="w-full py-4 bg-[#633B48] hover:bg-[#300117] text-white rounded-xl font-bold text-lg flex items-center justify-center transition-all disabled:opacity-70"
-                            >
-                                {isProcessing ? "Processando..." : paymentMethod === "pix" ? "Já fiz o pagamento" : "Pagar Agora"}
-                            </button>
-
-                            <div className="mt-6 space-y-3">
-                                <div className="flex items-center gap-2 text-xs text-gray-300">
-                                    <ShieldCheck className="w-4 h-4 text-green-400" /> Transação criptografada
-                                </div>
-                                <div className="flex items-center gap-2 text-xs text-gray-300">
-                                    <CheckCircle2 className="w-4 h-4 text-green-400" /> Acesso liberado na hora
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
+  return (
+    <div className="min-h-screen bg-gray-50 pb-12 font-sans">
+      <div className="w-full bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center text-gray-600 hover:text-[#633B48] transition-colors font-medium"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Voltar
+          </button>
+          <div className="flex items-center gap-2 text-green-600 font-medium text-sm">
+            <ShieldCheck className="w-4 h-4" />
+            Pagamento via gateway seguro
+          </div>
         </div>
-    )
+      </div>
+
+      <div className="max-w-5xl mx-auto px-6 mt-8">
+        <div className="text-center md:text-left mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Comprar créditos</h1>
+          <p className="text-gray-600">
+            Os créditos ficam na sua carteira e são usados nas análises do seu CNIS
+            (cada análise consome {CREDITOS_POR_ANALISE} créditos).
+          </p>
+        </div>
+
+        <div className="mb-8 inline-flex items-center gap-3 bg-[#0A1F30] text-white rounded-2xl px-6 py-4 shadow-sm">
+          <Wallet className="w-5 h-5 text-[#FFB6E1]" />
+          <span className="text-sm text-gray-300">Saldo atual:</span>
+          <span className="text-xl font-bold">
+            {balance !== null ? `${balance} créditos` : "--"}
+          </span>
+        </div>
+
+        <div className="grid sm:grid-cols-3 gap-6 items-stretch">
+          {PACOTES.map((pacote) => {
+            const analises = Math.floor(pacote.creditos / CREDITOS_POR_ANALISE)
+            const isProcessing = processingCreditos === pacote.creditos
+            const anyProcessing = processingCreditos !== null
+            return (
+              <div
+                key={pacote.creditos}
+                className={`relative rounded-2xl border-2 p-8 flex flex-col items-center text-center bg-white transition-colors ${
+                  pacote.destaque ? "border-[#633B48] shadow-md" : "border-gray-100 hover:border-gray-200"
+                }`}
+              >
+                {pacote.destaque && (
+                  <span className="absolute -top-3 bg-[#633B48] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                    {pacote.label}
+                  </span>
+                )}
+                {!pacote.destaque && (
+                  <span className="text-xs font-bold uppercase tracking-wider mb-1 text-gray-400">
+                    {pacote.label}
+                  </span>
+                )}
+
+                <div className="flex items-center gap-2 mt-3 mb-1">
+                  <Coins className="w-6 h-6 text-[#633B48]" />
+                  <span className="text-4xl font-bold text-[#0A1F30]">{pacote.creditos}</span>
+                </div>
+                <span className="text-sm text-gray-500 mb-1">créditos</span>
+                <span className="text-xs text-gray-400 mb-4">
+                  equivale a {analises} {analises === 1 ? "análise" : "análises"}
+                </span>
+
+                <div className="text-2xl font-bold text-[#0A1F30] mb-6">{formatBRL(pacote.preco)}</div>
+
+                <button
+                  onClick={() => handleComprar(pacote)}
+                  disabled={anyProcessing}
+                  className={`mt-auto w-full h-11 rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 ${
+                    pacote.destaque
+                      ? "bg-[#633B48] text-white hover:bg-[#300117]"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4" /> Comprar</>}
+                </button>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className="mt-8 flex items-center justify-center gap-2 text-xs text-gray-400">
+          <ShieldCheck className="w-4 h-4 text-green-500" />
+          Você será redirecionado ao gateway para concluir o pagamento com segurança.
+        </div>
+      </div>
+    </div>
+  )
 }
