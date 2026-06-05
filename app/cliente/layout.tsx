@@ -4,7 +4,7 @@ import { type JSX, type ReactNode } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
-import { LayoutDashboard, FileText, Settings, LogOut } from "lucide-react"
+import { LayoutDashboard, FileText, Inbox, Settings, LogOut } from "lucide-react"
 
 interface ClienteLayoutProps {
   children: ReactNode
@@ -12,6 +12,7 @@ interface ClienteLayoutProps {
 
 const navItems = [
   { href: "/cliente/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/cliente/meus-pedidos", label: "Meus Pedidos", icon: Inbox },
   { href: "/cliente/relatorio", label: "Relatórios", icon: FileText },
 ]
 
