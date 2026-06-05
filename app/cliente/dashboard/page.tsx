@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, type JSX, type ChangeEvent } from "react"
+import { useState, useEffect, useCallback, type JSX, type ChangeEvent } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
@@ -11,11 +11,11 @@ import {
   AlertCircle,
   Clock,
   Lock,
-  Unlock,
+  Coins,
 } from "lucide-react"
 
 import { useAuth } from "@/contexts/AuthContext"
-import { post } from "@/lib/api"
+import { get, post } from "@/lib/api"
 import type { ApiResponse } from "@/lib/types"
 import { toast } from "@/hooks/use-toast"
 
@@ -30,12 +30,27 @@ interface ClientAnalysis {
 export default function ClienteDashboardPage(): JSX.Element {
   const { user } = useAuth()
   const router = useRouter()
+  const [balance, setBalance] = useState<number | null>(null)
   const [file, setFile] = useState<File | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [progress, setProgress] = useState(0)
   const [stepLabel, setStepLabel] = useState("")
   const [error, setError] = useState<"PASSWORD_PROTECTED" | "ILLEGIBLE" | "GENERIC" | null>(null)
   const [analysis, setAnalysis] = useState<ClientAnalysis | null>(null)
+
+  const fetchBalance = useCallback(async () => {
+    if (!user?.id) return
+    try {
+      const res = await get<ApiResponse<number>>(`/wallets/user/${user.id}/balance`)
+      if (res.success) setBalance(res.data)
+    } catch {
+      // saldo é informativo nesta tela; ignora falha
+    }
+  }, [user?.id])
+
+  useEffect(() => {
+    fetchBalance()
+  }, [fetchBalance])
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
@@ -98,10 +113,10 @@ export default function ClienteDashboardPage(): JSX.Element {
     setFile(null)
   }
 
-  const handleUnlock = () => {
-    // Vai para a página de pagamentos (antiga aba "Pagamentos"), levando a análise a desbloquear.
+  const handleVerRelatorio = () => {
+    // A análise já consome créditos no upload; o relatório completo é só a visão detalhada (sem cobrança extra).
     const query = analysis?.id ? `?analysisId=${analysis.id}` : ""
-    router.push(`/cliente/checkout${query}`)
+    router.push(`/cliente/relatorio${query}`)
   }
 
   const totalFalhas = analysis?.falhas.length ?? 0
@@ -111,9 +126,24 @@ export default function ClienteDashboardPage(): JSX.Element {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <div className="bg-[#162D3F] text-white">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <h1 className="text-3xl font-bold mb-2">Análise CNIS</h1>
-          <p className="text-gray-400">Envie o seu extrato previdenciário e nossa Inteligência Artificial vai traduzir tudo de forma simples e clara, identificando pendências e próximos passos.</p>
+        <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Análise CNIS</h1>
+            <p className="text-gray-400 max-w-2xl">Envie o seu extrato previdenciário e nossa Inteligência Artificial vai traduzir tudo de forma simples e clara, identificando pendências e próximos passos.</p>
+          </div>
+          <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-3 shrink-0">
+            <Coins className="w-5 h-5 text-[#FFB6E1]" />
+            <div className="leading-tight">
+              <p className="text-xs text-gray-400">Seus créditos</p>
+              <p className="text-lg font-bold">{balance !== null ? balance : "--"}</p>
+            </div>
+            <Link
+              href="/cliente/checkout"
+              className="ml-2 text-xs font-bold text-[#0A1F30] bg-[#FFB6E1] hover:bg-[#ff9ed4] px-3 py-2 rounded-lg transition-colors"
+            >
+              Comprar
+            </Link>
+          </div>
         </div>
       </div>
       <div className="p-6 md:p-12 font-sans flex flex-col items-center flex-grow">
@@ -304,11 +334,11 @@ export default function ClienteDashboardPage(): JSX.Element {
 
               <div className="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
                 <button
-                  onClick={handleUnlock}
+                  onClick={handleVerRelatorio}
                   className="w-full py-5 rounded-xl bg-white hover:bg-gray-100 text-[#633B48] font-bold text-lg flex items-center justify-center transition-transform hover:scale-[1.02] shadow-md"
                 >
-                  <Unlock className="w-5 h-5 mr-2" />
-                  Desbloquear Relatório (R$ 29,90)
+                  <FileText className="w-5 h-5 mr-2" />
+                  Ver Relatório Completo
                 </button>
 
                 <Link
