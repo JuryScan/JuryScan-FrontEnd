@@ -27,14 +27,9 @@ import {
   BarChart,
   Bar,
 } from "recharts"
-import {
-  MOCK_DASHBOARD_STATS,
-  MOCK_INTELLIGENCE_STATS,
-  MOCK_RECENT_ANALYSES,
-} from "@/lib/mocks"
 import { useAuth } from "@/contexts/AuthContext"
 import { get } from "@/lib/api"
-import type { ApiResponse, AuditRecord } from "@/lib/types"
+import type { ApiResponse, AuditRecord, DashboardMetrics } from "@/lib/types"
 
 export default function AdvogadoDashboardPage(): JSX.Element {
   const { user } = useAuth()
@@ -42,18 +37,26 @@ export default function AdvogadoDashboardPage(): JSX.Element {
   const [viewMode, setViewMode] = useState<"general" | "intelligence">("general")
   const [recentAnalyses, setRecentAnalyses] = useState<AuditRecord[]>([])
   const [isLoadingAnalyses, setIsLoadingAnalyses] = useState(true)
+  const [isLoadingMetrics, setIsLoadingMetrics] = useState(true)
   const [balance, setBalance] = useState<number | null>(null)
+  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
 
   const fetchData = useCallback(async () => {
     if (!user?.id) return
 
+    setIsLoadingMetrics(true)
     setIsLoadingAnalyses(true)
     try {
-      const [analysesRes, balanceRes] = await Promise.all([
+      const [analysesRes, balanceRes, metricsRes] = await Promise.all([
         get<ApiResponse<any>>(`/analysis/user/${user.id}?page=0&page_size=5`),
-        get<ApiResponse<number>>(`/wallets/user/${user.id}/balance`)
+        get<ApiResponse<number>>(`/wallets/user/${user.id}/balance`),
+        get<ApiResponse<DashboardMetrics>>(`/dashboard/metrics/me`),
       ])
-      
+
+      if (metricsRes.success) {
+        setMetrics(metricsRes.data)
+      }
+
       if (analysesRes.success && analysesRes.data?.items?.length) {
         const mappedAnalyses: AuditRecord[] = analysesRes.data.items.map((item: any) => ({
           id: item.id,
@@ -71,6 +74,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
     } catch (error) {
       console.error("Erro ao buscar dados do dashboard:", error)
     } finally {
+      setIsLoadingMetrics(false)
       setIsLoadingAnalyses(false)
     }
   }, [user?.id])
@@ -79,9 +83,19 @@ export default function AdvogadoDashboardPage(): JSX.Element {
     fetchData()
   }, [fetchData])
 
-  const filteredAnalyses = recentAnalyses.filter(analysis => 
+  const filteredAnalyses = recentAnalyses.filter(analysis =>
     analysis.client.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  // Série mensal dos gráficos: mescla análises e erros por mês (mesmos 6 meses do backend).
+  const chartData = (metrics?.analisesPorMes ?? []).map((m, i) => ({
+    month: m.label,
+    analyses: m.count,
+    errors: metrics?.errosPorMes?.[i]?.count ?? 0,
+  }))
+
+  const taxaConversao =
+    metrics?.taxaConversao != null ? `${Math.round(metrics.taxaConversao * 100)}%` : "--"
 
   return (
     <div className="flex flex-col font-sans">
@@ -141,13 +155,20 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
                   <Users className="w-6 h-6" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-sm text-gray-500 font-medium mb-1">
                     Leads Adquiridos
                   </p>
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    {MOCK_DASHBOARD_STATS.activeClients}
-                  </h3>
+                  {isLoadingMetrics ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
+                      <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                    </div>
+                  ) : (
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      {metrics ? metrics.leadsAdquiridos : "--"}
+                    </h3>
+                  )}
                 </div>
               </div>
 
@@ -155,13 +176,20 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 <div className="w-12 h-12 bg-[#FFECF1] text-[#A50064] rounded-xl flex items-center justify-center">
                   <MessageSquare className="w-6 h-6" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-sm text-gray-500 font-medium mb-1">
                     Leads Disponíveis
                   </p>
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    {MOCK_DASHBOARD_STATS.newLeads}
-                  </h3>
+                  {isLoadingMetrics ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
+                      <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                    </div>
+                  ) : (
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      {metrics ? metrics.leadsDisponiveis : "--"}
+                    </h3>
+                  )}
                 </div>
               </div>
 
@@ -169,13 +197,20 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center">
                   <FileText className="w-6 h-6" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-sm text-gray-500 font-medium mb-1">
                     Análises no Mês
                   </p>
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    {MOCK_DASHBOARD_STATS.analysesThisMonth}
-                  </h3>
+                  {isLoadingMetrics ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
+                      <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                    </div>
+                  ) : (
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      {metrics ? metrics.analisesNoMes : "--"}
+                    </h3>
+                  )}
                 </div>
               </div>
 
@@ -184,13 +219,20 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
                   <Coins className="w-6 h-6" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-sm text-gray-500 font-medium mb-1">
                     Saldo de Tokens
                   </p>
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    {balance !== null ? balance : "--"}
-                  </h3>
+                  {isLoadingMetrics ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
+                      <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                    </div>
+                  ) : (
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      {balance !== null ? balance : "--"}
+                    </h3>
+                  )}
                 </div>
                 <ArrowRight className="w-4 h-4 ml-auto text-gray-300 group-hover:text-[#A50064] transition-colors" />
               </div>
@@ -200,7 +242,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
               <div className="p-6 border-b border-gray-100 flex items-center justify-between gap-4">
                 <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
                   <FileText className="w-5 h-5 text-[#633B48]" />
-                  Análises Recentes
+                  Análises Recentes (5)
                 </h2>
                 <div className="flex items-center gap-4 w-full justify-end">
                   <div className="relative hidden md:block w-full max-w-xs">
@@ -278,7 +320,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                   <h4 className="font-bold text-gray-900">Total de Erros</h4>
                 </div>
                 <p className="text-3xl font-bold text-gray-900">
-                  {MOCK_INTELLIGENCE_STATS.totalErrors}
+                  {metrics ? metrics.totalErros : "--"}
                 </p>
                 <p className="text-sm text-red-600 font-medium mt-1">
                   Pendências detectadas no total
@@ -288,18 +330,15 @@ export default function AdvogadoDashboardPage(): JSX.Element {
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
-                    <Coins className="w-5 h-5" />
+                    <TrendingUp className="w-5 h-5" />
                   </div>
-                  <h4 className="font-bold text-gray-900">Valor Recuperável</h4>
+                  <h4 className="font-bold text-gray-900">Taxa de Conversão</h4>
                 </div>
                 <p className="text-3xl font-bold text-gray-900">
-                  {new Intl.NumberFormat("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  }).format(MOCK_INTELLIGENCE_STATS.totalRecoverableValue)}
+                  {taxaConversao}
                 </p>
                 <p className="text-sm text-green-600 font-medium mt-1">
-                  Estimativa total aproximada
+                  Clientes atendidos por lead adquirido
                 </p>
               </div>
             </div>
@@ -312,7 +351,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 </h3>
                 <div className="h-80 w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={MOCK_INTELLIGENCE_STATS.monthlyData}>
+                    <BarChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} />
                       <XAxis dataKey="month" axisLine={false} tickLine={false} />
                       <YAxis axisLine={false} tickLine={false} />
@@ -332,7 +371,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 </h3>
                 <div className="h-80 w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={MOCK_INTELLIGENCE_STATS.monthlyData}>
+                    <LineChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} />
                       <XAxis dataKey="month" axisLine={false} tickLine={false} />
                       <YAxis axisLine={false} tickLine={false} />

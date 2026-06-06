@@ -4,7 +4,7 @@ import { type JSX, type ReactNode } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
-import { LayoutDashboard, FileText, Settings, LogOut, ChevronDown, Users } from "lucide-react"
+import { LayoutDashboard, FileText, Settings, LogOut, ChevronDown, Users, Inbox } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -22,6 +22,7 @@ const navItems = [
   { href: "/cliente/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/cliente/relatorio", label: "Relatórios", icon: FileText },
   { href: "/cliente/advogados", label: "Advogados", icon: Users },
+  { href: "/cliente/meus-pedidos", label: "Meus Pedidos", icon: Inbox },
 ]
 
 export default function ClienteLayout({ children }: ClienteLayoutProps): JSX.Element {
@@ -60,7 +61,7 @@ export default function ClienteLayout({ children }: ClienteLayoutProps): JSX.Ele
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header interno do cliente */}
-      <nav className="bg-[#0A1F30] text-white border-b border-gray-800">
+      <nav className="sticky top-0 z-50 bg-[#0A1F30] text-white border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
