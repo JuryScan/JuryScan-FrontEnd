@@ -37,12 +37,14 @@ export default function AdvogadoDashboardPage(): JSX.Element {
   const [viewMode, setViewMode] = useState<"general" | "intelligence">("general")
   const [recentAnalyses, setRecentAnalyses] = useState<AuditRecord[]>([])
   const [isLoadingAnalyses, setIsLoadingAnalyses] = useState(true)
+  const [isLoadingMetrics, setIsLoadingMetrics] = useState(true)
   const [balance, setBalance] = useState<number | null>(null)
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
 
   const fetchData = useCallback(async () => {
     if (!user?.id) return
 
+    setIsLoadingMetrics(true)
     setIsLoadingAnalyses(true)
     try {
       const [analysesRes, balanceRes, metricsRes] = await Promise.all([
@@ -72,6 +74,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
     } catch (error) {
       console.error("Erro ao buscar dados do dashboard:", error)
     } finally {
+      setIsLoadingMetrics(false)
       setIsLoadingAnalyses(false)
     }
   }, [user?.id])
@@ -152,13 +155,20 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
                   <Users className="w-6 h-6" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-sm text-gray-500 font-medium mb-1">
                     Leads Adquiridos
                   </p>
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    {metrics ? metrics.leadsAdquiridos : "--"}
-                  </h3>
+                  {isLoadingMetrics ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
+                      <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                    </div>
+                  ) : (
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      {metrics ? metrics.leadsAdquiridos : "--"}
+                    </h3>
+                  )}
                 </div>
               </div>
 
@@ -166,13 +176,20 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 <div className="w-12 h-12 bg-[#FFECF1] text-[#A50064] rounded-xl flex items-center justify-center">
                   <MessageSquare className="w-6 h-6" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-sm text-gray-500 font-medium mb-1">
                     Leads Disponíveis
                   </p>
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    {metrics ? metrics.leadsDisponiveis : "--"}
-                  </h3>
+                  {isLoadingMetrics ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
+                      <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                    </div>
+                  ) : (
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      {metrics ? metrics.leadsDisponiveis : "--"}
+                    </h3>
+                  )}
                 </div>
               </div>
 
@@ -180,13 +197,20 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center">
                   <FileText className="w-6 h-6" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-sm text-gray-500 font-medium mb-1">
                     Análises no Mês
                   </p>
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    {metrics ? metrics.analisesNoMes : "--"}
-                  </h3>
+                  {isLoadingMetrics ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
+                      <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                    </div>
+                  ) : (
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      {metrics ? metrics.analisesNoMes : "--"}
+                    </h3>
+                  )}
                 </div>
               </div>
 
@@ -195,13 +219,20 @@ export default function AdvogadoDashboardPage(): JSX.Element {
                 <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
                   <Coins className="w-6 h-6" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-sm text-gray-500 font-medium mb-1">
                     Saldo de Tokens
                   </p>
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    {balance !== null ? balance : "--"}
-                  </h3>
+                  {isLoadingMetrics ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
+                      <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                    </div>
+                  ) : (
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      {balance !== null ? balance : "--"}
+                    </h3>
+                  )}
                 </div>
                 <ArrowRight className="w-4 h-4 ml-auto text-gray-300 group-hover:text-[#A50064] transition-colors" />
               </div>
@@ -211,7 +242,7 @@ export default function AdvogadoDashboardPage(): JSX.Element {
               <div className="p-6 border-b border-gray-100 flex items-center justify-between gap-4">
                 <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 whitespace-nowrap">
                   <FileText className="w-5 h-5 text-[#633B48]" />
-                  Análises Recentes
+                  Análises Recentes (5)
                 </h2>
                 <div className="flex items-center gap-4 w-full justify-end">
                   <div className="relative hidden md:block w-full max-w-xs">

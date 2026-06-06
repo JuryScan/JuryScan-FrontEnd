@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog"
-import { AlertTriangle, UserPlus, CheckCircle2, FileText, Loader2, Coins, Briefcase, User } from "lucide-react"
+import { AlertTriangle, UserPlus, CheckCircle2, FileText, Loader2, Coins, Briefcase, User, RefreshCw } from "lucide-react"
 import { get, post } from "@/lib/api"
 import type { ApiResponse, PageResponse } from "@/lib/types"
 import { toast } from "@/hooks/use-toast"
@@ -152,68 +152,80 @@ export default function MarketplaceLeadsPage() {
   }
 
   return (
-    <div className="space-y-6 p-6 max-w-7xl mx-auto">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Marketplace de Leads</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          Capture potenciais clientes da sua região com pré-análises automatizadas de CNIS realizadas pelo JuryScan.
-        </p>
-      </div>
-
-      <Tabs defaultValue="disponiveis" className="w-full">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-3">
-          <TabsList>
-            <TabsTrigger value="disponiveis">Disponíveis</TabsTrigger>
-            <TabsTrigger value="meus">Meus Leads</TabsTrigger>
-          </TabsList>
-
-          <Badge variant="outline" className="w-fit px-3 py-1 bg-white dark:bg-slate-950">
-            {available.length} Disponíveis
-          </Badge>
+    <div className="flex flex-col">
+      <div className="max-w-7xl mx-auto px-6 py-8 w-full">
+        <div className="flex flex-col gap-1 mb-8">
+          <h1 className="text-3xl font-bold text-[#0A1F30]">Marketplace de Leads</h1>
+          <p className="text-gray-500">
+            Capture potenciais clientes da sua região com pré-análises automatizadas de CNIS realizadas pelo JuryScan.
+          </p>
         </div>
 
-        {isLoading ? (
-          <div className="py-20 flex flex-col items-center justify-center text-slate-400">
-            <Loader2 className="h-10 w-10 animate-spin mb-4" />
-            <p>Carregando leads...</p>
+        <Tabs defaultValue="disponiveis" className="w-full">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-3">
+            <TabsList>
+              <TabsTrigger value="disponiveis">Disponíveis</TabsTrigger>
+              <TabsTrigger value="meus">Meus Leads</TabsTrigger>
+            </TabsList>
+
+            <div className="flex items-center gap-3">
+              <Badge variant="outline" className="w-fit px-3 py-1 bg-white">
+                {available.length} Disponíveis
+              </Badge>
+
+              <button
+                onClick={fetchLeads}
+                disabled={isLoading}
+                className="hidden md:flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
+                Atualizar
+              </button>
+            </div>
           </div>
-        ) : (
-          <>
-            <TabsContent value="disponiveis" className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 outline-none">
-              {available.length === 0 ? (
-                <div className="col-span-full py-16 text-center text-slate-400">
-                  <UserPlus className="h-10 w-10 mx-auto mb-3 opacity-30" />
-                  <p>Nenhum lead disponível na sua região no momento.</p>
-                </div>
-              ) : (
-                available.map((lead) => (
-                  <Card key={lead.id} className="flex flex-col justify-between border-slate-200 dark:border-slate-800">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="space-y-1">
-                          <CardTitle className="text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100">
-                            {lead.nomeCliente || "Cliente"}
-                          </CardTitle>
-                          <CardDescription className="flex items-center gap-1 text-xs">
-                            <FileText className="h-3.5 w-3.5 text-slate-400" />
-                            {lead.tituloAnalise || "Análise de CNIS"}
-                          </CardDescription>
+
+          {isLoading ? (
+            <div className="py-20 flex flex-col items-center justify-center text-gray-400">
+              <Loader2 className="h-10 w-10 animate-spin mb-4" />
+              <p>Carregando leads...</p>
+            </div>
+          ) : (
+            <>
+              <TabsContent value="disponiveis" className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 outline-none">
+                {available.length === 0 ? (
+                  <div className="col-span-full py-16 text-center text-gray-400">
+                    <UserPlus className="h-10 w-10 mx-auto mb-3 opacity-30" />
+                    <p>Nenhum lead disponível no momento.</p>
+                  </div>
+                ) : (
+                  available.map((lead) => (
+                    <Card key={lead.id} className="flex flex-col justify-between border-gray-200">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="space-y-1">
+                            <CardTitle className="text-xl font-bold tracking-tight text-gray-900">
+                              {lead.nomeCliente || "Cliente"}
+                            </CardTitle>
+                            <CardDescription className="flex items-center gap-1 text-xs">
+                              <FileText className="h-3.5 w-3.5 text-gray-400" />
+                              {lead.tituloAnalise || "Análise de CNIS"}
+                            </CardDescription>
                         </div>
                         <Badge variant="default" className="text-xs font-medium whitespace-nowrap">Lead Disponível</Badge>
                       </div>
                     </CardHeader>
 
-                    <CardContent className="flex-grow">
-                      <div className="rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 p-3.5 flex items-center gap-2 text-sm text-amber-900 dark:text-amber-300">
-                        <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500 flex-shrink-0" />
-                        Pré-análise de CNIS gerada pelo JuryScan disponível.
-                      </div>
-                    </CardContent>
+                      <CardContent className="flex-grow">
+                        <div className="rounded-xl bg-amber-50 border border-amber-200 p-3.5 flex items-center gap-2 text-sm text-amber-900">
+                          <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                          Pré-análise de CNIS gerada pelo JuryScan disponível.
+                        </div>
+                      </CardContent>
 
-                    <CardFooter className="border-t pt-4 bg-slate-50/50 dark:bg-slate-900/10 flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
-                      <span className="flex items-center gap-1">
-                        <Coins className="h-3.5 w-3.5" /> {lead.custoCreditos ?? 1} crédito(s)
-                      </span>
+                      <CardFooter className="border-t pt-4 bg-gray-50/50 flex items-center justify-between text-xs text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <Coins className="h-3.5 w-3.5" /> {lead.custoCreditos ?? 1} crédito(s)
+                        </span>
                       <Button
                         size="sm"
                         onClick={() => handleAcquire(lead.id)}
@@ -235,21 +247,21 @@ export default function MarketplaceLeadsPage() {
 
             <TabsContent value="meus" className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 outline-none">
               {acquired.length === 0 ? (
-                <div className="col-span-full py-16 text-center text-slate-400">
+                <div className="col-span-full py-16 text-center text-gray-400">
                   <User className="h-10 w-10 mx-auto mb-3 opacity-30" />
                   <p>Você ainda não capturou nenhum lead.</p>
                 </div>
               ) : (
                 acquired.map((lead) => (
-                  <Card key={lead.id} className="flex flex-col justify-between border-blue-200 bg-blue-50/20 dark:border-blue-900/40 dark:bg-blue-950/5">
+                  <Card key={lead.id} className="flex flex-col justify-between border-blue-200 bg-blue-50/20">
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between gap-4">
                         <div className="space-y-1">
-                          <CardTitle className="text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100">
+                          <CardTitle className="text-xl font-bold tracking-tight text-gray-900">
                             {lead.nomeCliente || "Cliente"}
                           </CardTitle>
                           <CardDescription className="flex items-center gap-1 text-xs">
-                            <FileText className="h-3.5 w-3.5 text-slate-400" />
+                            <FileText className="h-3.5 w-3.5 text-gray-400" />
                             {lead.tituloAnalise || "Análise de CNIS"}
                           </CardDescription>
                         </div>
@@ -259,11 +271,11 @@ export default function MarketplaceLeadsPage() {
                       </div>
                     </CardHeader>
 
-                    <CardContent className="flex-grow text-sm text-slate-600 dark:text-slate-300">
+                    <CardContent className="flex-grow text-sm text-gray-600">
                       Capturado em {formatDate(lead.dataCriacao) || "—"}.
                     </CardContent>
 
-                    <CardFooter className="border-t pt-4 bg-slate-50/50 dark:bg-slate-900/10 flex items-center justify-end">
+                    <CardFooter className="border-t pt-4 bg-gray-50/50 flex items-center justify-end">
                       <LeadHistoryDialog lead={lead} />
                     </CardFooter>
                   </Card>
@@ -272,7 +284,8 @@ export default function MarketplaceLeadsPage() {
             </TabsContent>
           </>
         )}
-      </Tabs>
+        </Tabs>
+      </div>
     </div>
   )
 }

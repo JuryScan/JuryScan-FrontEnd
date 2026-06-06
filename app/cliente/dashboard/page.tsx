@@ -12,6 +12,9 @@ import {
   Clock,
   Lock,
   Coins,
+  Loader2,
+  Briefcase,
+  CheckCircle2,
 } from "lucide-react"
 
 import { useAuth } from "@/contexts/AuthContext"
@@ -31,20 +34,29 @@ export default function ClienteDashboardPage(): JSX.Element {
   const { user } = useAuth()
   const router = useRouter()
   const [balance, setBalance] = useState<number | null>(null)
+  const [isLoadingBalance, setIsLoadingBalance] = useState(true)
   const [file, setFile] = useState<File | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [progress, setProgress] = useState(0)
   const [stepLabel, setStepLabel] = useState("")
   const [error, setError] = useState<"PASSWORD_PROTECTED" | "ILLEGIBLE" | "GENERIC" | null>(null)
   const [analysis, setAnalysis] = useState<ClientAnalysis | null>(null)
+  const [isCreatingLead, setIsCreatingLead] = useState(false)
+  const [leadCreatedId, setLeadCreatedId] = useState<string | null>(null)
 
   const fetchBalance = useCallback(async () => {
-    if (!user?.id) return
+    if (!user?.id) {
+      setIsLoadingBalance(false)
+      return
+    }
+    setIsLoadingBalance(true)
     try {
       const res = await get<ApiResponse<number>>(`/wallets/user/${user.id}/balance`)
       if (res.success) setBalance(res.data)
     } catch {
       // saldo é informativo nesta tela; ignora falha
+    } finally {
+      setIsLoadingBalance(false)
     }
   }, [user?.id])
 
@@ -119,6 +131,42 @@ export default function ClienteDashboardPage(): JSX.Element {
     router.push(`/cliente/relatorio${query}`)
   }
 
+  const handleRequestAdvogado = async () => {
+    if (!analysis?.id) {
+      toast({
+        title: "Erro",
+        description: "Análise não disponível.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsCreatingLead(true)
+    try {
+      const res = await post<ApiResponse<any>>(`/leads/request`, {
+        analysisId: analysis.id,
+      })
+      if (res?.success) {
+        setLeadCreatedId(res.data?.id || "created")
+        toast({
+          title: "Sucesso!",
+          description: "Solicitação enviada. Advogados podem visualizar seu lead no marketplace.",
+        })
+        setTimeout(() => {
+          router.push("/cliente/meus-pedidos")
+        }, 2000)
+      }
+    } catch (e: any) {
+      toast({
+        title: "Erro",
+        description: e?.message || "Não foi possível solicitar um advogado. Tente novamente.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsCreatingLead(false)
+    }
+  }
+
   const totalFalhas = analysis?.falhas.length ?? 0
   const primeiraFalha = analysis?.falhas[0]
   const ocultas = Math.max(totalFalhas - 1, 0)
@@ -135,7 +183,14 @@ export default function ClienteDashboardPage(): JSX.Element {
             <Coins className="w-5 h-5 text-[#FFB6E1]" />
             <div className="leading-tight">
               <p className="text-xs text-gray-400">Seus créditos</p>
-              <p className="text-lg font-bold">{balance !== null ? balance : "--"}</p>
+              {isLoadingBalance ? (
+                <div className="flex items-center gap-2 mt-1">
+                  <div className="h-6 bg-white/10 rounded animate-pulse w-20"></div>
+                  <Loader2 className="w-3 h-3 animate-spin text-[#FFB6E1]" />
+                </div>
+              ) : (
+                <p className="text-lg font-bold">{balance !== null ? balance : "--"}</p>
+              )}
             </div>
             <Link
               href="/cliente/checkout"
@@ -320,38 +375,84 @@ export default function ClienteDashboardPage(): JSX.Element {
 
         {analysis && (
           <div className="w-full animate-in fade-in slide-in-from-bottom-8 duration-700 mt-8">
-            <div className="bg-[#633B48] rounded-2xl p-8 md:p-10 text-white shadow-xl border border-[#300117]">
-              <div className="text-center max-w-2xl mx-auto mb-8">
-                <h4 className="font-bold text-2xl md:text-3xl mb-3">
-                  Não perca dinheiro do INSS
-                </h4>
-                <p className="text-[#FFECF1] text-base md:text-lg">
-                  Problemas ocultos podem reduzir o valor da sua aposentadoria ou
-                  atrasar a liberação. Escolha como quer resolver as pendências
-                  encontradas:
+            {leadCreatedId ? (
+              <div className="bg-green-50 border border-green-200 rounded-2xl p-8 md:p-10 text-green-800 shadow-md">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <CheckCircle2 className="w-8 h-8 text-green-600" />
+                  <h4 className="font-bold text-2xl">Lead criado com sucesso!</h4>
+                </div>
+                <p className="text-center text-green-700 mb-6">
+                  Sua solicitação foi enviada para o marketplace. Advogados podem visualizar e capturar seu lead.
                 </p>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto">
-                <button
-                  onClick={handleVerRelatorio}
-                  className="w-full py-5 rounded-xl bg-white hover:bg-gray-100 text-[#633B48] font-bold text-lg flex items-center justify-center transition-transform hover:scale-[1.02] shadow-md"
-                >
-                  <FileText className="w-5 h-5 mr-2" />
-                  Ver Relatório Completo
-                </button>
-
-                <Link
-                  href={`/cliente/advogados${analysis?.id ? `?analysisId=${analysis.id}` : ""}`}
-                  className="w-full"
-                >
-                  <button className="w-full py-5 rounded-xl bg-[#300117] hover:bg-[#1a000c] text-white border border-[#FFECF1]/20 font-bold text-lg flex items-center justify-center transition-transform hover:scale-[1.02] shadow-md">
-                    Contratar Advogado Parceiro{" "}
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <button
+                    onClick={() => router.push("/cliente/meus-pedidos")}
+                    className="px-6 py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Briefcase className="w-5 h-5" />
+                    Ver Meus Leads
                   </button>
-                </Link>
+                  <button
+                    onClick={() => {
+                      setAnalysis(null)
+                      setFile(null)
+                      setLeadCreatedId(null)
+                    }}
+                    className="px-6 py-3 rounded-xl bg-white hover:bg-gray-100 text-green-600 font-bold border border-green-200 transition-colors"
+                  >
+                    Analisar Novo CNIS
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="bg-[#633B48] rounded-2xl p-8 md:p-10 text-white shadow-xl border border-[#300117]">
+                <div className="text-center max-w-2xl mx-auto mb-8">
+                  <h4 className="font-bold text-2xl md:text-3xl mb-3">
+                    Não perca dinheiro do INSS
+                  </h4>
+                  <p className="text-[#FFECF1] text-base md:text-lg">
+                    Problemas ocultos podem reduzir o valor da sua aposentadoria ou
+                    atrasar a liberação. Escolha como quer resolver as pendências
+                    encontradas:
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                  <button
+                    onClick={handleVerRelatorio}
+                    className="w-full py-5 rounded-xl bg-white hover:bg-gray-100 text-[#633B48] font-bold text-lg flex flex-col items-center justify-center transition-transform hover:scale-[1.02] shadow-md gap-2"
+                  >
+                    <FileText className="w-5 h-5" />
+                    <span className="text-sm md:text-base">Ver Relatório Completo</span>
+                  </button>
+
+                  <button
+                    onClick={handleRequestAdvogado}
+                    disabled={isCreatingLead}
+                    className="w-full py-5 rounded-xl bg-[#FFB6E1] hover:bg-[#ff9ed4] text-[#0A1F30] font-bold text-lg flex flex-col items-center justify-center transition-transform hover:scale-[1.02] shadow-md gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {isCreatingLead ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <Briefcase className="w-5 h-5" />
+                    )}
+                    <span className="text-sm md:text-base">
+                      {isCreatingLead ? "Enviando..." : "Solicitar Advogado"}
+                    </span>
+                  </button>
+
+                  <Link
+                    href={`/cliente/advogados${analysis?.id ? `?analysisId=${analysis.id}` : ""}`}
+                    className="w-full"
+                  >
+                    <button className="w-full py-5 rounded-xl bg-[#300117] hover:bg-[#1a000c] text-white border border-[#FFECF1]/20 font-bold text-lg flex flex-col items-center justify-center transition-transform hover:scale-[1.02] shadow-md gap-2">
+                      <ArrowRight className="w-5 h-5" />
+                      <span className="text-sm md:text-base">Parceiros Diretos</span>
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         )}
         </div>

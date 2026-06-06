@@ -33,14 +33,21 @@ export default function CheckoutCreditosPage() {
   const { user } = useAuth()
   const [balance, setBalance] = useState<number | null>(null)
   const [processingCreditos, setProcessingCreditos] = useState<number | null>(null)
+  const [isLoadingBalance, setIsLoadingBalance] = useState(true)
 
   const fetchBalance = useCallback(async () => {
-    if (!user?.id) return
+    if (!user?.id) {
+      setIsLoadingBalance(false)
+      return
+    }
+    setIsLoadingBalance(true)
     try {
       const res = await get<ApiResponse<number>>(`/wallets/user/${user.id}/balance`)
       if (res.success) setBalance(res.data)
     } catch {
       // saldo é apenas informativo nesta tela; ignora falha
+    } finally {
+      setIsLoadingBalance(false)
     }
   }, [user?.id])
 
@@ -109,9 +116,16 @@ export default function CheckoutCreditosPage() {
         <div className="mb-8 inline-flex items-center gap-3 bg-[#0A1F30] text-white rounded-2xl px-6 py-4 shadow-sm">
           <Wallet className="w-5 h-5 text-[#FFB6E1]" />
           <span className="text-sm text-gray-300">Saldo atual:</span>
-          <span className="text-xl font-bold">
-            {balance !== null ? `${balance} créditos` : "--"}
-          </span>
+          {isLoadingBalance ? (
+            <div className="flex items-center gap-2">
+              <div className="h-6 bg-white/10 rounded animate-pulse w-32"></div>
+              <Loader2 className="w-4 h-4 animate-spin text-[#FFB6E1]" />
+            </div>
+          ) : (
+            <span className="text-xl font-bold">
+              {balance !== null ? `${balance} créditos` : "--"}
+            </span>
+          )}
         </div>
 
         <div className="grid sm:grid-cols-3 gap-6 items-stretch">
