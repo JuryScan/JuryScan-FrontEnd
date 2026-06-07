@@ -17,9 +17,10 @@ const DEFAULT_HEADERS: Record<string, string> = {
   "Content-Type": "application/json",
 }
 
-// Timeout padrão aumentado para 120s para suportar análise de documentos (~60s)
+// Timeout padrão aumentado para 180s para suportar análise de documentos CNIS
+// Análises de CNIS podem demorar até 3 minutos dependendo do tamanho do documento
 // Operações mais rápidas geralmente completam em <5s
-const TIMEOUT_MS = 120000 // 120 segundos (2 minutos)
+const TIMEOUT_MS = 180000 // 180 segundos (3 minutos)
 
 export interface ApiRequestOptions extends RequestInit {
   timeout?: number

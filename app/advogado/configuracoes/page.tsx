@@ -251,7 +251,7 @@ export default function ConfiguracoesPage() {
                   <TextInput name="nomeCompleto" label="Nome Completo" icon={<User className="size-4" />} />
                   <TextInput name="email" label="E-mail" icon={<Mail className="size-4" />} disabled />
                   <TextInput name="telefone" label="Telefone" icon={<Phone className="size-4" />} mask="(99) 99999-9999" />
-                  <TextInput name="numeroOab" label="Número da OAB" icon={<Briefcase className="size-4" />} placeholder="000000/UF" />
+                  <TextInput name="numeroOab" label="Número da OAB" icon={<Briefcase className="size-4" />} placeholder="000000/PE" maxLength={8} />
                 </div>
                 
                 <TextInput name="experiencia" label="Experiência Profissional" placeholder="Ex: Especialista em Direito Previdenciário há 10 anos" />

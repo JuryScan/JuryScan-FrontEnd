@@ -107,19 +107,25 @@ export default function RelatorioPage(): JSX.Element {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-12 font-sans">
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <button
-            onClick={() => router.push("/cliente/dashboard")}
-            className="flex items-center text-gray-600 hover:text-[#633B48] transition-colors font-medium"
-          >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Voltar ao Início
-          </button>
+      <div className="bg-[#162D3F] text-white">
+        <div className="max-w-5xl mx-auto px-6 py-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Relatórios</h1>
+            <p className="text-gray-400">
+              Visualize a análise completa do seu CNIS com pendências e sugestões de correção.
+            </p>
+          </div>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-6 mt-8">
+        <button
+          onClick={() => router.push("/cliente/dashboard")}
+          className="flex items-center text-gray-600 hover:text-[#633B48] transition-colors font-medium mb-6"
+        >
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          Voltar ao Início
+        </button>
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-32 text-gray-400">
             <Loader2 className="w-10 h-10 animate-spin mb-4 text-[#633B48]" />

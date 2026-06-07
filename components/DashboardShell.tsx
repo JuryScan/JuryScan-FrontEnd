@@ -42,7 +42,7 @@ function ShellContent({ children }: { children: React.ReactNode }) {
         { href: '/advogado/configuracoes', label: 'Configurações', icon: Settings },
       ]
     : [
-        { href: '/cliente/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { href: '/cliente/dashboard', label: 'Análise CNIS', icon: LayoutDashboard },
         { href: '/cliente/relatorio', label: 'Relatórios', icon: FileText },
       ]
 

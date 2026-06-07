@@ -262,7 +262,7 @@ export default function ClienteDashboardPage(): JSX.Element {
                 disabled={!file || isAnalyzing}
                 className="w-full py-5 bg-[#633B48] hover:bg-[#300117] text-white font-bold text-lg rounded-xl shadow-md transition-all disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {isAnalyzing ? "Processando..." : "Traduzir meu CNIS"}
+                {isAnalyzing ? "Processando..." : "Analisar meu CNIS"}
               </button>
             </div>
           </div>
