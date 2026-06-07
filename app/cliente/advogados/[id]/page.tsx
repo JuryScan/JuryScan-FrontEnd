@@ -9,6 +9,7 @@ import {
 import { get } from "@/lib/api"
 import type { ApiResponse, Lawyer } from "@/lib/types"
 import { toast } from "@/hooks/use-toast"
+import AvatarWithInitial from "@/components/AvatarWithInitial"
 
 export default function PerfilAdvogadoPage() {
     const router = useRouter()
@@ -77,11 +78,14 @@ export default function PerfilAdvogadoPage() {
                             <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-[#FFECF1] to-white"></div>
                             
                             <div className="relative flex flex-col sm:flex-row gap-6 items-center sm:items-start text-center sm:text-left">
-                                <img 
-                                    src={lawyer.fotoUrl || "https://via.placeholder.com/150"} 
-                                    alt={lawyer.nomeCompleto} 
-                                    className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md z-10"
-                                />
+                                <div className="z-10">
+                                    <AvatarWithInitial
+                                        name={lawyer.nomeCompleto}
+                                        photoUrl={lawyer.fotoUrl}
+                                        size="lg"
+                                        borderColor="border-white shadow-md"
+                                    />
+                                </div>
                                 <div className="z-10 mt-2 sm:mt-4">
                                     <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
                                         <h1 className="text-2xl font-bold text-gray-900">{lawyer.nomeCompleto}</h1>

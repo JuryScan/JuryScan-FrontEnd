@@ -7,6 +7,7 @@ import { Search, Phone, Award, ShieldCheck, ArrowRight, Loader2, Mail } from "lu
 import { get } from "@/lib/api"
 import type { ApiResponse, PageResponse } from "@/lib/types"
 import { toast } from "@/hooks/use-toast"
+import AvatarWithInitial from "@/components/AvatarWithInitial"
 
 interface LawyerData {
   id: string
@@ -20,6 +21,8 @@ interface LawyerData {
   status: string
   emailVerificado: boolean
 }
+
+
 
 export default function MarketplaceAdvogados() {
     const searchParams = useSearchParams()
@@ -119,11 +122,14 @@ export default function MarketplaceAdvogados() {
                         {filteredLawyers.map((lawyer) => (
                             <div key={lawyer.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
                                 <div className="p-6 border-b border-gray-100 flex flex-col items-center text-center relative">
-                                    <img 
-                                        src={lawyer.fotoUrl || "https://via.placeholder.com/150?text=Advogado"} 
-                                        alt={lawyer.nomeCompleto} 
-                                        className="w-24 h-24 rounded-full object-cover border-4 border-[#FFECF1] mb-4"
-                                    />
+                                    <div className="mb-4">
+                                        <AvatarWithInitial
+                                            name={lawyer.nomeCompleto}
+                                            photoUrl={lawyer.fotoUrl}
+                                            size="md"
+                                            borderColor="border-[#FFECF1]"
+                                        />
+                                    </div>
                                     <h3 className="text-lg font-bold text-gray-900">{lawyer.nomeCompleto}</h3>
                                     <p className="text-sm text-gray-500 font-medium">{lawyer.numeroOab}</p>
                                     {lawyer.emailVerificado && (

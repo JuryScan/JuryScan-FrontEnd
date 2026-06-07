@@ -6,8 +6,10 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog"
-import { AlertTriangle, UserPlus, CheckCircle2, FileText, Loader2, Coins, Briefcase, User, RefreshCw } from "lucide-react"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { AlertTriangle, UserPlus, CheckCircle2, FileText, Loader2, Coins, Briefcase, User, RefreshCw, Mail, Phone, Calendar, BadgeCheck } from "lucide-react"
 import { get, post } from "@/lib/api"
+import { useAuth } from "@/contexts/AuthContext"
 import type { ApiResponse, PageResponse } from "@/lib/types"
 import { toast } from "@/hooks/use-toast"
 
@@ -27,7 +29,7 @@ function formatDate(value?: string): string {
   return isNaN(d.getTime()) ? "" : d.toLocaleDateString("pt-BR")
 }
 
-// Modal "Ver Histórico": busca os detalhes do lead (cliente + análise/CNIS analisado).
+// Modal "Ver Detalhes do Lead": busca os detalhes do lead (cliente + análise/CNIS analisado).
 function LeadHistoryDialog({ lead }: { lead: Lead }) {
   const [open, setOpen] = useState(false)
   const [details, setDetails] = useState<any>(null)
@@ -45,6 +47,31 @@ function LeadHistoryDialog({ lead }: { lead: Lead }) {
     }
   }, [lead.id])
 
+  const formatCPF = (cpf?: string) => {
+    if (!cpf) return ""
+    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")
+  }
+
+  const formatPhoneNumber = (phone?: string) => {
+    if (!phone) return ""
+    const cleaned = phone.replace(/\D/g, "")
+    if (cleaned.length === 11) {
+      return cleaned.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3")
+    } else if (cleaned.length === 10) {
+      return cleaned.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3")
+    }
+    return phone
+  }
+
+  const formatDate = (date?: string) => {
+    if (!date) return ""
+    try {
+      return new Date(date).toLocaleDateString("pt-BR", { year: "numeric", month: "long", day: "numeric" })
+    } catch {
+      return ""
+    }
+  }
+
   return (
     <Dialog
       open={open}
@@ -55,13 +82,16 @@ function LeadHistoryDialog({ lead }: { lead: Lead }) {
     >
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" className="gap-1.5 font-medium">
-          <Briefcase className="h-4 w-4" /> Ver Histórico
+          <Briefcase className="h-4 w-4" /> Ver Detalhes
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Histórico de Análises — {details?.nomeCompleto || lead.nomeCliente || "Cliente"}</DialogTitle>
-          <DialogDescription>CNIS analisado automaticamente pela IA do JuryScan.</DialogDescription>
+          <DialogTitle className="flex items-center gap-2">
+            <User className="h-5 w-5 text-[#A50064]" />
+            Perfil do Cliente — {details?.nomeCompleto || lead.nomeCliente || "Cliente"}
+          </DialogTitle>
+          <DialogDescription>Informações de contato e análise do lead adquirido</DialogDescription>
         </DialogHeader>
 
         {loading ? (
@@ -70,26 +100,109 @@ function LeadHistoryDialog({ lead }: { lead: Lead }) {
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="flex items-center justify-between rounded-lg border p-3">
-              <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FFECF1] text-[#A50064]">
-                  <FileText className="h-4 w-4" />
+            {/* Card de Contato Principal */}
+            <div className="rounded-xl bg-gradient-to-br from-[#FFECF1] to-[#FFE4ED] border border-[#FFD6E6] p-4 space-y-3">
+              <div className="flex items-start justify-between gap-4">
+                {/* Avatar */}
+                <div className="flex flex-col items-center gap-2">
+                  {details?.fotoUrl ? (
+                    <img 
+                      src={details.fotoUrl} 
+                      alt={details?.nomeCompleto} 
+                      className="h-16 w-16 rounded-full object-cover border-2 border-white shadow-md"
+                    />
+                  ) : (
+                    <div className="h-16 w-16 rounded-full bg-[#A50064] flex items-center justify-center text-white font-bold text-2xl border-2 border-white shadow-md">
+                      {details?.nomeCompleto?.charAt(0)?.toUpperCase() || "?"}
+                    </div>
+                  )}
+                  <Badge variant="secondary" className="text-xs">Perfil</Badge>
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
-                    {details?.analise?.titulo || lead.tituloAnalise || "Análise de CNIS"}
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    {details?.email || ""}
-                    {details?.telefone ? ` · ${details.telefone}` : ""}
-                  </p>
+
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-[#0A1F30]">{details?.nomeCompleto || "Cliente"}</h3>
+                  <p className="text-sm text-gray-600">Dados de contato do cliente</p>
                 </div>
+
+                <Badge variant="default" className="gap-1 bg-[#A50064]">
+                  <BadgeCheck className="h-3 w-3" /> Verificado
+                </Badge>
               </div>
-              <Badge variant="secondary" className="gap-1">
-                <CheckCircle2 className="h-3 w-3" /> Concluída
-              </Badge>
+
+              <div className="grid grid-cols-1 gap-3">
+                {/* Email */}
+                {details?.email && (
+                  <div className="flex items-center gap-3 bg-white rounded-lg p-2.5">
+                    <Mail className="h-4 w-4 text-[#A50064] flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-xs text-gray-500">Email</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">{details.email}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Telefone */}
+                {details?.telefone && (
+                  <div className="flex items-center gap-3 bg-white rounded-lg p-2.5">
+                    <Phone className="h-4 w-4 text-[#A50064] flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-xs text-gray-500">Telefone</p>
+                      <p className="text-sm font-medium text-gray-900">{formatPhoneNumber(details.telefone)}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* CPF */}
+                {details?.cpf && (
+                  <div className="flex items-center gap-3 bg-white rounded-lg p-2.5">
+                    <BadgeCheck className="h-4 w-4 text-[#A50064] flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-xs text-gray-500">CPF</p>
+                      <p className="text-sm font-medium text-gray-900">{formatCPF(details.cpf)}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Data de Nascimento */}
+                {details?.dataNascimento && (
+                  <div className="flex items-center gap-3 bg-white rounded-lg p-2.5">
+                    <Calendar className="h-4 w-4 text-[#A50064] flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-xs text-gray-500">Data de Nascimento</p>
+                      <p className="text-sm font-medium text-gray-900">{formatDate(details.dataNascimento)}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
+            {/* Informações da Análise */}
+            <div className="rounded-lg border p-3">
+              <h4 className="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2">
+                <FileText className="h-4 w-4 text-gray-500" />
+                Análise de CNIS
+              </h4>
+              <div className="flex items-center justify-between rounded-lg border bg-gray-50 p-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FFECF1] text-[#A50064]">
+                    <FileText className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                      {details?.analise?.titulo || lead.tituloAnalise || "Análise de CNIS"}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {details?.analise?.descricao ? details.analise.descricao.substring(0, 60) : "Análise realizada"}
+                    </p>
+                  </div>
+                </div>
+                <Badge variant="secondary" className="gap-1">
+                  <CheckCircle2 className="h-3 w-3" /> Concluída
+                </Badge>
+              </div>
+            </div>
+
+            {/* Inconsistências Encontradas */}
             {Array.isArray(details?.analise?.falhas) && details.analise.falhas.length > 0 ? (
               <div className="rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 p-3.5">
                 <h4 className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1.5 mb-2.5">
@@ -103,8 +216,22 @@ function LeadHistoryDialog({ lead }: { lead: Lead }) {
                 </ul>
               </div>
             ) : (
-              <p className="text-sm text-slate-500">Sem detalhes de análise disponíveis para este lead.</p>
+              <p className="text-sm text-slate-500">Sem inconsistências encontradas nesta análise.</p>
             )}
+
+            {/* Informações Adicionais */}
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t text-xs">
+              <div>
+                <p className="text-gray-500 mb-1">Data de Criação do Lead</p>
+                <p className="font-medium text-gray-900">{formatDate(lead.dataCriacao)}</p>
+              </div>
+              <div>
+                <p className="text-gray-500 mb-1">Custo do Lead</p>
+                <p className="font-medium text-gray-900 flex items-center gap-1">
+                  <Coins className="h-3 w-3" /> {lead.custoCreditos || 1} crédito(s)
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </DialogContent>
@@ -113,20 +240,55 @@ function LeadHistoryDialog({ lead }: { lead: Lead }) {
 }
 
 export default function MarketplaceLeadsPage() {
+  const { user, isAuthenticated } = useAuth()
   const [available, setAvailable] = useState<Lead[]>([])
   const [acquired, setAcquired] = useState<Lead[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [acquiringId, setAcquiringId] = useState<string | null>(null)
+  const [confirmingLeadId, setConfirmingLeadId] = useState<string | null>(null)
+
+  useEffect(() => {
+    console.log(`[Marketplace] Página carregada. Usuário:`, { 
+      id: user?.id, 
+      email: user?.email, 
+      tipoUsuario: user?.tipoUsuario,
+      isAuthenticated 
+    })
+  }, [user, isAuthenticated])
 
   const fetchLeads = useCallback(async () => {
     setIsLoading(true)
     try {
+      console.log(`[Marketplace] Carregando leads...`)
+      
       const [av, acq] = await Promise.all([
-        get<ApiResponse<PageResponse<Lead>>>(`/leads/available?page=0&page_size=50`).catch(() => null),
-        get<ApiResponse<PageResponse<Lead>>>(`/leads/acquired?page=0&page_size=50`).catch(() => null),
+        get<ApiResponse<PageResponse<Lead>>>(`/leads/available?page=0&page_size=50`)
+          .catch((e) => {
+            console.error(`[Marketplace] Erro ao carregar leads disponíveis:`, e)
+            return null
+          }),
+        get<ApiResponse<PageResponse<Lead>>>(`/leads/acquired?page=0&page_size=50`)
+          .catch((e) => {
+            console.error(`[Marketplace] Erro ao carregar leads adquiridos:`, e)
+            return null
+          }),
       ])
+      
+      console.log(`[Marketplace] Leads disponíveis:`, av)
+      console.log(`[Marketplace] Leads adquiridos:`, acq)
+      
       setAvailable(av?.success && av.data?.items ? av.data.items : [])
       setAcquired(acq?.success && acq.data?.items ? acq.data.items : [])
+      
+      // Se ambas as requisições falharam, mostrar erro
+      if (!av && !acq) {
+        console.error(`[Marketplace] Não foi possível carregar os leads`)
+        toast({ 
+          title: "Erro ao carregar leads",
+          description: "Não foi possível conectar ao servidor.",
+          variant: "destructive"
+        })
+      }
     } finally {
       setIsLoading(false)
     }
@@ -139,13 +301,72 @@ export default function MarketplaceLeadsPage() {
   const handleAcquire = async (id: string) => {
     setAcquiringId(id)
     try {
+      console.log(`[Marketplace] Iniciando captura de lead: ${id}`)
+      
       const res = await post<ApiResponse<any>>(`/leads/${id}/acquire`)
-      if (res?.success) {
-        toast({ title: "Lead adquirido!", description: "O lead foi movido para 'Meus Leads'." })
+      
+      console.log(`[Marketplace] Resposta da API:`, res)
+      
+      // Verificar se a resposta foi bem-sucedida
+      if (res?.success === true) {
+        console.log(`[Marketplace] Lead adquirido com sucesso`)
+        toast({ 
+          title: "Lead adquirido com sucesso!", 
+          description: "O lead foi movido para 'Meus Leads'. Você pode visualizar os dados do cliente em 'Ver Histórico'.",
+          variant: "default"
+        })
+        // Aguardar um pouco antes de recarregar para garantir que o backend processou
+        await new Promise(resolve => setTimeout(resolve, 500))
         await fetchLeads()
+      } else if (res?.success === false) {
+        console.warn(`[Marketplace] API retornou sucesso=false:`, res.message)
+        toast({ 
+          title: "Não foi possível adquirir o lead",
+          description: res.message || "O servidor retornou um erro desconhecido.",
+          variant: "destructive"
+        })
+      } else {
+        console.warn(`[Marketplace] Resposta inesperada:`, res)
+        toast({ 
+          title: "Resposta inesperada do servidor",
+          description: "Não foi possível confirmar a aquisição do lead.",
+          variant: "destructive"
+        })
       }
     } catch (e: any) {
-      toast({ title: "Erro", description: e?.message || "Não foi possível adquirir o lead.", variant: "destructive" })
+      console.error(`[Marketplace] Erro ao adquirir lead:`, e)
+      
+      // Mapear erros comuns para mensagens amigáveis
+      let title = "Erro ao capturar lead"
+      let description = "Não foi possível adquirir o lead."
+      
+      if (e?.status === 401) {
+        title = "Autenticação expirada"
+        description = "Sua sessão expirou. Faça login novamente."
+      } else if (e?.status === 403) {
+        title = "Permissão negada"
+        description = "Você não tem permissão para adquirir leads."
+      } else if (e?.status === 402) {
+        title = "Créditos insuficientes"
+        description = "Você não possui créditos suficientes para adquirir este lead. Recarregue sua carteira e tente novamente."
+      } else if (e?.status === 404) {
+        title = "Lead não encontrado"
+        description = "Este lead não existe mais ou já foi adquirido por outro advogado."
+      } else if (e?.status === 409) {
+        title = "Conflito"
+        description = "Este lead já foi adquirido. Atualize a página para ver a lista atualizada."
+      } else if (e?.status === 500) {
+        title = "Erro no servidor"
+        description = "Ocorreu um erro ao processar sua solicitação. Tente novamente."
+      } else if (e?.message) {
+        description = e.message
+      }
+      
+      toast({ 
+        title,
+        description,
+        variant: "destructive"
+      })
     } finally {
       setAcquiringId(null)
     }
@@ -228,7 +449,7 @@ export default function MarketplaceLeadsPage() {
                         </span>
                       <Button
                         size="sm"
-                        onClick={() => handleAcquire(lead.id)}
+                        onClick={() => setConfirmingLeadId(lead.id)}
                         disabled={acquiringId === lead.id}
                         className="gap-1.5 font-medium"
                       >
@@ -237,7 +458,7 @@ export default function MarketplaceLeadsPage() {
                         ) : (
                           <UserPlus className="h-4 w-4" />
                         )}
-                        Capturar Lead
+                        Adquirir Lead
                       </Button>
                     </CardFooter>
                   </Card>
@@ -285,6 +506,35 @@ export default function MarketplaceLeadsPage() {
           </>
         )}
         </Tabs>
+
+        {/* Modal de Confirmação de Aquisição de Lead */}
+        <AlertDialog open={confirmingLeadId !== null} onOpenChange={(open) => !open && setConfirmingLeadId(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Deseja adquirir este lead?</AlertDialogTitle>
+              <AlertDialogDescription>
+                {confirmingLeadId && available.find(l => l.id === confirmingLeadId) && (
+                  <>
+                    Você está prestes a adquirir o lead de <strong>{available.find(l => l.id === confirmingLeadId)?.nomeCliente}</strong>, que custará <strong>{available.find(l => l.id === confirmingLeadId)?.custoCreditos ?? 1} crédito(s)</strong>.
+                  </>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="flex justify-end gap-3">
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={async () => {
+                  if (confirmingLeadId) {
+                    await handleAcquire(confirmingLeadId)
+                    setConfirmingLeadId(null)
+                  }
+                }}
+              >
+                Confirmar
+              </AlertDialogAction>
+            </div>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   )

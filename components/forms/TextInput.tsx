@@ -12,10 +12,11 @@ type TextInputProps = {
   type?: "text" | "password" | "email" | "tel" | "number";
   icon?: React.ReactNode;
   disabled?: boolean;
+  maxLength?: number;
 };
 
 export const TextInput: React.FC<TextInputProps> = ({
-  name, label, mask, placeholder, rules, type = "text", icon, disabled,
+  name, label, mask, placeholder, rules, type = "text", icon, disabled, maxLength,
 }) => {
   const { control, formState: { errors } } = useFormContext();
   const error = errors[name]?.message as string | undefined;
@@ -44,6 +45,7 @@ export const TextInput: React.FC<TextInputProps> = ({
                 id={name}
                 placeholder={placeholder}
                 disabled={disabled}
+                maxLength={maxLength}
                 className={inputClassName}
                 onBlur={() => {
                   field.onBlur()
@@ -58,6 +60,7 @@ export const TextInput: React.FC<TextInputProps> = ({
                 id={name}
                 placeholder={placeholder}
                 disabled={disabled}
+                maxLength={maxLength}
                 className={inputClassName}
                 type={type}
                 onBlur={() => {

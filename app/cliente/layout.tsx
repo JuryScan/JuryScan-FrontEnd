@@ -19,7 +19,7 @@ interface ClienteLayoutProps {
 }
 
 const navItems = [
-  { href: "/cliente/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/cliente/dashboard", label: "Análise CNIS", icon: LayoutDashboard },
   { href: "/cliente/relatorio", label: "Relatórios", icon: FileText },
   { href: "/cliente/advogados", label: "Advogados", icon: Users },
   { href: "/cliente/meus-pedidos", label: "Meus Pedidos", icon: Inbox },
